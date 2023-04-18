@@ -107,6 +107,19 @@ namespace Jace.Tests
         }
 
         [TestMethod]
+        public void TestCalculateFormulaWithCaseSensitiveThrows()
+        {
+            Dictionary<string, double> variables = new Dictionary<string, double>();
+            variables.Add("var1", 1);
+            variables.Add("var2", 1);
+
+            CalculationEngine engine = new CalculationEngine(new JaceOptions { CaseSensitive = true });
+                //CultureInfo.InvariantCulture, ExecutionMode.Compiled, false, false, false);
+            var ex = AssertExtensions.ThrowsException<VariableNotDefinedException>( () => engine.Calculate("VaR1*vAr2", variables));
+            Assert.AreEqual("The variable \"VaR1\" used is not defined.", ex.Message);
+        }
+
+        [TestMethod]
         public void TestCalculateFormulaWithCaseSensitiveVariables1Interpreted()
         {
             Dictionary<string, double> variables = new Dictionary<string, double>();
@@ -554,6 +567,32 @@ namespace Jace.Tests
             variables.Add("otherVariable", 4.2);
 
             double result = formula(variables);
+        }
+
+        [TestMethod]
+        public void TestConstantBuildCompiled()
+        {
+            CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+            Func<Dictionary<string, double>, double> formula = engine.Build("pi");
+
+            Dictionary<string, double> variables = new Dictionary<string, double>();
+
+            double result = formula(variables);
+
+            Assert.AreEqual(Math.PI, result);
+        }
+
+        [TestMethod]
+        public void TestConstantBuildInterpreted()
+        {
+            CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+            Func<Dictionary<string, double>, double> formula = engine.Build("pi");
+
+            Dictionary<string, double> variables = new Dictionary<string, double>();
+
+            double result = formula(variables);
+
+            Assert.AreEqual(Math.PI, result);
         }
 
         [TestMethod]
