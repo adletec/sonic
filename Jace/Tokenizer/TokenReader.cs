@@ -47,7 +47,7 @@ namespace Jace.Tokenizer
 
             for(int i = 0; i < characters.Length; i++)
             {
-                if (IsPartOfNumeric(characters[i], true, isFormulaSubPart))
+                if (IsPartOfNumeric(characters[i], true, false, isFormulaSubPart))
                 {
                     StringBuilder buffer = new StringBuilder();
                     buffer.Append(characters[i]);
@@ -55,7 +55,7 @@ namespace Jace.Tokenizer
                     int startPosition = i;
                                        
 
-                    while (++i < characters.Length && IsPartOfNumeric(characters[i], false, isFormulaSubPart))
+                    while (++i < characters.Length && IsPartOfNumeric(characters[i], false, characters[i-1] == '-', isFormulaSubPart))
                     {
                         if (isScientific && IsScientificNotation(characters[i]))
                             throw new ParseException(string.Format("Invalid token \"{0}\" detected at position {1}.", characters[i], i));
@@ -225,9 +225,9 @@ namespace Jace.Tokenizer
             return tokens;
         }
 
-        private bool IsPartOfNumeric(char character, bool isFirstCharacter, bool isFormulaSubPart)
+        private bool IsPartOfNumeric(char character, bool isFirstCharacter, bool afterMinus, bool isFormulaSubPart)
         {
-            return character == decimalSeparator || (character >= '0' && character <= '9') || (isFormulaSubPart && isFirstCharacter && character == '-') || (!isFirstCharacter && character == 'e') || (!isFirstCharacter && character == 'E');
+            return character == decimalSeparator || (character >= '0' && character <= '9') || (isFormulaSubPart && isFirstCharacter && character == '-') || (!isFirstCharacter && !afterMinus && character == 'e') || (!isFirstCharacter && character == 'E');
         }
 
         private bool IsPartOfVariable(char character, bool isFirstCharacter)
