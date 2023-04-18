@@ -14,7 +14,7 @@ namespace Jace.Benchmark
         private readonly Random random;
 
         public FunctionGenerator()
-            : this(CultureInfo.CurrentCulture)
+            : this(CultureInfo.InvariantCulture)
         {
         }
 
