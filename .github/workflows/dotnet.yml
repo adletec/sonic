@@ -5,9 +5,18 @@ name: .NET
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - 'master'
+      - 'maintenance/**'
+      - 'feature/**'
+      - 'bugfix/**'
+
   pull_request:
-    branches: [ "master" ]
+    branches:
+      - 'master'
+      - 'maintenance/**'
+      - 'feature/**'
+      - 'bugfix/**'
 
 jobs:
   build:
