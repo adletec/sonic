@@ -10,3 +10,6 @@ packages/*
 *.userprefs
 .vs/
 project.lock.json
+.vscode/
+.idea/
+*.DotSettings.user
