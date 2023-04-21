@@ -32,11 +32,45 @@ namespace Jace.Benchmark
         { 
             TimeSpan duration;
 
-            CalculationEngine interpretedEngine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted, true, true, true);
-            CalculationEngine interpretedEngineCaseSensitive = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted, true, true, false);
-            CalculationEngine compiledEngine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled, true, true, true);
-            CalculationEngine compiledEngineCaseSensitive = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled, true, true, false);
+            // setup benchmark scenarios
+            var baseOptions = new JaceOptions()
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                CacheEnabled = true,
+                OptimizerEnabled = true
+            };
+            
+            var interpretedEngineOptions = new JaceOptions(baseOptions)
+            {
+                ExecutionMode = ExecutionMode.Interpreted,
+                CaseSensitive = false
+            };
 
+            var interpretedEngineCaseSensitiveOptions = new JaceOptions(baseOptions)
+            {
+                ExecutionMode = ExecutionMode.Interpreted,
+                CaseSensitive = true
+            };
+
+            var compiledEngineOptions = new JaceOptions(baseOptions)
+            {
+                ExecutionMode = ExecutionMode.Compiled,
+                CaseSensitive = false
+            };
+            
+            var compiledEngineCaseSensitiveOptions = new JaceOptions(baseOptions)
+            {
+                ExecutionMode = ExecutionMode.Compiled,
+                CaseSensitive = true
+            };
+            
+            // initialize engines with benchmark scenarios
+            var interpretedEngine = new CalculationEngine(interpretedEngineOptions);
+            var interpretedEngineCaseSensitive = new CalculationEngine(interpretedEngineCaseSensitiveOptions);
+            var compiledEngine = new CalculationEngine(compiledEngineOptions);
+            var compiledEngineCaseSensitive = new CalculationEngine(compiledEngineCaseSensitiveOptions);
+
+            // define benchmark operations
             BenchMarkOperation[] benchmarks = {
                 new BenchMarkOperation() { Formula = "2+3*7", Mode = BenchmarkMode.Static, BenchMarkDelegate = BenchMarkCalculationEngine },
                 new BenchMarkOperation() { Formula = "something2 - (var1 + var2 * 3)/(2+3)", Mode = BenchmarkMode.Simple, BenchMarkDelegate = BenchMarkCalculationEngine, 
@@ -45,6 +79,7 @@ namespace Jace.Benchmark
                 new BenchMarkOperation() { Formula = "(var1 + var2 * 3)/(2+3) - something", Mode = BenchmarkMode.Simple , BenchMarkDelegate = BenchMarkCalculationEngineFunctionBuild },
             };
 
+            // define result layout
             DataTable table = new DataTable();
             table.Columns.Add("Engine");
             table.Columns.Add("Case Sensitive");
@@ -53,6 +88,7 @@ namespace Jace.Benchmark
             table.Columns.Add("Total Iteration", typeof(int));
             table.Columns.Add("Total Duration");
 
+            // run benchmark scenarios
             foreach (BenchMarkOperation benchmark in benchmarks)
             {
                 if (mode == BenchmarkMode.All || mode == benchmark.Mode)
