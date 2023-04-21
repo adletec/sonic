@@ -25,6 +25,22 @@ namespace Jace
         }
 
         /// <summary>
+        /// Copy constructor.
+        /// </summary>
+        /// <param name="options">The options to copy from.</param>
+        public JaceOptions(JaceOptions options)
+        {
+            CultureInfo = options.CultureInfo;
+            ExecutionMode = options.ExecutionMode;
+            CacheEnabled = options.CacheEnabled;
+            OptimizerEnabled = options.OptimizerEnabled;
+            CaseSensitive = options.CaseSensitive;
+            DefaultConstants = options.DefaultConstants;
+            CacheMaximumSize = DefaultCacheMaximumSize;
+            CacheReductionSize = DefaultCacheReductionSize;
+        }
+
+        /// <summary>
         /// The <see cref="CultureInfo"/> required for correctly reading floating poin numbers.
         /// </summary>
         public CultureInfo CultureInfo { get; set; }
