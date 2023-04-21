@@ -1,7 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
+    <Title>adletec jace</Title>
+    <PackageId>Adletec.Jace</PackageId>
+    <PackageVersion>1.1.0-beta1</PackageVersion>
+    <Authors>Florian Engel, Pieter de Rycke</Authors>
+    <Company>adletec Software Engineering</Company>
+    <Product>jace</Product>
+    <PackageTags>math parse mathematical symbolic formula calculation expression parse evaluate interpret</PackageTags>
+    <Description>
+      jace is a high performance calculation engine for the .NET platform that can dynamically parse, 
+      interpret and execute strings containing mathematical functions. This version is a custom fork with 
+      additional bugfixes and optimizations compared to the no longer actively maintained upstream.
+    </Description>
+    <RepositoryUrl>https://github.com/adletec/jace</RepositoryUrl>
   </PropertyGroup>
-
 </Project>
