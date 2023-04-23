@@ -36,8 +36,9 @@ namespace Jace
             OptimizerEnabled = options.OptimizerEnabled;
             CaseSensitive = options.CaseSensitive;
             DefaultConstants = options.DefaultConstants;
-            CacheMaximumSize = DefaultCacheMaximumSize;
-            CacheReductionSize = DefaultCacheReductionSize;
+            DefaultFunctions = options.DefaultFunctions;
+            CacheMaximumSize = options.CacheMaximumSize;
+            CacheReductionSize = options.CacheReductionSize;
         }
 
         /// <summary>
@@ -99,5 +100,36 @@ namespace Jace
         /// Enable or disable the default constants.
         /// </summary>
         public bool DefaultConstants { get; set; }
+        
+        protected bool Equals(JaceOptions other)
+        {
+            return Equals(CultureInfo, other.CultureInfo) && ExecutionMode == other.ExecutionMode && CacheEnabled == other.CacheEnabled && CacheMaximumSize == other.CacheMaximumSize && CacheReductionSize == other.CacheReductionSize && OptimizerEnabled == other.OptimizerEnabled && CaseSensitive == other.CaseSensitive && DefaultFunctions == other.DefaultFunctions && DefaultConstants == other.DefaultConstants;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((JaceOptions)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (CultureInfo != null ? CultureInfo.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (int)ExecutionMode;
+                hashCode = (hashCode * 397) ^ CacheEnabled.GetHashCode();
+                hashCode = (hashCode * 397) ^ CacheMaximumSize;
+                hashCode = (hashCode * 397) ^ CacheReductionSize;
+                hashCode = (hashCode * 397) ^ OptimizerEnabled.GetHashCode();
+                hashCode = (hashCode * 397) ^ CaseSensitive.GetHashCode();
+                hashCode = (hashCode * 397) ^ DefaultFunctions.GetHashCode();
+                hashCode = (hashCode * 397) ^ DefaultConstants.GetHashCode();
+                return hashCode;
+            }
+        }
+
     }
 }
