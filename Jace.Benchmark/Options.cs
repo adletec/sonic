@@ -1,9 +1,4 @@
 ﻿using CommandLine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Jace.Benchmark
 {
@@ -15,8 +10,8 @@ namespace Jace.Benchmark
         [Option('m', "mode", HelpText = "Specify the benchmark to execute.")]
         public BenchmarkMode Mode { get; set; }
 
-
-        [Option('f', "file", HelpText = "The file to store the output results in.", Required = true)]
+        [Option('f', "file", HelpText = "If set, the result will be written to the specified path as CSV.")]
         public string FileName { get; set; }
+        
     }
 }
