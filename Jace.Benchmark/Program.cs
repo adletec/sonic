@@ -102,7 +102,7 @@ namespace Jace.Benchmark
             table.Columns.Add("Case Sensitive");
             table.Columns.Add("Formula");
             table.Columns.Add("Iterations per Random Formula", typeof(int));
-            table.Columns.Add("Total Iteration", typeof(int));
+            table.Columns.Add("Total Iterations", typeof(int));
             table.Columns.Add("Total Duration");
 
             // run benchmark scenarios
