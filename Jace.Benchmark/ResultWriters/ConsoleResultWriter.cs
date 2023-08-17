@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 
 namespace Jace.Benchmark.Properties.ResultWriters;
@@ -47,8 +48,16 @@ private static string GetFormattedRow(IEnumerable<object> values, int[] maxLengt
     {
         var formattedValue = values.ElementAt(i).ToString();
 
-        // If the value is numeric, pad left; otherwise, pad right
-        formattedValue = IsNumeric(formattedValue) ? formattedValue.PadLeft(maxLengths[i]) : formattedValue.PadRight(maxLengths[i]);
+        // If the value is numeric, format with decimal separator and pad left; otherwise, pad right
+        if (IsNumeric(formattedValue))
+        {
+            var numericValue = double.Parse(formattedValue, CultureInfo.InvariantCulture);
+            formattedValue = numericValue.ToString("N0", CultureInfo.CurrentCulture).PadLeft(maxLengths[i]);
+        }
+        else
+        {
+            formattedValue = formattedValue.PadRight(maxLengths[i]);
+        }
 
         formattedValues.Add(formattedValue);
     }
