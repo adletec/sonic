@@ -1,0 +1,16 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Jace.DemoApp.MainWindow"
+        Title="Jace Calculator Demo App" Width="500" Height="409" MinWidth="500" MinHeight="409">
+    <DockPanel Margin="5">
+        <TextBlock Text="Formula" DockPanel.Dock="Top" Margin="5"/>
+        <TextBox Name="formulaTextBox" TextWrapping="Wrap" DockPanel.Dock="Top" Margin="5"/>
+        <Button Name="calculateButton" Content="Calculate" DockPanel.Dock="Top" HorizontalAlignment="Right" Click="calculateButton_Click" Margin="5 5 5 10"/>
+        <TextBlock Text="Tokens" HorizontalAlignment="Left"  DockPanel.Dock="Top" Margin="5"/>
+        <TextBox Name="tokensTextBox" TextWrapping="Wrap" DockPanel.Dock="Top" IsReadOnly="True" Margin="5 5 5 10"/>
+        <TextBox Name="resultTextBox"  TextWrapping="Wrap" DockPanel.Dock="Bottom" IsReadOnly="True" Margin="5"/>
+        <TextBlock Text="Result" HorizontalAlignment="Left"  DockPanel.Dock="Bottom" Margin="5"/>
+        <TextBlock Text="Abstract Syntax Tree" HorizontalAlignment="Left"  DockPanel.Dock="Top" Margin="5"/>
+        <TreeView Name="astTreeView" VerticalAlignment="Stretch" DockPanel.Dock="Top" Margin="5 5 5 10"/>
+    </DockPanel>
+</Window>
