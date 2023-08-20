@@ -1,32 +1,35 @@
-# Jace.NET
-Jace.NET is a high performance calculation engine for the .NET platform. It stands for "Just Another Calculation Engine".
+# jace
+_jace_ is a high performance calculation engine for the .NET platform. It can interpret and execute strings containing mathematical formulas. _jace_ is a fork of _Jace.NET_ by Pieter De Rycke, which is no longer actively maintained. It contains bugfixes, performance improvements and a lot of maintenance work when compared to the upstream. See the changelog for a full list.
 
 ## Build Status
-* [![Build status](https://ci.appveyor.com/api/projects/status/0qas60k4tlhi2b1d/branch/master?svg=true)](https://ci.appveyor.com/project/pieterderycke/jace/branch/master) (master)
-* [![Build status](https://ci.appveyor.com/api/projects/status/0qas60k4tlhi2b1d/branch/dev?svg=true)](https://ci.appveyor.com/project/pieterderycke/jace/branch/dev) (dev)
+* [![Build status](https://github.com/adletec/jace/actions/workflows/dotnet/badge.svg?branch=master)](https://github.com/adletec/jace/actions/workflows/dotnet.yml?query=branch%3Amaster) (master)
+* [![Build status](https://github.com/adletec/jace/actions/workflows/release/badge.svg)](https://github.com/adletec/jace/actions/workflows/release.yml?query=) (release)
 
 ## What does it do?
-Jace.NET can interprete and execute strings containing mathematical formulas. These formulas can rely on variables. If variables are used, values can be provided for these variables at execution time of the mathematical formula.
+_jace_ can interpret and execute strings containing mathematical formulas. These formulas can rely on variables. If variables are used, values can be provided for these variables at execution time of the mathematical formula.
 
-Jace can execute formulas in two modes: in interpreted mode and in a dynamic compilation mode. If dynamic compilation mode is used, Jace will create a dynamic method at runtime and will generate the necessary MSIL opcodes for native execution of the formula. If a formula is re-executed with other variables, Jace will take the dynamically generated method from its cache. It is recommended to use Jace in dynamic compilation mode.
+_jace_ can execute formulas in two modes: in interpreted mode and in a dynamic compilation mode. If dynamic compilation mode is used, Jace will create a dynamic method at runtime and will generate the necessary MSIL opcodes for native execution of the formula. If a formula is re-executed with other variables, Jace will take the dynamically generated method from its cache. It is recommended to use Jace in dynamic compilation mode. For specific use-cases (e.g. Unity with IL2CPP) dynamic code generation can be limited. In those cases, you can use the interpreted mode as a fallback.
 
 ## Wiki
 For detailed information how to use Jace.NET, please consult the [wiki](https://github.com/pieterderycke/Jace/wiki)
 
 ## Architecture
-Jace.NET follows a design similar to most of the modern compilers. Interpretation and execution is done in a number of phases:
+_jace_ follows a design similar to most of the modern compilers. Interpretation and execution is done in a number of phases:
 
 ### Tokenizing
 During the tokenizing phase, the string is converted into the different kind of tokens: variables, operators and constants.
+
 ### Abstract Syntax Tree Creation
 During the abstract syntax tree creation phase, the tokenized input is converted into a hierarchical tree representing the mathematically formula. This tree unambiguously stores the mathematical calculations that must be executed.
+
 ### Optimization
 During the optimization phase, the abstract syntax tree is optimized for executing.
+
 ### Interpreted Execution/Dynamic Compilation
 In this phase the abstract syntax tree is executed in either interpreted mode or in dynamic compilation mode.
 
 ## Examples
-Jace.NET can be used in a couple of ways:
+_jace_ can be used in a couple of ways:
 
 To directly execute a given mathematical formula using the provided variables:
 ```csharp
@@ -81,7 +84,7 @@ Below you can find the results of Jace.NET benchmark that show its high performa
 * Dynamic Compilation Mode: 00:00:02.5584045
 
 ## Compatibility
-If you are using Jace.NET inside a Unity project using IL2CPP you must use Jace.NET in interpreted mode due to limitations of IL2CPP with dynamic code generation.
+If you are using _jace_ inside a Unity project using IL2CPP you must use _jace_ in interpreted mode due to limitations of IL2CPP with dynamic code generation.
 
 ## More Information
 For more information, you can read the following articles:
