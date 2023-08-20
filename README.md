@@ -2,8 +2,8 @@
 _jace_ is a high performance calculation engine for the .NET platform. It can interpret and execute strings containing mathematical formulas. _jace_ is a fork of _Jace.NET_ by Pieter De Rycke, which is no longer actively maintained. It contains bugfixes, performance improvements and a lot of maintenance work when compared to the upstream. See the changelog for a full list.
 
 ## Build Status
-* [![Build status](https://github.com/adletec/jace/actions/workflows/dotnet/badge.svg?branch=master)](https://github.com/adletec/jace/actions/workflows/dotnet.yml?query=branch%3Amaster) (master)
-* [![Build status](https://github.com/adletec/jace/actions/workflows/release/badge.svg)](https://github.com/adletec/jace/actions/workflows/release.yml?query=) (release)
+* [![Build status](https://github.com/adletec/jace/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/adletec/jace/actions/workflows/dotnet.yml?query=branch%3Amaster) (master)
+* [![Build status](https://github.com/adletec/jace/actions/workflows/release.yml/badge.svg)](https://github.com/adletec/jace/actions/workflows/release.yml?query=) (release)
 
 ## What does it do?
 _jace_ can interpret and execute strings containing mathematical formulas. These formulas can rely on variables. If variables are used, values can be provided for these variables at execution time of the mathematical formula.
