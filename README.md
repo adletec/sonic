@@ -33,7 +33,7 @@ double result = engine.Calculate("ft2m(30)"); // 9.144
 
 You can find more examples below.
 
-_jace_ can execute formulas in two modes: **dynamic compilation mode** and **interpreted mode**. If **dynamic compilation mode **is used, _jace_ will create a dynamic method at runtime and will generate the necessary MSIL opcodes for native execution of the formula. If a formula is re-executed with other variables, _jace_ will take the dynamically generated method from its cache. Dynamic compilation mode is a lot faster and the sane default for most applications.
+_jace_ can execute formulas in two modes: **dynamic compilation mode** and **interpreted mode**. If **dynamic compilation mode** is used, _jace_ will create a dynamic method at runtime and will generate the necessary MSIL opcodes for native execution of the formula. If a formula is re-executed with other variables, _jace_ will take the dynamically generated method from its cache. Dynamic compilation mode is a lot faster and the sane default for most applications.
 
 For specific use-cases (e.g. Unity with IL2CPP) dynamic code generation can be limited. In those cases, you can use the **interpreted mode** as a fallback.
 
