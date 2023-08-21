@@ -131,8 +131,7 @@ namespace Jace.Util
 
                 foreach (TKey key in keysToDelete)
                 {
-                    CacheItem cacheItem;
-                    dictionary.TryRemove(key, out cacheItem);
+                    dictionary.TryRemove(key, out _);
                 }
             }
         }
