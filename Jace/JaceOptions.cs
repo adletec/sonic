@@ -6,8 +6,8 @@ namespace Jace
 {
     public class JaceOptions
     {
-        internal const int DefaultCacheMaximumSize = 500;
-        internal const int DefaultCacheReductionSize = 50;
+        private const int DefaultCacheMaximumSize = 500;
+        private const int DefaultCacheReductionSize = 50;
 
         public JaceOptions()
         {
@@ -40,7 +40,7 @@ namespace Jace
         }
 
         /// <summary>
-        /// The <see cref="CultureInfo"/> required for correctly reading floating poin numbers.
+        /// The <see cref="CultureInfo"/> required for correctly reading floating point numbers.
         /// </summary>
         public CultureInfo CultureInfo { get; set; }
 
@@ -74,14 +74,8 @@ namespace Jace
         /// </summary>
         [Obsolete]
         public bool AdjustVariableCase { 
-            get
-            {
-                return !CaseSensitive;
-            }
-            set
-            {
-                CaseSensitive = !value;
-            }
+            get => !CaseSensitive;
+            set => CaseSensitive = !value;
         }
 
         /// <summary>

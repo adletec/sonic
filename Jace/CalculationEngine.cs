@@ -14,7 +14,7 @@ namespace Jace
     /// <summary>
     /// The CalculationEngine class is the main class of Jace.NET to convert strings containing
     /// mathematical formulas into .NET Delegates and to calculate the result.
-    /// It can be configured to run in a number of modes based on the constructor parameters choosen.
+    /// It can be configured to run in a number of modes based on the constructor parameters chosen.
     /// </summary>
     public class CalculationEngine
     {
@@ -42,10 +42,10 @@ namespace Jace
         /// is used for formula execution and the optimizer and cache are enabled.
         /// </summary>
         /// <param name="cultureInfo">
-        /// The <see cref="CultureInfo"/> required for correctly reading floating poin numbers.
+        /// The <see cref="CultureInfo"/> required for correctly reading floating point numbers.
         /// </param>
         public CalculationEngine(CultureInfo cultureInfo)
-            : this(new JaceOptions() { CultureInfo = cultureInfo })
+            : this(new JaceOptions { CultureInfo = cultureInfo })
         {
         }
 
@@ -54,11 +54,11 @@ namespace Jace
         /// cache are enabled.
         /// </summary>
         /// <param name="cultureInfo">
-        /// The <see cref="CultureInfo"/> required for correctly reading floating poin numbers.
+        /// The <see cref="CultureInfo"/> required for correctly reading floating point numbers.
         /// </param>
         /// <param name="executionMode">The execution mode that must be used for formula execution.</param>
         public CalculationEngine(CultureInfo cultureInfo, ExecutionMode executionMode)
-            : this (new JaceOptions() { CultureInfo = cultureInfo, ExecutionMode = executionMode })
+            : this (new JaceOptions { CultureInfo = cultureInfo, ExecutionMode = executionMode })
         {
         }
 
@@ -66,15 +66,15 @@ namespace Jace
         /// Creates a new instance of the <see cref="CalculationEngine"/> class.
         /// </summary>
         /// <param name="cultureInfo">
-        /// The <see cref="CultureInfo"/> required for correctly reading floating poin numbers.
+        /// The <see cref="CultureInfo"/> required for correctly reading floating point numbers.
         /// </param>
         /// <param name="executionMode">The execution mode that must be used for formula execution.</param>
         /// <param name="cacheEnabled">Enable or disable caching of mathematical formulas.</param>
         /// <param name="optimizerEnabled">Enable or disable optimizing of formulas.</param>
-        /// <param name="adjustVariableCaseEnabled">Enable or disable auto lowercasing of variables.</param>
+        /// <param name="adjustVariableCaseEnabled">Enable or disable auto lower-casing of variables.</param>
         [Obsolete]
         public CalculationEngine(CultureInfo cultureInfo, ExecutionMode executionMode, bool cacheEnabled, bool optimizerEnabled, bool adjustVariableCaseEnabled)
-            : this(new JaceOptions() { CultureInfo = cultureInfo, ExecutionMode = executionMode, CacheEnabled = cacheEnabled, OptimizerEnabled = optimizerEnabled, CaseSensitive = !adjustVariableCaseEnabled })
+            : this(new JaceOptions { CultureInfo = cultureInfo, ExecutionMode = executionMode, CacheEnabled = cacheEnabled, OptimizerEnabled = optimizerEnabled, CaseSensitive = !adjustVariableCaseEnabled })
         {
         }
 
@@ -82,7 +82,7 @@ namespace Jace
         /// Creates a new instance of the <see cref="CalculationEngine"/> class.
         /// </summary>
         /// <param name="cultureInfo">
-        /// The <see cref="CultureInfo"/> required for correctly reading floating poin numbers.
+        /// The <see cref="CultureInfo"/> required for correctly reading floating point numbers.
         /// </param>
         /// <param name="executionMode">The execution mode that must be used for formula execution.</param>
         /// <param name="cacheEnabled">Enable or disable caching of mathematical formulas.</param>
@@ -95,7 +95,8 @@ namespace Jace
         [Obsolete]
         public CalculationEngine(CultureInfo cultureInfo, ExecutionMode executionMode, bool cacheEnabled,
             bool optimizerEnabled, bool adjustVariableCaseEnabled, bool defaultFunctions, bool defaultConstants, int cacheMaximumSize, int cacheReductionSize)
-            : this(new JaceOptions() { CultureInfo = cultureInfo, ExecutionMode = executionMode, CacheEnabled = cacheEnabled, OptimizerEnabled = optimizerEnabled,
+            : this(new JaceOptions
+            { CultureInfo = cultureInfo, ExecutionMode = executionMode, CacheEnabled = cacheEnabled, OptimizerEnabled = optimizerEnabled,
                 CaseSensitive = !adjustVariableCaseEnabled, DefaultFunctions = defaultFunctions, DefaultConstants = defaultConstants, 
                 CacheMaximumSize = cacheMaximumSize, CacheReductionSize = cacheReductionSize })
         {
@@ -117,13 +118,18 @@ namespace Jace
 
             this.random = new Random();
 
-            if (options.ExecutionMode == ExecutionMode.Interpreted)
-                executor = new Interpreter(caseSensitive);
-            else if (options.ExecutionMode == ExecutionMode.Compiled)
-                executor = new DynamicCompiler(caseSensitive);
-            else
-                throw new ArgumentException(string.Format("Unsupported execution mode \"{0}\".", options.ExecutionMode),
-                    nameof(options.ExecutionMode));
+            switch (options.ExecutionMode)
+            {
+                case ExecutionMode.Interpreted:
+                    executor = new Interpreter(caseSensitive);
+                    break;
+                case ExecutionMode.Compiled:
+                    executor = new DynamicCompiler(caseSensitive);
+                    break;
+                default:
+                    throw new ArgumentException($"Unsupported execution mode \"{options.ExecutionMode}\".",
+                        nameof(options.ExecutionMode));
+            }
 
             optimizer = new Optimizer(new Interpreter()); // We run the optimizer with the interpreter 
 
@@ -136,13 +142,13 @@ namespace Jace
                 RegisterDefaultFunctions();
         }
 
-        internal IFunctionRegistry FunctionRegistry { get; private set; }
+        internal IFunctionRegistry FunctionRegistry { get; }
 
-        internal IConstantRegistry ConstantRegistry { get; private set; }
+        internal IConstantRegistry ConstantRegistry { get; }
 
-        public IEnumerable<FunctionInfo> Functions { get { return FunctionRegistry; } }
+        public IEnumerable<FunctionInfo> Functions => FunctionRegistry;
 
-        public IEnumerable<ConstantInfo> Constants { get { return ConstantRegistry; } }
+        public IEnumerable<ConstantInfo> Constants => ConstantRegistry;
 
         public double Calculate(string formulaText)
         {
@@ -152,10 +158,10 @@ namespace Jace
         public double Calculate(string formulaText, IDictionary<string, double> variables)
         {
             if (string.IsNullOrEmpty(formulaText))
-                throw new ArgumentNullException("formulaText");
+                throw new ArgumentNullException(nameof(formulaText));
 
             if (variables == null)
-                throw new ArgumentNullException("variables");
+                throw new ArgumentNullException(nameof(variables));
 
             if (!caseSensitive)
             {
@@ -171,18 +177,16 @@ namespace Jace
             {
                 return function(variables);
             }
-            else
-            {
-                Operation operation = BuildAbstractSyntaxTree(formulaText, new ConstantRegistry(caseSensitive));
-                function = BuildFormula(formulaText, null, operation);
-                return function(variables);
-            }
+
+            Operation operation = BuildAbstractSyntaxTree(formulaText, new ConstantRegistry(caseSensitive));
+            function = BuildFormula(formulaText, null, operation);
+            return function(variables);
         }
 
         public FormulaBuilder Formula(string formulaText)
         {
             if (string.IsNullOrEmpty(formulaText))
-                throw new ArgumentNullException("formulaText");
+                throw new ArgumentNullException(nameof(formulaText));
 
             return new FormulaBuilder(formulaText, caseSensitive, this);
         }
@@ -195,17 +199,15 @@ namespace Jace
         public Func<IDictionary<string, double>, double> Build(string formulaText)
         {
             if (string.IsNullOrEmpty(formulaText))
-                throw new ArgumentNullException("formulaText");
+                throw new ArgumentNullException(nameof(formulaText));
 
             if (IsInFormulaCache(formulaText, null, out var result))
             {
                 return result;
             }
-            else
-            {
-                Operation operation = BuildAbstractSyntaxTree(formulaText, new ConstantRegistry(caseSensitive));
-                return BuildFormula(formulaText, null, operation);
-            }
+
+            Operation operation = BuildAbstractSyntaxTree(formulaText, new ConstantRegistry(caseSensitive));
+            return BuildFormula(formulaText, null, operation);
         }
 
         /// <summary>
@@ -217,7 +219,7 @@ namespace Jace
         public Func<IDictionary<string, double>, double> Build(string formulaText, IDictionary<string, double> constants)
         {
             if (string.IsNullOrEmpty(formulaText))
-                throw new ArgumentNullException("formulaText");
+                throw new ArgumentNullException(nameof(formulaText));
 
 
             ConstantRegistry compiledConstants = new ConstantRegistry(caseSensitive);
@@ -233,18 +235,16 @@ namespace Jace
             {
                 return result;
             }
-            else
-            {
-                Operation operation = BuildAbstractSyntaxTree(formulaText, compiledConstants);
-                return BuildFormula(formulaText, compiledConstants,  operation);
-            }
+
+            Operation operation = BuildAbstractSyntaxTree(formulaText, compiledConstants);
+            return BuildFormula(formulaText, compiledConstants,  operation);
         }
 
         /// <summary>
         /// Add a function to the calculation engine.
         /// </summary>
         /// <param name="functionName">The name of the function. This name can be used in mathematical formulas.</param>
-        /// <param name="function">The implemenation of the function.</param>
+        /// <param name="function">The implementation of the function.</param>
         /// <param name="isIdempotent">Does the function provide the same result when it is executed multiple times.</param>
         public void AddFunction(string functionName, Func<double> function, bool isIdempotent = true)
         {
@@ -255,7 +255,7 @@ namespace Jace
         /// Add a function to the calculation engine.
         /// </summary>
         /// <param name="functionName">The name of the function. This name can be used in mathematical formulas.</param>
-        /// <param name="function">The implemenation of the function.</param>
+        /// <param name="function">The implementation of the function.</param>
         /// <param name="isIdempotent">Does the function provide the same result when it is executed multiple times.</param>
         public void AddFunction(string functionName, Func<double, double> function, bool isIdempotent = true)
         {
@@ -266,7 +266,7 @@ namespace Jace
         /// Add a function to the calculation engine.
         /// </summary>
         /// <param name="functionName">The name of the function. This name can be used in mathematical formulas.</param>
-        /// <param name="function">The implemenation of the function.</param>
+        /// <param name="function">The implementation of the function.</param>
         /// <param name="isIdempotent">Does the function provide the same result when it is executed multiple times.</param>
         public void AddFunction(string functionName, Func<double, double, double> function, bool isIdempotent = true)
         {
@@ -277,7 +277,7 @@ namespace Jace
         /// Add a function to the calculation engine.
         /// </summary>
         /// <param name="functionName">The name of the function. This name can be used in mathematical formulas.</param>
-        /// <param name="function">The implemenation of the function.</param>
+        /// <param name="function">The implementation of the function.</param>
         /// <param name="isIdempotent">Does the function provide the same result when it is executed multiple times.</param>
         public void AddFunction(string functionName, Func<double, double, double, double> function, bool isIdempotent = true)
         {
@@ -288,7 +288,7 @@ namespace Jace
         /// Add a function to the calculation engine.
         /// </summary>
         /// <param name="functionName">The name of the function. This name can be used in mathematical formulas.</param>
-        /// <param name="function">The implemenation of the function.</param>
+        /// <param name="function">The implementation of the function.</param>
         /// <param name="isIdempotent">Does the function provide the same result when it is executed multiple times.</param>
         public void AddFunction(string functionName, Func<double, double, double, double, double> function, bool isIdempotent = true)
         {
@@ -299,7 +299,7 @@ namespace Jace
         /// Add a function to the calculation engine.
         /// </summary>
         /// <param name="functionName">The name of the function. This name can be used in mathematical formulas.</param>
-        /// <param name="function">The implemenation of the function.</param>
+        /// <param name="function">The implementation of the function.</param>
         /// <param name="isIdempotent">Does the function provide the same result when it is executed multiple times.</param>
         public void AddFunction(string functionName, Func<double, double, double, double, double, double> function, bool isIdempotent = true)
         {
@@ -310,7 +310,7 @@ namespace Jace
         /// Add a function to the calculation engine.
         /// </summary>
         /// <param name="functionName">The name of the function. This name can be used in mathematical formulas.</param>
-        /// <param name="function">The implemenation of the function.</param>
+        /// <param name="function">The implementation of the function.</param>
         /// <param name="isIdempotent">Does the function provide the same result when it is executed multiple times.</param>
         public void AddFunction(string functionName, Func<double, double, double, double, double, double, double> function, bool isIdempotent = true)
         {
@@ -396,7 +396,7 @@ namespace Jace
             FunctionRegistry.RegisterFunction("acot", (Func<double, double>)MathUtil.Acot, true, false);
             FunctionRegistry.RegisterFunction("loge", (Func<double, double>)Math.Log, true, false);
             FunctionRegistry.RegisterFunction("log10", (Func<double, double>)Math.Log10, true, false);
-            FunctionRegistry.RegisterFunction("logn", (Func<double, double, double>)((a, b) => Math.Log(a, b)), true, false);
+            FunctionRegistry.RegisterFunction("logn", (Func<double, double, double>)Math.Log, true, false);
             FunctionRegistry.RegisterFunction("sqrt", (Func<double, double>)Math.Sqrt, true, false);
             FunctionRegistry.RegisterFunction("abs", (Func<double, double>)Math.Abs, true, false);
             FunctionRegistry.RegisterFunction("if", (Func<double, double, double, double>)((a, b, c) => (a != 0.0 ? b : c)), true, false);
@@ -409,11 +409,11 @@ namespace Jace
             FunctionRegistry.RegisterFunction("round", (Func<double, double>)Math.Round, true, false);
 
             // Dynamic based arguments Functions
-            FunctionRegistry.RegisterFunction("max",  (DynamicFunc<double, double>)((a) => a.Max()), true, false);
-            FunctionRegistry.RegisterFunction("min", (DynamicFunc<double, double>)((a) => a.Min()), true, false);
-            FunctionRegistry.RegisterFunction("avg", (DynamicFunc<double, double>)((a) => a.Average()), true, false);
-            FunctionRegistry.RegisterFunction("median", (DynamicFunc<double, double>)((a) => MathExtended.Median(a)), true, false);
-            FunctionRegistry.RegisterFunction("sum", (DynamicFunc<double, double>)((a) => a.Sum()), true, false);
+            FunctionRegistry.RegisterFunction("max",  (DynamicFunc<double, double>)(a => a.Max()), true, false);
+            FunctionRegistry.RegisterFunction("min", (DynamicFunc<double, double>)(a => a.Min()), true, false);
+            FunctionRegistry.RegisterFunction("avg", (DynamicFunc<double, double>)(a => a.Average()), true, false);
+            FunctionRegistry.RegisterFunction("median", (DynamicFunc<double, double>)(a => a.Median()), true, false);
+            FunctionRegistry.RegisterFunction("sum", (DynamicFunc<double, double>)(a => a.Sum()), true, false);
 
             // Non Idempotent Functions
             FunctionRegistry.RegisterFunction("random", (Func<double>)random.NextDouble, false, false);
@@ -433,18 +433,15 @@ namespace Jace
         /// into an abstract syntax tree.</param>
         /// <param name="compiledConstants">The constants which are to be available in the given formula.</param>
         /// <returns>The abstract syntax tree of the formula.</returns>
-        private Operation BuildAbstractSyntaxTree(string formulaText, ConstantRegistry compiledConstants)
+        private Operation BuildAbstractSyntaxTree(string formulaText, IConstantRegistry compiledConstants)
         {
-            TokenReader tokenReader = new TokenReader(cultureInfo);
+            var tokenReader = new TokenReader(cultureInfo);
             List<Token> tokens = tokenReader.Read(formulaText);
             
-            AstBuilder astBuilder = new AstBuilder(FunctionRegistry, caseSensitive, compiledConstants);
+            var astBuilder = new AstBuilder(FunctionRegistry, caseSensitive, compiledConstants);
             Operation operation = astBuilder.Build(tokens);
 
-            if (optimizerEnabled)
-                return optimizer.Optimize(operation, this.FunctionRegistry, this.ConstantRegistry);
-            else
-                return operation;
+            return optimizerEnabled ? optimizer.Optimize(operation, this.FunctionRegistry, this.ConstantRegistry) : operation;
         }
 
         private Func<IDictionary<string, double>, double> BuildFormula(string formulaText, ConstantRegistry compiledConstants, Operation operation)
@@ -460,7 +457,7 @@ namespace Jace
 
         private string GenerateFormulaCacheKey(string formulaText, ConstantRegistry compiledConstants)
         {
-            return (compiledConstants != null && compiledConstants.Any()) ? $"{formulaText}@{String.Join(",", compiledConstants.Select(x => $"{x.ConstantName}:{x.Value}"))}" : formulaText;
+            return compiledConstants != null && compiledConstants.Any() ? $"{formulaText}@{string.Join(",", compiledConstants.Select(x => $"{x.ConstantName}:{x.Value}"))}" : formulaText;
         }
 
         /// <summary>
@@ -471,13 +468,15 @@ namespace Jace
         /// <param name="variables">The colletion of variables that must be verified.</param>
         internal void VerifyVariableNames(IDictionary<string, double> variables)
         {
-            foreach (string variableName in variables.Keys)
+            foreach (var variableName in variables.Keys)
             {
                 if(ConstantRegistry.IsConstantName(variableName) && !ConstantRegistry.GetConstantInfo(variableName).IsOverWritable)
-                    throw new ArgumentException(string.Format("The name \"{0}\" is a reservered variable name that cannot be overwritten.", variableName), "variables");
+                    throw new ArgumentException(
+                        $"The name \"{variableName}\" is a reservered variable name that cannot be overwritten.", nameof(variables));
 
                 if (FunctionRegistry.IsFunctionName(variableName))
-                    throw new ArgumentException(string.Format("The name \"{0}\" is a function name. Parameters cannot have this name.", variableName), "variables");
+                    throw new ArgumentException(
+                        $"The name \"{variableName}\" is a function name. Parameters cannot have this name.", nameof(variables));
             }
         }
     }
