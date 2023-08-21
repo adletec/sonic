@@ -17,7 +17,7 @@ namespace Jace.Util
         private readonly int maximumSize;
         private readonly int reductionSize;
 
-        private long counter; // We cannot use DateTime.Now, because the precission is not high enough.
+        private long counter; // We cannot use DateTime.Now, because the precision is not high enough.
 
         private readonly ConcurrentDictionary<TKey, CacheItem> dictionary;
 
@@ -29,11 +29,11 @@ namespace Jace.Util
         public MemoryCache(int maximumSize, int reductionSize)
         {
             if (maximumSize < 1)
-                throw new ArgumentOutOfRangeException("maximumSize",
+                throw new ArgumentOutOfRangeException(nameof(maximumSize),
                     "The maximum allowed number of items in the cache must be at least one.");
 
             if (reductionSize < 1)
-                throw new ArgumentOutOfRangeException("reductionSize",
+                throw new ArgumentOutOfRangeException(nameof(reductionSize),
                     "The cache reduction size must be at least one.");
 
             this.maximumSize = maximumSize;
@@ -60,13 +60,7 @@ namespace Jace.Util
         /// <summary>
         /// Gets the number of items in the cache.
         /// </summary>
-        public int Count
-        {
-            get
-            {
-                return dictionary.Count;
-            }
-        }
+        public int Count => dictionary.Count;
 
         /// <summary>
         /// Returns true if an item with the given key is present in the cache.
@@ -86,11 +80,9 @@ namespace Jace.Util
                 result = cachedItem.Value;
                 return true;
             }
-            else
-            {
-                result = default(TValue);
-                return false;
-            }
+
+            result = default;
+            return false;
         }
 
         /// <summary>
@@ -105,7 +97,7 @@ namespace Jace.Util
         public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
         {
             if (valueFactory == null)
-                throw new ArgumentNullException("valueFactory");
+                throw new ArgumentNullException(nameof(valueFactory));
 
             CacheItem cacheItem = dictionary.GetOrAdd(key, k => 
                 {
@@ -122,23 +114,22 @@ namespace Jace.Util
         /// </summary>
         private void EnsureCacheStorageAvailable()
         {
-            if (dictionary.Count >= maximumSize) // >= because we want to add an item after this method
-            {
-                IList<TKey> keysToDelete = (from p in dictionary.ToArray()
-                                            where p.Key != null && p.Value != null
-                                            orderby p.Value.LastAccessed ascending
-                                            select p.Key).Take(reductionSize).ToList();
+            if (dictionary.Count < maximumSize) return; // < because we want to add an item after this method
+            
+            IList<TKey> keysToDelete = (from p in dictionary.ToArray()
+                where p.Key != null && p.Value != null
+                orderby p.Value.LastAccessed
+                select p.Key).Take(reductionSize).ToList();
 
-                foreach (TKey key in keysToDelete)
-                {
-                    dictionary.TryRemove(key, out _);
-                }
+            foreach (var key in keysToDelete)
+            {
+                dictionary.TryRemove(key, out _);
             }
         }
 
         private class CacheItem
         {
-            private MemoryCache<TKey, TValue> cache;
+            private readonly MemoryCache<TKey, TValue> cache;
 
             public CacheItem(MemoryCache<TKey, TValue> cache, TValue value)
             {
@@ -148,7 +139,7 @@ namespace Jace.Util
                 Accessed();
             }
 
-            public TValue Value { get; private set; }
+            public TValue Value { get; }
 
             public long LastAccessed { get; private set; }
 

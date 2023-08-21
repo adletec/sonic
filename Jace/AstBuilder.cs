@@ -13,17 +13,14 @@ namespace Jace
         private readonly IFunctionRegistry functionRegistry;
         private readonly IConstantRegistry localConstantRegistry;
         private readonly bool caseSensitive;
-        private Dictionary<char, int> operationPrecedence = new Dictionary<char, int>();
-        private Stack<Operation> resultStack = new Stack<Operation>();
-        private Stack<Token> operatorStack = new Stack<Token>();
-        private Stack<int> parameterCount = new Stack<int>();
+        private readonly Dictionary<char, int> operationPrecedence = new Dictionary<char, int>();
+        private readonly Stack<Operation> resultStack = new Stack<Operation>();
+        private readonly Stack<Token> operatorStack = new Stack<Token>();
+        private readonly Stack<int> parameterCount = new Stack<int>();
 
         public AstBuilder(IFunctionRegistry functionRegistry, bool caseSensitive, IConstantRegistry compiledConstants = null)
         {
-            if (functionRegistry == null)
-                throw new ArgumentNullException("functionRegistry");
-
-            this.functionRegistry = functionRegistry;
+            this.functionRegistry = functionRegistry ?? throw new ArgumentNullException(nameof(functionRegistry));
             this.localConstantRegistry = compiledConstants ?? new ConstantRegistry(caseSensitive);
             this.caseSensitive = caseSensitive;
 
@@ -45,14 +42,14 @@ namespace Jace
             operationPrecedence.Add('^', 6);
         }
 
-        public Operation Build(IList<Token> tokens)
+        public Operation Build(IEnumerable<Token> tokens)
         {
             resultStack.Clear();
             operatorStack.Clear();
 
             parameterCount.Clear();
 
-            foreach (Token token in tokens)
+            foreach (var token in tokens)
             {
                 switch (token.TokenType)
                 {
@@ -70,7 +67,7 @@ namespace Jace
                         }
                         else
                         {
-                            string tokenValue = (string)token.Value;
+                            var tokenValue = (string)token.Value;
                             if (localConstantRegistry.IsConstantName(tokenValue))
                             {
                                 resultStack.Push(new FloatingPointConstant(localConstantRegistry.GetConstantInfo(tokenValue).Value));
@@ -90,7 +87,6 @@ namespace Jace
                         break;
                     case TokenType.RightBracket:
                         PopOperations(true, token);
-                        //parameterCount.Pop();
                         break;
                     case TokenType.ArgumentSeparator:
                         PopOperations(false, token);
@@ -98,17 +94,17 @@ namespace Jace
                         break;
                     case TokenType.Operation:
                         Token operation1Token = token;
-                        char operation1 = (char)operation1Token.Value;
+                        var operation1 = (char)operation1Token.Value;
 
                         while (operatorStack.Count > 0 && (operatorStack.Peek().TokenType == TokenType.Operation ||
                             operatorStack.Peek().TokenType == TokenType.Text))
                         {
                             Token operation2Token = operatorStack.Peek();
-                            bool isFunctionOnTopOfStack = operation2Token.TokenType == TokenType.Text;
+                            var isFunctionOnTopOfStack = operation2Token.TokenType == TokenType.Text;
 
                             if (!isFunctionOnTopOfStack)
                             {
-                                char operation2 = (char)operation2Token.Value;
+                                var operation2 = (char)operation2Token.Value;
 
                                 if ((IsLeftAssociativeOperation(operation1) &&
                                         operationPrecedence[operation1] <= operationPrecedence[operation2]) ||
@@ -131,6 +127,8 @@ namespace Jace
 
                         operatorStack.Push(operation1Token);
                         break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(token), $"Unexpected value \"{token}\" for {nameof(token)}.");
                 }
             }
 
@@ -141,11 +139,11 @@ namespace Jace
             return resultStack.First();
         }
 
-        private void PopOperations(bool untillLeftBracket, Token? currentToken)
+        private void PopOperations(bool untilLeftBracket, Token? currentToken)
         {
-            if (untillLeftBracket && !currentToken.HasValue)
-                throw new ArgumentNullException("currentToken", "If the parameter \"untillLeftBracket\" is set to true, " +
-                    "the parameter \"currentToken\" cannot be null.");
+            if (untilLeftBracket && !currentToken.HasValue)
+                throw new ArgumentNullException(nameof(currentToken), $"If the parameter \"{nameof(untilLeftBracket)}\" is set to true, " +
+                                                                      $"the parameter \"${nameof(currentToken)}\" cannot be null.");
 
             while (operatorStack.Count > 0 && operatorStack.Peek().TokenType != TokenType.LeftBracket)
             {
@@ -162,20 +160,20 @@ namespace Jace
                 }
             }
 
-            if (untillLeftBracket)
+            if (untilLeftBracket)
             {
                 if (operatorStack.Count > 0 && operatorStack.Peek().TokenType == TokenType.LeftBracket)
                     operatorStack.Pop();
                 else
-                    throw new ParseException(string.Format("No matching left bracket found for the right " +
-                        "bracket at position {0}.", currentToken.Value.StartPosition));
+                    throw new ParseException("No matching left bracket found for the right " +
+                                             $"bracket at position {currentToken.Value.StartPosition}.");
             }
             else
             {
                 if (operatorStack.Count > 0 && operatorStack.Peek().TokenType == TokenType.LeftBracket 
                     && !(currentToken.HasValue && currentToken.Value.TokenType == TokenType.ArgumentSeparator))
-                    throw new ParseException(string.Format("No matching right bracket found for the left " +
-                        "bracket at position {0}.", operatorStack.Peek().StartPosition));
+                    throw new ParseException("No matching right bracket found for the left " +
+                                             $"bracket at position {operatorStack.Peek().StartPosition}.");
             }
         }
 
@@ -187,7 +185,7 @@ namespace Jace
                 Operation argument1;
                 Operation argument2;
                 Operation divisor;
-                Operation divident;
+                Operation dividend;
 
                 switch ((char)operationToken.Value)
                 {
@@ -211,14 +209,14 @@ namespace Jace
                         return new Multiplication(dataType, argument1, argument2);
                     case '/':
                         divisor = resultStack.Pop();
-                        divident = resultStack.Pop();
+                        dividend = resultStack.Pop();
 
-                        return new Division(DataType.FloatingPoint, divident, divisor);
+                        return new Division(DataType.FloatingPoint, dividend, divisor);
                     case '%':
                         divisor = resultStack.Pop();
-                        divident = resultStack.Pop();
+                        dividend = resultStack.Pop();
 
-                        return new Modulo(DataType.FloatingPoint, divident, divisor);
+                        return new Modulo(DataType.FloatingPoint, dividend, divisor);
                     case '_':
                         argument1 = resultStack.Pop();
 
@@ -277,15 +275,16 @@ namespace Jace
 
                         return new NotEqual(dataType, argument1, argument2);
                     default:
-                        throw new ArgumentException(string.Format("Unknown operation \"{0}\".", operationToken), nameof(operationToken));
+                        throw new ArgumentException($"Unknown operation \"{operationToken}\".", nameof(operationToken));
                 }
             }
             catch (InvalidOperationException)
             {
                 // If we encounter a Stack empty issue this means there is a syntax issue in 
                 // the mathematical formula
-                throw new ParseException(string.Format("There is a syntax issue for the operation \"{0}\" at position {1}. " +
-                    "The number of arguments does not match with what is expected.", operationToken.Value, operationToken.StartPosition));
+                throw new ParseException(
+                    $"There is a syntax issue for the operation \"{operationToken.Value}\" at position {operationToken.StartPosition}. " +
+                    "The number of arguments does not match with what is expected.");
             }
         }
 
@@ -293,7 +292,7 @@ namespace Jace
         {
             try
             {
-                string functionName = ((string)functionToken.Value).ToLowerInvariant();
+                var functionName = ((string)functionToken.Value).ToLowerInvariant();
 
                 if (functionRegistry.IsFunctionName(functionName))
                 {
@@ -309,8 +308,8 @@ namespace Jace
                         numberOfParameters = functionInfo.NumberOfParameters;
                     }
                     
-                    List<Operation> operations = new List<Operation>();
-                    for (int i = 0; i < numberOfParameters; i++)
+                    var operations = new List<Operation>();
+                    for (var i = 0; i < numberOfParameters; i++)
                         operations.Add(resultStack.Pop());
                     operations.Reverse();
 
@@ -318,42 +317,43 @@ namespace Jace
                 }
                 else
                 {
-                    throw new ArgumentException(string.Format("Unknown function \"{0}\".", functionToken.Value), nameof(functionToken.Value));
+                    throw new ArgumentException($"Unknown function \"{functionToken.Value}\".", nameof(functionToken.Value));
                 }
             }
             catch (InvalidOperationException)
             {
                 // If we encounter a Stack empty issue this means there is a syntax issue in 
                 // the mathematical formula
-                throw new ParseException(string.Format("There is a syntax issue for the function \"{0}\" at position {1}. " +
-                    "The number of arguments does not match with what is expected.", functionToken.Value, functionToken.StartPosition));
+                throw new ParseException(
+                    $"There is a syntax issue for the function \"{functionToken.Value}\" at position {functionToken.StartPosition}. " +
+                    "The number of arguments does not match with what is expected.");
             }
         }
 
         private void VerifyResultStack()
         {
-            if(resultStack.Count > 1)
+            if (resultStack.Count <= 1) return;
+            
+            Operation[] operations = resultStack.ToArray();
+
+            for (var i = 1; i < operations.Length; i++)
             {
-                Operation[] operations = resultStack.ToArray();
+                Operation operation = operations[i];
 
-                for (int i = 1; i < operations.Length; i++)
+                if (operation.GetType() == typeof(IntegerConstant))
                 {
-                    Operation operation = operations[i];
-
-                    if (operation.GetType() == typeof(IntegerConstant))
-                    {
-                        IntegerConstant constant = (IntegerConstant)operation;
-                        throw new ParseException(string.Format("Unexpected integer constant \"{0}\" found.", constant.Value));
-                    }
-                    else if (operation.GetType() == typeof(FloatingPointConstant))
-                    {
-                        FloatingPointConstant constant = (FloatingPointConstant)operation;
-                        throw new ParseException(string.Format("Unexpected floating point constant \"{0}\" found.", constant.Value)); 
-                    }
+                    var constant = (IntegerConstant)operation;
+                    throw new ParseException($"Unexpected integer constant \"{constant.Value}\" found.");
                 }
 
-                throw new ParseException("The syntax of the provided formula is not valid.");
+                if (operation.GetType() == typeof(FloatingPointConstant))
+                {
+                    var constant = (FloatingPointConstant)operation;
+                    throw new ParseException($"Unexpected floating point constant \"{constant.Value}\" found."); 
+                }
             }
+
+            throw new ParseException("The syntax of the provided formula is not valid.");
         }
 
         private bool IsLeftAssociativeOperation(char character)
@@ -363,7 +363,7 @@ namespace Jace
 
         private DataType RequiredDataType(Operation argument1, Operation argument2)
         {
-            return (argument1.DataType == DataType.FloatingPoint || argument2.DataType == DataType.FloatingPoint) ? DataType.FloatingPoint : DataType.Integer;
+            return argument1.DataType == DataType.FloatingPoint || argument2.DataType == DataType.FloatingPoint ? DataType.FloatingPoint : DataType.Integer;
         }
     }
 }
