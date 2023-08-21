@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Jace.Operations
+﻿namespace Jace.Operations
 {
     public abstract class Operation
     {
-        public Operation(DataType dataType, bool dependsOnVariables, bool isIdempotent)
+        protected Operation(DataType dataType, bool dependsOnVariables, bool isIdempotent)
         {
             this.DataType = dataType;
             this.DependsOnVariables = dependsOnVariables;

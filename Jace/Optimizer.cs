@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Jace.Operations;
 using Jace.Execution;
+using Jace.Operations;
 
 namespace Jace
 {
@@ -28,19 +26,19 @@ namespace Jace
             {
                 if (operation.GetType() == typeof(Addition))
                 {
-                    Addition addition = (Addition)operation;
+                    var addition = (Addition)operation;
                     addition.Argument1 = Optimize(addition.Argument1, functionRegistry, constantRegistry);
                     addition.Argument2 = Optimize(addition.Argument2, functionRegistry, constantRegistry);
                 }
                 else if (operation.GetType() == typeof(Subtraction))
                 {
-                    Subtraction substraction = (Subtraction)operation;
-                    substraction.Argument1 = Optimize(substraction.Argument1, functionRegistry, constantRegistry);
-                    substraction.Argument2 = Optimize(substraction.Argument2, functionRegistry, constantRegistry);
+                    var subtraction = (Subtraction)operation;
+                    subtraction.Argument1 = Optimize(subtraction.Argument1, functionRegistry, constantRegistry);
+                    subtraction.Argument2 = Optimize(subtraction.Argument2, functionRegistry, constantRegistry);
                 }
                 else if (operation.GetType() == typeof(Multiplication))
                 {
-                    Multiplication multiplication = (Multiplication)operation;
+                    var multiplication = (Multiplication)operation;
                     multiplication.Argument1 = Optimize(multiplication.Argument1, functionRegistry, constantRegistry);
                     multiplication.Argument2 = Optimize(multiplication.Argument2, functionRegistry, constantRegistry);
 
@@ -52,19 +50,19 @@ namespace Jace
                 }
                 else if (operation.GetType() == typeof(Division))
                 {
-                    Division division = (Division)operation;
+                    var division = (Division)operation;
                     division.Dividend = Optimize(division.Dividend, functionRegistry, constantRegistry);
                     division.Divisor = Optimize(division.Divisor, functionRegistry, constantRegistry);
                 }
                 else if (operation.GetType() == typeof(Exponentiation))
                 {
-                    Exponentiation division = (Exponentiation)operation;
-                    division.Base = Optimize(division.Base, functionRegistry, constantRegistry);
-                    division.Exponent = Optimize(division.Exponent, functionRegistry, constantRegistry);
+                    var exponentiation = (Exponentiation)operation;
+                    exponentiation.Base = Optimize(exponentiation.Base, functionRegistry, constantRegistry);
+                    exponentiation.Exponent = Optimize(exponentiation.Exponent, functionRegistry, constantRegistry);
                 }
                 else if(operation.GetType() == typeof(Function))
                 {
-                    Function function = (Function)operation;
+                    var function = (Function)operation;
                     IList<Operation> arguments = function.Arguments.Select(a => Optimize(a, functionRegistry, constantRegistry)).ToList();
                     function.Arguments = arguments;
                 }

@@ -1,75 +1,71 @@
-﻿using Jace.Execution;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using Jace.Execution;
 using Jace.Operations;
 using Jace.Tokenizer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Jace.Tests
+namespace Jace.Tests;
+
+[TestClass]
+public class OptimizerTests
 {
-    [TestClass]
-    public class OptimizerTests
+    [TestMethod]
+    public void TestOptimizerIdempotentFunction()
     {
-        [TestMethod]
-        public void TestOptimizerIdempotentFunction()
-        {
-            Optimizer optimizer = new Optimizer(new Interpreter());
+        Optimizer optimizer = new Optimizer(new Interpreter());
 
-            TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
-            IList<Token> tokens = tokenReader.Read("test(var1, (2+3) * 500)");
+        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        IList<Token> tokens = tokenReader.Read("test(var1, (2+3) * 500)");
 
-            IFunctionRegistry functionRegistry = new FunctionRegistry(true);
-            functionRegistry.RegisterFunction("test", (Func<double, double, double>)((a, b) =>  a + b));
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+        functionRegistry.RegisterFunction("test", (Func<double, double, double>)((a, b) =>  a + b));
 
-            AstBuilder astBuilder = new AstBuilder(functionRegistry, true);
-            Operation operation = astBuilder.Build(tokens);
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, true);
+        Operation operation = astBuilder.Build(tokens);
 
-            Function optimizedFuction = (Function)optimizer.Optimize(operation, functionRegistry, null);
+        Function optimizedFuction = (Function)optimizer.Optimize(operation, functionRegistry, null);
 
-            Assert.AreEqual(typeof(FloatingPointConstant), optimizedFuction.Arguments[1].GetType());
-        }
+        Assert.AreEqual(typeof(FloatingPointConstant), optimizedFuction.Arguments[1].GetType());
+    }
 
-        [TestMethod]
-        public void TestOptimizerNonIdempotentFunction()
-        {
-            Optimizer optimizer = new Optimizer(new Interpreter());
+    [TestMethod]
+    public void TestOptimizerNonIdempotentFunction()
+    {
+        Optimizer optimizer = new Optimizer(new Interpreter());
 
-            TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
-            IList<Token> tokens = tokenReader.Read("test(500)");
+        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        IList<Token> tokens = tokenReader.Read("test(500)");
 
-            IFunctionRegistry functionRegistry = new FunctionRegistry(true);
-            functionRegistry.RegisterFunction("test", (Func<double, double>)(a => a), false, true);
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+        functionRegistry.RegisterFunction("test", (Func<double, double>)(a => a), false, true);
 
-            AstBuilder astBuilder = new AstBuilder(functionRegistry, true);
-            Operation operation = astBuilder.Build(tokens);
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, true);
+        Operation operation = astBuilder.Build(tokens);
 
-            Operation optimizedFuction = optimizer.Optimize(operation, functionRegistry, null);
+        Operation optimizedFuction = optimizer.Optimize(operation, functionRegistry, null);
 
-            Assert.AreEqual(typeof(Function), optimizedFuction.GetType());
-            Assert.AreEqual(typeof(IntegerConstant), ((Function)optimizedFuction).Arguments[0].GetType());
-        }
+        Assert.AreEqual(typeof(Function), optimizedFuction.GetType());
+        Assert.AreEqual(typeof(IntegerConstant), ((Function)optimizedFuction).Arguments[0].GetType());
+    }
 
-        [TestMethod]
-        public void TestOptimizerMultiplicationByZero()
-        {
-            Optimizer optimizer = new Optimizer(new Interpreter());
+    [TestMethod]
+    public void TestOptimizerMultiplicationByZero()
+    {
+        Optimizer optimizer = new Optimizer(new Interpreter());
 
-            TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
-            IList<Token> tokens = tokenReader.Read("var1 * 0.0");
+        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        IList<Token> tokens = tokenReader.Read("var1 * 0.0");
 
-            IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
 
-            AstBuilder astBuilder = new AstBuilder(functionRegistry, true);
-            Operation operation = astBuilder.Build(tokens);
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, true);
+        Operation operation = astBuilder.Build(tokens);
 
-            Operation optimizedOperation = optimizer.Optimize(operation, functionRegistry, null);
+        Operation optimizedOperation = optimizer.Optimize(operation, functionRegistry, null);
 
-            Assert.AreEqual(typeof(FloatingPointConstant), optimizedOperation.GetType());
-            Assert.AreEqual(0.0, ((FloatingPointConstant)optimizedOperation).Value);
-        }
+        Assert.AreEqual(typeof(FloatingPointConstant), optimizedOperation.GetType());
+        Assert.AreEqual(0.0, ((FloatingPointConstant)optimizedOperation).Value);
     }
 }

@@ -4,7 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 
-namespace Jace.Benchmark.Properties.ResultWriters;
+namespace Jace.Benchmark.ResultWriters;
 
 public class ConsoleResultWriter : IResultWriter
 {
@@ -48,6 +48,10 @@ private static string GetFormattedRow(IEnumerable<object> values, int[] maxLengt
     {
         var formattedValue = values.ElementAt(i).ToString();
 
+        if (formattedValue == null)
+        {
+            throw new InvalidOperationException($"{nameof(values)} may not contain null.");
+        }
         // If the value is numeric, format with decimal separator and pad left; otherwise, pad right
         if (IsNumeric(formattedValue))
         {

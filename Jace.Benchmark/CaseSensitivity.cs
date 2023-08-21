@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Jace.Benchmark;
 
-namespace Jace.Benchmark
+public enum CaseSensitivity
 {
-    public enum CaseSensitivity
-    {
-        All,
-        CaseSensitive,
-        CaseInSensitive
-    }
+    All,
+    CaseSensitive,
+    CaseInSensitive
 }

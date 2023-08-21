@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Jace.Operations
+﻿namespace Jace.Operations
 {
     public class Modulo : Operation
     {
@@ -14,7 +9,7 @@ namespace Jace.Operations
             this.Divisor = divisor;
         }
 
-        public Operation Dividend { get; internal set; }
-        public Operation Divisor { get; internal set; }
+        public Operation Dividend { get; }
+        public Operation Divisor { get; }
     }
 }

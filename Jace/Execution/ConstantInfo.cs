@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Jace.Execution
+﻿namespace Jace.Execution
 {
     public class ConstantInfo
     {
@@ -18,6 +13,6 @@ namespace Jace.Execution
 
         public double Value { get; private set; }
 
-        public bool IsOverWritable { get; set; }
+        public bool IsOverWritable { get; }
     }
 }
