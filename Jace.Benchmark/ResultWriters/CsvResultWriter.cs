@@ -2,7 +2,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 
-namespace Jace.Benchmark.Properties.ResultWriters;
+namespace Jace.Benchmark.ResultWriters;
 
 public class CsvResultWriter : IResultWriter
 {

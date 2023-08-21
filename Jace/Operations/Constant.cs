@@ -1,27 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Jace.Operations
+﻿namespace Jace.Operations
 {
     public abstract class Constant<T> : Operation
     {
-        public Constant(DataType dataType, T value)
+        protected Constant(DataType dataType, T value)
             : base(dataType, false, true)
         {
             this.Value = value;
         }
 
-        public T Value { get; private set; }
+        public T Value { get; }
 
         public override bool Equals(object obj)
         {
-            Constant<T> other = obj as Constant<T>;
-            if (other != null)
+            if (obj is Constant<T> other)
                 return this.Value.Equals(other.Value);
-            else
-                return false;
+            return false;
         }
 
         public override int GetHashCode()

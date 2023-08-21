@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Jace.Benchmark;
 
-namespace Jace.Benchmark
+public enum BenchmarkMode
 {
-    public enum BenchmarkMode
-    {
-        All,
-        Static,
-        Simple,
-        SimpleFunction,
-        Random
-    }
+    All,
+    Static,
+    Simple,
+    SimpleFunction,
+    Random
 }

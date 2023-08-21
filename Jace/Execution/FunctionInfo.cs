@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Jace.Execution
 {
@@ -17,16 +14,16 @@ namespace Jace.Execution
             this.Function = function;
         }
 
-        public string FunctionName { get; private set; }
+        public string FunctionName { get; }
         
-        public int NumberOfParameters { get; private set; }
+        public int NumberOfParameters { get; }
 
-        public bool IsOverWritable { get; set; }
+        public bool IsOverWritable { get; }
 
-        public bool IsIdempotent { get; set; }
+        public bool IsIdempotent { get; }
 
-        public bool IsDynamicFunc { get; private set; }
+        public bool IsDynamicFunc { get; }
 
-        public Delegate Function { get; private set; }
+        public Delegate Function { get; }
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Jace.Operations
+﻿namespace Jace.Operations
 {
     public class NotEqual : Operation
     {
@@ -14,7 +9,7 @@ namespace Jace.Operations
             this.Argument2 = argument2;
         }
 
-        public Operation Argument1 { get; internal set; }
-        public Operation Argument2 { get; internal set; }
+        public Operation Argument1 { get; }
+        public Operation Argument2 { get; }
     }
 }
