@@ -48,13 +48,14 @@ private static string GetFormattedRow(IEnumerable<object> values, int[] maxLengt
     {
         var formattedValue = values.ElementAt(i).ToString();
 
+        if (formattedValue == null)
+        {
+            throw new InvalidOperationException($"{nameof(values)} may not contain null.");
+        }
         // If the value is numeric, format with decimal separator and pad left; otherwise, pad right
         if (IsNumeric(formattedValue))
         {
-            var numericValue = double.Parse(formattedValue ?? 
-                throw new InvalidOperationException($"{nameof(values)} may not contain null."), 
-                CultureInfo.InvariantCulture);
-            
+            var numericValue = double.Parse(formattedValue, CultureInfo.InvariantCulture);
             formattedValue = numericValue.ToString("N0", CultureInfo.CurrentCulture).PadLeft(maxLengths[i]);
         }
         else
