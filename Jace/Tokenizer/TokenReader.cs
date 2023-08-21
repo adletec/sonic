@@ -96,7 +96,7 @@ namespace Jace.Tokenizer
                         }
                         else
                         {
-                            throw new ParseException(string.Format("Invalid floating point number: {0}", buffer.ToString()));
+                            throw new ParseException(string.Format("Invalid floating point number: {0}", buffer));
                         }
                     }
 
