@@ -93,8 +93,7 @@ namespace Jace
                         parameterCount.Push(parameterCount.Pop() + 1);
                         break;
                     case TokenType.Operation:
-                        Token operation1Token = token;
-                        var operation1 = (char)operation1Token.Value;
+                        var operation1 = (char)token.Value;
 
                         while (operatorStack.Count > 0 && (operatorStack.Peek().TokenType == TokenType.Operation ||
                             operatorStack.Peek().TokenType == TokenType.Text))
@@ -108,7 +107,7 @@ namespace Jace
 
                                 if ((IsLeftAssociativeOperation(operation1) &&
                                         operationPrecedence[operation1] <= operationPrecedence[operation2]) ||
-                                    (operationPrecedence[operation1] < operationPrecedence[operation2]))
+                                    operationPrecedence[operation1] < operationPrecedence[operation2])
                                 {
                                     operatorStack.Pop();
                                     resultStack.Push(ConvertOperation(operation2Token));
@@ -125,7 +124,7 @@ namespace Jace
                             }
                         }
 
-                        operatorStack.Push(operation1Token);
+                        operatorStack.Push(token);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(token), $"Unexpected value \"{token}\" for {nameof(token)}.");

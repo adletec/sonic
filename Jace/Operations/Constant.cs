@@ -8,7 +8,7 @@
             this.Value = value;
         }
 
-        public T Value { get; private set; }
+        public T Value { get; }
 
         public override bool Equals(object obj)
         {

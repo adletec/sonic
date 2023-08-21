@@ -399,10 +399,10 @@ namespace Jace
             FunctionRegistry.RegisterFunction("logn", (Func<double, double, double>)Math.Log, true, false);
             FunctionRegistry.RegisterFunction("sqrt", (Func<double, double>)Math.Sqrt, true, false);
             FunctionRegistry.RegisterFunction("abs", (Func<double, double>)Math.Abs, true, false);
-            FunctionRegistry.RegisterFunction("if", (Func<double, double, double, double>)((a, b, c) => (a != 0.0 ? b : c)), true, false);
-            FunctionRegistry.RegisterFunction("ifless", (Func<double, double, double, double, double>)((a, b, c, d) => (a < b ? c : d)), true, false);
-            FunctionRegistry.RegisterFunction("ifmore", (Func<double, double, double, double, double>)((a, b, c, d) => (a > b ? c : d)), true, false);
-            FunctionRegistry.RegisterFunction("ifequal", (Func<double, double, double, double, double>)((a, b, c, d) => (a == b ? c : d)), true, false);
+            FunctionRegistry.RegisterFunction("if", (Func<double, double, double, double>)((a, b, c) => a != 0.0 ? b : c), true, false);
+            FunctionRegistry.RegisterFunction("ifless", (Func<double, double, double, double, double>)((a, b, c, d) => a < b ? c : d), true, false);
+            FunctionRegistry.RegisterFunction("ifmore", (Func<double, double, double, double, double>)((a, b, c, d) => a > b ? c : d), true, false);
+            FunctionRegistry.RegisterFunction("ifequal", (Func<double, double, double, double, double>)((a, b, c, d) => a == b ? c : d), true, false);
             FunctionRegistry.RegisterFunction("ceiling", (Func<double, double>)Math.Ceiling, true, false);
             FunctionRegistry.RegisterFunction("floor", (Func<double, double>)Math.Floor, true, false);
             FunctionRegistry.RegisterFunction("truncate", (Func<double, double>)Math.Truncate, true, false);
@@ -465,14 +465,14 @@ namespace Jace
         /// Users are not allowed to overwrite reserved variables or use function names as variables.
         /// If an invalid variable is detected an exception is thrown.
         /// </summary>
-        /// <param name="variables">The colletion of variables that must be verified.</param>
+        /// <param name="variables">The collection of variables that must be verified.</param>
         internal void VerifyVariableNames(IDictionary<string, double> variables)
         {
             foreach (var variableName in variables.Keys)
             {
                 if(ConstantRegistry.IsConstantName(variableName) && !ConstantRegistry.GetConstantInfo(variableName).IsOverWritable)
                     throw new ArgumentException(
-                        $"The name \"{variableName}\" is a reservered variable name that cannot be overwritten.", nameof(variables));
+                        $"The name \"{variableName}\" is a reserved variable name that cannot be overwritten.", nameof(variables));
 
                 if (FunctionRegistry.IsFunctionName(variableName))
                     throw new ArgumentException(

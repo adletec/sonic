@@ -72,17 +72,17 @@ namespace Jace.Util
             return lambdaExpression.Compile();
         }
 
-        private Type GetDelegateType(ParameterInfo[] parameters)
+        private Type GetDelegateType(IList<ParameterInfo> parameters)
         {
-            var funcTypeName = $"System.Func`{parameters.Length + 1}";
+            var funcTypeName = $"System.Func`{parameters.Count + 1}";
             var funcType = Type.GetType(funcTypeName);
             if (funcType == null)
             {
                 throw new InvalidOperationException($"Couldn't get type of ${funcTypeName}.");
             }
 
-            Type[] typeArguments = new Type[parameters.Length + 1];
-            for (var i = 0; i < parameters.Length; i++)
+            Type[] typeArguments = new Type[parameters.Count + 1];
+            for (var i = 0; i < parameters.Count; i++)
                 typeArguments[i] = (parameters[i].DataType == DataType.FloatingPoint) ? typeof(double) : typeof(int);
             typeArguments[typeArguments.Length - 1] = typeof(double);
 

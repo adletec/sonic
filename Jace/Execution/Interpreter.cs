@@ -116,7 +116,7 @@ namespace Jace.Execution
                 var operation1 = Execute(and.Argument1, functionRegistry, constantRegistry,  variables) != 0;
                 var operation2 = Execute(and.Argument2, functionRegistry, constantRegistry,  variables) != 0;
 
-                return (operation1 && operation2) ? 1.0 : 0.0;
+                return operation1 && operation2 ? 1.0 : 0.0;
             }
 
             if (operation.GetType() == typeof(Or))
@@ -125,43 +125,43 @@ namespace Jace.Execution
                 var operation1 = Execute(or.Argument1, functionRegistry, constantRegistry,  variables) != 0;
                 var operation2 = Execute(or.Argument2, functionRegistry, constantRegistry,  variables) != 0;
 
-                return (operation1 || operation2) ? 1.0 : 0.0;
+                return operation1 || operation2 ? 1.0 : 0.0;
             }
 
             if(operation.GetType() == typeof(LessThan))
             {
                 var lessThan = (LessThan)operation;
-                return (Execute(lessThan.Argument1, functionRegistry, constantRegistry,  variables) < Execute(lessThan.Argument2, functionRegistry, constantRegistry,  variables)) ? 1.0 : 0.0;
+                return Execute(lessThan.Argument1, functionRegistry, constantRegistry,  variables) < Execute(lessThan.Argument2, functionRegistry, constantRegistry,  variables) ? 1.0 : 0.0;
             }
 
             if (operation.GetType() == typeof(LessOrEqualThan))
             {
                 var lessOrEqualThan = (LessOrEqualThan)operation;
-                return (Execute(lessOrEqualThan.Argument1, functionRegistry, constantRegistry,  variables) <= Execute(lessOrEqualThan.Argument2, functionRegistry, constantRegistry,  variables)) ? 1.0 : 0.0;
+                return Execute(lessOrEqualThan.Argument1, functionRegistry, constantRegistry,  variables) <= Execute(lessOrEqualThan.Argument2, functionRegistry, constantRegistry,  variables) ? 1.0 : 0.0;
             }
 
             if (operation.GetType() == typeof(GreaterThan))
             {
                 var greaterThan = (GreaterThan)operation;
-                return (Execute(greaterThan.Argument1, functionRegistry, constantRegistry,  variables) > Execute(greaterThan.Argument2, functionRegistry, constantRegistry,  variables)) ? 1.0 : 0.0;
+                return Execute(greaterThan.Argument1, functionRegistry, constantRegistry,  variables) > Execute(greaterThan.Argument2, functionRegistry, constantRegistry,  variables) ? 1.0 : 0.0;
             }
 
             if (operation.GetType() == typeof(GreaterOrEqualThan))
             {
                 var greaterOrEqualThan = (GreaterOrEqualThan)operation;
-                return (Execute(greaterOrEqualThan.Argument1, functionRegistry, constantRegistry,  variables) >= Execute(greaterOrEqualThan.Argument2, functionRegistry, constantRegistry,  variables)) ? 1.0 : 0.0;
+                return Execute(greaterOrEqualThan.Argument1, functionRegistry, constantRegistry,  variables) >= Execute(greaterOrEqualThan.Argument2, functionRegistry, constantRegistry,  variables) ? 1.0 : 0.0;
             }
 
             if (operation.GetType() == typeof(Equal))
             {
                 var equal = (Equal)operation;
-                return (Execute(equal.Argument1, functionRegistry, constantRegistry,  variables) == Execute(equal.Argument2, functionRegistry, constantRegistry,  variables)) ? 1.0 : 0.0;
+                return Execute(equal.Argument1, functionRegistry, constantRegistry,  variables) == Execute(equal.Argument2, functionRegistry, constantRegistry,  variables) ? 1.0 : 0.0;
             }
 
             if (operation.GetType() == typeof(NotEqual))
             {
                 var notEqual = (NotEqual)operation;
-                return (Execute(notEqual.Argument1, functionRegistry, constantRegistry,  variables) != Execute(notEqual.Argument2, functionRegistry, constantRegistry,  variables)) ? 1.0 : 0.0;
+                return Execute(notEqual.Argument1, functionRegistry, constantRegistry,  variables) != Execute(notEqual.Argument2, functionRegistry, constantRegistry,  variables) ? 1.0 : 0.0;
             }
 
             if (operation.GetType() == typeof(Function))

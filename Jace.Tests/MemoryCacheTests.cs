@@ -9,50 +9,49 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 #endif
 using Jace.Util;
 
-namespace Jace.Tests
+namespace Jace.Tests;
+
+[TestClass]
+public class MemoryCacheTests
 {
-    [TestClass]
-    public class MemoryCacheTests
+    [TestMethod]
+    public void TestCacheCleanupOnlyAdd()
     {
-        [TestMethod]
-        public void TestCacheCleanupOnlyAdd()
-        {
-            MemoryCache<string, int> cache = new MemoryCache<string, int>(3, 1);
-            cache.GetOrAdd("test1", k => 1);
-            cache.GetOrAdd("test2", k => 2);
-            cache.GetOrAdd("test3", k => 3);
-            cache.GetOrAdd("test4", k => 3);
+        MemoryCache<string, int> cache = new MemoryCache<string, int>(3, 1);
+        cache.GetOrAdd("test1", k => 1);
+        cache.GetOrAdd("test2", k => 2);
+        cache.GetOrAdd("test3", k => 3);
+        cache.GetOrAdd("test4", k => 3);
 
-            Assert.IsFalse(cache.ContainsKey("test1"));
-            Assert.AreEqual(3, cache.Count);
-        }
+        Assert.IsFalse(cache.ContainsKey("test1"));
+        Assert.AreEqual(3, cache.Count);
+    }
 
-        [TestMethod]
-        public void TestCacheCleanupRetrieve()
-        {
-            MemoryCache<string, int> cache = new MemoryCache<string, int>(3, 1);
-            cache.GetOrAdd("test1", k => 1);
-            cache.GetOrAdd("test2", k => 2);
-            cache.GetOrAdd("test3", k => 3);
+    [TestMethod]
+    public void TestCacheCleanupRetrieve()
+    {
+        MemoryCache<string, int> cache = new MemoryCache<string, int>(3, 1);
+        cache.GetOrAdd("test1", k => 1);
+        cache.GetOrAdd("test2", k => 2);
+        cache.GetOrAdd("test3", k => 3);
             
-            Assert.AreEqual(1, cache["test1"]);
+        Assert.AreEqual(1, cache["test1"]);
             
-            cache.GetOrAdd("test4", k => 3);
+        cache.GetOrAdd("test4", k => 3);
 
-            Assert.IsTrue(cache.ContainsKey("test1"));
-            Assert.AreEqual(3, cache.Count);
-        }
+        Assert.IsTrue(cache.ContainsKey("test1"));
+        Assert.AreEqual(3, cache.Count);
+    }
 
-        [TestMethod]
-        public void TestCacheCleanupBiggerThanCacheSize()
-        {
-            MemoryCache<string, int> cache = new MemoryCache<string, int>(1, 3);
-            cache.GetOrAdd("test1", k => 1);
-            cache.GetOrAdd("test2", k => 2);
-            cache.GetOrAdd("test3", k => 3);
+    [TestMethod]
+    public void TestCacheCleanupBiggerThanCacheSize()
+    {
+        MemoryCache<string, int> cache = new MemoryCache<string, int>(1, 3);
+        cache.GetOrAdd("test1", k => 1);
+        cache.GetOrAdd("test2", k => 2);
+        cache.GetOrAdd("test3", k => 3);
 
-            Assert.IsTrue(cache.ContainsKey("test3"));
-            Assert.AreEqual(1, cache.Count);
-        }
+        Assert.IsTrue(cache.ContainsKey("test3"));
+        Assert.AreEqual(1, cache.Count);
     }
 }

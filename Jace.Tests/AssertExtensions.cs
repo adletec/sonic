@@ -7,29 +7,28 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 #endif
 using System;
 
-namespace Jace.Tests
-{
-    public static class AssertExtensions
-    {
-        public static T ThrowsException<T>(Action action) where T : Exception
-        {
-            try
-            {
-                action();
+namespace Jace.Tests;
 
-                Assert.Fail("An exception of type \"{0}\" was expected, but no exception was thrown.", typeof(T).FullName);
-                return null;
-            }
-            catch (T ex)
-            {
-                return ex;
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("An exception of type \"{0}\" was expected, but instead an exception of type \"{1}\" was thrown.",
-                    typeof(T).FullName, ex.GetType().FullName);
-                return null;
-            }
+public static class AssertExtensions
+{
+    public static T ThrowsException<T>(Action action) where T : Exception
+    {
+        try
+        {
+            action();
+
+            Assert.Fail("An exception of type \"{0}\" was expected, but no exception was thrown.", typeof(T).FullName);
+            return null;
+        }
+        catch (T ex)
+        {
+            return ex;
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("An exception of type \"{0}\" was expected, but instead an exception of type \"{1}\" was thrown.",
+                typeof(T).FullName, ex.GetType().FullName);
+            return null;
         }
     }
 }
