@@ -52,10 +52,11 @@ namespace Jace.Execution
                 throw new ArgumentNullException("function");
 
             Type funcType = function.GetType();
+            
             bool isDynamicFunc = false;
             int numberOfParameters = -1;
             
-            if (funcType.FullName.StartsWith("System.Func"))
+            if (funcType.FullName != null && funcType.FullName.StartsWith("System.Func"))
             {
                 foreach (Type genericArgument in funcType.GenericTypeArguments)
                     if (genericArgument != typeof(double))
@@ -66,7 +67,7 @@ namespace Jace.Execution
                     .GetParameters()
                     .Count(p => p.ParameterType == typeof(double));
             }
-            else if (funcType.FullName.StartsWith(DynamicFuncName))
+            else if (funcType.FullName != null && funcType.FullName.StartsWith(DynamicFuncName))
             {
                 isDynamicFunc = true;
             }
