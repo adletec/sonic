@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Jace.Util;
 
 namespace Jace.Execution
 {
@@ -11,13 +10,13 @@ namespace Jace.Execution
     {
         private const string DynamicFuncName = "Jace.DynamicFunc";
 
-        private readonly bool caseSensitive;
         private readonly Dictionary<string, FunctionInfo> functions;
 
         public FunctionRegistry(bool caseSensitive)
         {
-            this.caseSensitive = caseSensitive;
-            this.functions = new Dictionary<string, FunctionInfo>();
+            functions = caseSensitive
+                ? new Dictionary<string, FunctionInfo>()
+                : new Dictionary<string, FunctionInfo>(StringComparer.OrdinalIgnoreCase);
         }
 
         public IEnumerator<FunctionInfo> GetEnumerator()
@@ -35,14 +34,14 @@ namespace Jace.Execution
             if (string.IsNullOrEmpty(functionName))
                 throw new ArgumentNullException(nameof(functionName));
 
-            return functions.TryGetValue(ConvertFunctionName(functionName), out var functionInfo) ? functionInfo : null;
+            return functions.TryGetValue(functionName, out var functionInfo) ? functionInfo : null;
         }
 
         public void RegisterFunction(string functionName, Delegate function)
         {
             RegisterFunction(functionName, function, true, true);
         }
-        
+
         public void RegisterFunction(string functionName, Delegate function, bool isIdempotent, bool isOverWritable)
         {
             if (string.IsNullOrEmpty(functionName))
@@ -52,15 +51,16 @@ namespace Jace.Execution
                 throw new ArgumentNullException(nameof(function));
 
             Type funcType = function.GetType();
-            
+
             var isDynamicFunc = false;
             var numberOfParameters = -1;
-            
+
             if (funcType.FullName != null && funcType.FullName.StartsWith("System.Func"))
             {
                 foreach (Type genericArgument in funcType.GenericTypeArguments)
                     if (genericArgument != typeof(double))
-                        throw new ArgumentException("Only doubles are supported as function arguments.", nameof(function));
+                        throw new ArgumentException("Only doubles are supported as function arguments.",
+                            nameof(function));
 
                 numberOfParameters = function
                     .GetMethodInfo()
@@ -72,9 +72,8 @@ namespace Jace.Execution
                 isDynamicFunc = true;
             }
             else
-                throw new ArgumentException($"Only System.Func and {DynamicFuncName} delegates are permitted.", nameof(function));
-
-            functionName = ConvertFunctionName(functionName);
+                throw new ArgumentException($"Only System.Func and {DynamicFuncName} delegates are permitted.",
+                    nameof(function));
 
             if (functions.ContainsKey(functionName) && !functions[functionName].IsOverWritable)
             {
@@ -89,25 +88,22 @@ namespace Jace.Execution
 
             if (functions.ContainsKey(functionName) && functions[functionName].IsDynamicFunc != isDynamicFunc)
             {
-                throw new Exception("A Func can only be overwritten by another Func and a DynamicFunc can only be overwritten by another DynamicFunc.");
+                throw new Exception(
+                    "A Func can only be overwritten by another Func and a DynamicFunc can only be overwritten by another DynamicFunc.");
             }
 
-            var functionInfo = new FunctionInfo(functionName, numberOfParameters, isIdempotent, isOverWritable, isDynamicFunc, function);
+            var functionInfo = new FunctionInfo(functionName, numberOfParameters, isIdempotent, isOverWritable,
+                isDynamicFunc, function);
 
             functions[functionName] = functionInfo;
         }
 
-            public bool IsFunctionName(string functionName)
+        public bool IsFunctionName(string functionName)
         {
             if (string.IsNullOrEmpty(functionName))
                 throw new ArgumentNullException(nameof(functionName));
 
-            return functions.ContainsKey(ConvertFunctionName(functionName));
-        }
-
-        private string ConvertFunctionName(string functionName)
-        {
-            return caseSensitive ? functionName : functionName.ToLowerFast();
+            return functions.ContainsKey(functionName);
         }
     }
 }
