@@ -123,7 +123,7 @@ namespace Jace
                 executor = new DynamicCompiler(caseSensitive);
             else
                 throw new ArgumentException(string.Format("Unsupported execution mode \"{0}\".", options.ExecutionMode),
-                    "executionMode");
+                    nameof(options.ExecutionMode));
 
             optimizer = new Optimizer(new Interpreter()); // We run the optimizer with the interpreter 
 

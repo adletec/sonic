@@ -277,7 +277,7 @@ namespace Jace
 
                         return new NotEqual(dataType, argument1, argument2);
                     default:
-                        throw new ArgumentException(string.Format("Unknown operation \"{0}\".", operationToken), "operation");
+                        throw new ArgumentException(string.Format("Unknown operation \"{0}\".", operationToken), nameof(operationToken));
                 }
             }
             catch (InvalidOperationException)
@@ -318,7 +318,7 @@ namespace Jace
                 }
                 else
                 {
-                    throw new ArgumentException(string.Format("Unknown function \"{0}\".", functionToken.Value), "function");
+                    throw new ArgumentException(string.Format("Unknown function \"{0}\".", functionToken.Value), nameof(functionToken.Value));
                 }
             }
             catch (InvalidOperationException)
