@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Jace.Util;
 
 namespace Jace.Execution
 {
     public class ConstantRegistry : IConstantRegistry
     {
-        private readonly bool caseSensitive;
         private readonly Dictionary<string, ConstantInfo> constants;
 
         public ConstantRegistry(bool caseSensitive)
         {
-            this.caseSensitive = caseSensitive;
-            this.constants = new Dictionary<string, ConstantInfo>();
+            constants = caseSensitive
+                ? new Dictionary<string, ConstantInfo>()
+                : new Dictionary<string, ConstantInfo>(StringComparer.OrdinalIgnoreCase);
         }
 
         public IEnumerator<ConstantInfo> GetEnumerator()
@@ -31,7 +30,7 @@ namespace Jace.Execution
             if (string.IsNullOrEmpty(constantName))
                 throw new ArgumentNullException(nameof(constantName));
 
-            return constants.TryGetValue(ConvertConstantName(constantName), out var constantInfo) ? constantInfo : null;
+            return constants.TryGetValue(constantName, out var constantInfo) ? constantInfo : null;
         }
 
         public bool IsConstantName(string constantName)
@@ -39,7 +38,7 @@ namespace Jace.Execution
             if (string.IsNullOrEmpty(constantName))
                 throw new ArgumentNullException(nameof(constantName));
 
-            return constants.ContainsKey(ConvertConstantName(constantName));
+            return constants.ContainsKey(constantName);
         }
 
         public void RegisterConstant(string constantName, double value)
@@ -52,8 +51,6 @@ namespace Jace.Execution
             if(string.IsNullOrEmpty(constantName))
                 throw new ArgumentNullException(nameof(constantName));
 
-            constantName = ConvertConstantName(constantName);
-
             if (constants.ContainsKey(constantName) && !constants[constantName].IsOverWritable)
             {
                 throw new Exception($"The constant \"{constantName}\" cannot be overwritten.");
@@ -62,11 +59,6 @@ namespace Jace.Execution
             var constantInfo = new ConstantInfo(constantName, value, isOverWritable);
 
             constants[constantName] = constantInfo;
-        }
-
-        private string ConvertConstantName(string constantName)
-        {
-            return caseSensitive ? constantName : constantName.ToLowerFast();
         }
     }
 }

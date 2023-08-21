@@ -25,9 +25,9 @@ public class OptimizerTests
         AstBuilder astBuilder = new AstBuilder(functionRegistry, true);
         Operation operation = astBuilder.Build(tokens);
 
-        Function optimizedFuction = (Function)optimizer.Optimize(operation, functionRegistry, null);
+        Function optimizedFunction = (Function)optimizer.Optimize(operation, functionRegistry, null);
 
-        Assert.AreEqual(typeof(FloatingPointConstant), optimizedFuction.Arguments[1].GetType());
+        Assert.AreEqual(typeof(FloatingPointConstant), optimizedFunction.Arguments[1].GetType());
     }
 
     [TestMethod]
@@ -44,10 +44,10 @@ public class OptimizerTests
         AstBuilder astBuilder = new AstBuilder(functionRegistry, true);
         Operation operation = astBuilder.Build(tokens);
 
-        Operation optimizedFuction = optimizer.Optimize(operation, functionRegistry, null);
+        Operation optimizedFunction = optimizer.Optimize(operation, functionRegistry, null);
 
-        Assert.AreEqual(typeof(Function), optimizedFuction.GetType());
-        Assert.AreEqual(typeof(IntegerConstant), ((Function)optimizedFuction).Arguments[0].GetType());
+        Assert.AreEqual(typeof(Function), optimizedFunction.GetType());
+        Assert.AreEqual(typeof(IntegerConstant), ((Function)optimizedFunction).Arguments[0].GetType());
     }
 
     [TestMethod]
