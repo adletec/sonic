@@ -58,6 +58,12 @@ namespace Jace
                 var exponentiation = (Exponentiation)operation;
                 exponentiation.Base = Optimize(exponentiation.Base, functionRegistry, constantRegistry);
                 exponentiation.Exponent = Optimize(exponentiation.Exponent, functionRegistry, constantRegistry);
+
+                if (exponentiation.Exponent.GetType() == typeof(FloatingPointConstant) &&
+                    ((FloatingPointConstant)exponentiation.Exponent).Value == 0.0)
+                {
+                    return new FloatingPointConstant(1.0);
+                }
             }
             else if(operation.GetType() == typeof(Function))
             {
