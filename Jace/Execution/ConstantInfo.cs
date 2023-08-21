@@ -13,6 +13,6 @@
 
         public double Value { get; private set; }
 
-        public bool IsOverWritable { get; set; }
+        public bool IsOverWritable { get; }
     }
 }

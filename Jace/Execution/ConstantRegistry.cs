@@ -29,7 +29,7 @@ namespace Jace.Execution
         public ConstantInfo GetConstantInfo(string constantName)
         {
             if (string.IsNullOrEmpty(constantName))
-                throw new ArgumentNullException("constantName");
+                throw new ArgumentNullException(nameof(constantName));
 
             return constants.TryGetValue(ConvertConstantName(constantName), out var constantInfo) ? constantInfo : null;
         }
@@ -37,7 +37,7 @@ namespace Jace.Execution
         public bool IsConstantName(string constantName)
         {
             if (string.IsNullOrEmpty(constantName))
-                throw new ArgumentNullException("constantName");
+                throw new ArgumentNullException(nameof(constantName));
 
             return constants.ContainsKey(ConvertConstantName(constantName));
         }
@@ -50,17 +50,16 @@ namespace Jace.Execution
         public void RegisterConstant(string constantName, double value, bool isOverWritable)
         {
             if(string.IsNullOrEmpty(constantName))
-                throw new ArgumentNullException("constantName");
+                throw new ArgumentNullException(nameof(constantName));
 
             constantName = ConvertConstantName(constantName);
 
             if (constants.ContainsKey(constantName) && !constants[constantName].IsOverWritable)
             {
-                string message = string.Format("The constant \"{0}\" cannot be overwriten.", constantName);
-                throw new Exception(message);
+                throw new Exception($"The constant \"{constantName}\" cannot be overwritten.");
             }
 
-            ConstantInfo constantInfo = new ConstantInfo(constantName, value, isOverWritable);
+            var constantInfo = new ConstantInfo(constantName, value, isOverWritable);
 
             constants[constantName] = constantInfo;
         }

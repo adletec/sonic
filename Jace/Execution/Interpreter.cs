@@ -21,10 +21,7 @@ namespace Jace.Execution
             IConstantRegistry constantRegistry)
         {
             return caseSensitive
-              ? (Func<IDictionary<string, double>, double>)(variables =>
-              {
-                  return Execute(operation, functionRegistry, constantRegistry, variables);
-              })
+              ? (Func<IDictionary<string, double>, double>)(variables => Execute(operation, functionRegistry, constantRegistry, variables))
               : (Func<IDictionary<string, double>, double>)(variables =>
               {
                   variables = EngineUtil.ConvertVariableNamesToLowerCase(variables);
@@ -43,24 +40,25 @@ namespace Jace.Execution
             IDictionary<string, double> variables)
         {
             if (operation == null)
-                throw new ArgumentNullException("operation");
+                throw new ArgumentNullException(nameof(operation));
 
             if (operation.GetType() == typeof(IntegerConstant))
             {
-                IntegerConstant constant = (IntegerConstant)operation;
+                var constant = (IntegerConstant)operation;
                 return constant.Value;
             }
-            else if (operation.GetType() == typeof(FloatingPointConstant))
-            {
-                FloatingPointConstant constant = (FloatingPointConstant)operation;
-                return constant.Value;
-            }
-            else if (operation.GetType() == typeof(Variable))
-            {
-                Variable variable = (Variable)operation;
 
-                double value;
-                bool variableFound = variables.TryGetValue(variable.Name, out value);
+            if (operation.GetType() == typeof(FloatingPointConstant))
+            {
+                var constant = (FloatingPointConstant)operation;
+                return constant.Value;
+            }
+
+            if (operation.GetType() == typeof(Variable))
+            {
+                var variable = (Variable)operation;
+
+                var variableFound = variables.TryGetValue(variable.Name, out var value);
 
                 if (variableFound)
                     return value;
@@ -68,186 +66,214 @@ namespace Jace.Execution
                 if (constantRegistry.IsConstantName(variable.Name))
                     return constantRegistry.GetConstantInfo(variable.Name).Value;
 
-                throw new VariableNotDefinedException(string.Format("The variable \"{0}\" used is not defined.", variable.Name));
+                throw new VariableNotDefinedException($"The variable \"{variable.Name}\" used is not defined.");
             }
-            else if (operation.GetType() == typeof(Multiplication))
+            if (operation.GetType() == typeof(Multiplication))
             {
-                Multiplication multiplication = (Multiplication)operation;
+                var multiplication = (Multiplication)operation;
                 return Execute(multiplication.Argument1, functionRegistry, constantRegistry,  variables) * Execute(multiplication.Argument2, functionRegistry, constantRegistry,  variables);
             }
-            else if (operation.GetType() == typeof(Addition))
+
+            if (operation.GetType() == typeof(Addition))
             {
-                Addition addition = (Addition)operation;
+                var addition = (Addition)operation;
                 return Execute(addition.Argument1, functionRegistry, constantRegistry,  variables) + Execute(addition.Argument2, functionRegistry, constantRegistry,  variables);
             }
-            else if (operation.GetType() == typeof(Subtraction))
+
+            if (operation.GetType() == typeof(Subtraction))
             {
-                Subtraction addition = (Subtraction)operation;
+                var addition = (Subtraction)operation;
                 return Execute(addition.Argument1, functionRegistry, constantRegistry,  variables) - Execute(addition.Argument2, functionRegistry, constantRegistry,  variables);
             }
-            else if (operation.GetType() == typeof(Division))
+
+            if (operation.GetType() == typeof(Division))
             {
-                Division division = (Division)operation;
+                var division = (Division)operation;
                 return Execute(division.Dividend, functionRegistry, constantRegistry,  variables) / Execute(division.Divisor, functionRegistry, constantRegistry,  variables);
             }
-            else if (operation.GetType() == typeof(Modulo))
+
+            if (operation.GetType() == typeof(Modulo))
             {
-                Modulo division = (Modulo)operation;
+                var division = (Modulo)operation;
                 return Execute(division.Dividend, functionRegistry, constantRegistry,  variables) % Execute(division.Divisor, functionRegistry, constantRegistry,  variables);
             }
-            else if (operation.GetType() == typeof(Exponentiation))
+
+            if (operation.GetType() == typeof(Exponentiation))
             {
-                Exponentiation exponentiation = (Exponentiation)operation;
+                var exponentiation = (Exponentiation)operation;
                 return Math.Pow(Execute(exponentiation.Base, functionRegistry, constantRegistry,  variables), Execute(exponentiation.Exponent, functionRegistry, constantRegistry,  variables));
             }
-            else if (operation.GetType() == typeof(UnaryMinus))
+
+            if (operation.GetType() == typeof(UnaryMinus))
             {
-                UnaryMinus unaryMinus = (UnaryMinus)operation;
+                var unaryMinus = (UnaryMinus)operation;
                 return -Execute(unaryMinus.Argument, functionRegistry, constantRegistry,  variables);
             }
-            else if (operation.GetType() == typeof(And))
+
+            if (operation.GetType() == typeof(And))
             {
-                And and = (And)operation;
+                var and = (And)operation;
                 var operation1 = Execute(and.Argument1, functionRegistry, constantRegistry,  variables) != 0;
                 var operation2 = Execute(and.Argument2, functionRegistry, constantRegistry,  variables) != 0;
 
                 return (operation1 && operation2) ? 1.0 : 0.0;
             }
-            else if (operation.GetType() == typeof(Or))
+
+            if (operation.GetType() == typeof(Or))
             {
-                Or or = (Or)operation;
+                var or = (Or)operation;
                 var operation1 = Execute(or.Argument1, functionRegistry, constantRegistry,  variables) != 0;
                 var operation2 = Execute(or.Argument2, functionRegistry, constantRegistry,  variables) != 0;
 
                 return (operation1 || operation2) ? 1.0 : 0.0;
             }
-            else if(operation.GetType() == typeof(LessThan))
+
+            if(operation.GetType() == typeof(LessThan))
             {
-                LessThan lessThan = (LessThan)operation;
+                var lessThan = (LessThan)operation;
                 return (Execute(lessThan.Argument1, functionRegistry, constantRegistry,  variables) < Execute(lessThan.Argument2, functionRegistry, constantRegistry,  variables)) ? 1.0 : 0.0;
             }
-            else if (operation.GetType() == typeof(LessOrEqualThan))
+
+            if (operation.GetType() == typeof(LessOrEqualThan))
             {
-                LessOrEqualThan lessOrEqualThan = (LessOrEqualThan)operation;
+                var lessOrEqualThan = (LessOrEqualThan)operation;
                 return (Execute(lessOrEqualThan.Argument1, functionRegistry, constantRegistry,  variables) <= Execute(lessOrEqualThan.Argument2, functionRegistry, constantRegistry,  variables)) ? 1.0 : 0.0;
             }
-            else if (operation.GetType() == typeof(GreaterThan))
+
+            if (operation.GetType() == typeof(GreaterThan))
             {
-                GreaterThan greaterThan = (GreaterThan)operation;
+                var greaterThan = (GreaterThan)operation;
                 return (Execute(greaterThan.Argument1, functionRegistry, constantRegistry,  variables) > Execute(greaterThan.Argument2, functionRegistry, constantRegistry,  variables)) ? 1.0 : 0.0;
             }
-            else if (operation.GetType() == typeof(GreaterOrEqualThan))
+
+            if (operation.GetType() == typeof(GreaterOrEqualThan))
             {
-                GreaterOrEqualThan greaterOrEqualThan = (GreaterOrEqualThan)operation;
+                var greaterOrEqualThan = (GreaterOrEqualThan)operation;
                 return (Execute(greaterOrEqualThan.Argument1, functionRegistry, constantRegistry,  variables) >= Execute(greaterOrEqualThan.Argument2, functionRegistry, constantRegistry,  variables)) ? 1.0 : 0.0;
             }
-            else if (operation.GetType() == typeof(Equal))
+
+            if (operation.GetType() == typeof(Equal))
             {
-                Equal equal = (Equal)operation;
+                var equal = (Equal)operation;
                 return (Execute(equal.Argument1, functionRegistry, constantRegistry,  variables) == Execute(equal.Argument2, functionRegistry, constantRegistry,  variables)) ? 1.0 : 0.0;
             }
-            else if (operation.GetType() == typeof(NotEqual))
+
+            if (operation.GetType() == typeof(NotEqual))
             {
-                NotEqual notEqual = (NotEqual)operation;
+                var notEqual = (NotEqual)operation;
                 return (Execute(notEqual.Argument1, functionRegistry, constantRegistry,  variables) != Execute(notEqual.Argument2, functionRegistry, constantRegistry,  variables)) ? 1.0 : 0.0;
             }
-            else if (operation.GetType() == typeof(Function))
+
+            if (operation.GetType() == typeof(Function))
             {
-                Function function = (Function)operation;
+                var function = (Function)operation;
 
-                FunctionInfo functionInfo = functionRegistry.GetFunctionInfo(function.FunctionName);
+                var functionInfo = functionRegistry.GetFunctionInfo(function.FunctionName);
 
-                double[] arguments = new double[functionInfo.IsDynamicFunc ? function.Arguments.Count : functionInfo.NumberOfParameters];
-                for (int i = 0; i < arguments.Length; i++)
+                var arguments = new double[functionInfo.IsDynamicFunc ? function.Arguments.Count : functionInfo.NumberOfParameters];
+                for (var i = 0; i < arguments.Length; i++)
                     arguments[i] = Execute(function.Arguments[i], functionRegistry, constantRegistry,  variables);
 
                 return Invoke(functionInfo.Function, arguments);
             }
-            else
-            {
-                throw new ArgumentException(string.Format("Unsupported operation \"{0}\".", operation.GetType().FullName), "operation");
-            }
+
+            throw new ArgumentException($"Unsupported operation \"{operation.GetType().FullName}\".", nameof(operation));
         }
 
         private double Invoke(Delegate function, double[] arguments)
         {
             // DynamicInvoke is slow, so we first try to convert it to a Func
-            if (function is Func<double>)
+            if (function is Func<double> func)
             {
-                return ((Func<double>)function).Invoke();
+                return func.Invoke();
             }
-            else if (function is Func<double, double>)
+
+            if (function is Func<double, double> func1Argument)
             {
-                return ((Func<double, double>)function).Invoke(arguments[0]);
+                return func1Argument.Invoke(arguments[0]);
             }
-            else if (function is Func<double, double, double>)
+
+            if (function is Func<double, double, double> func2Arguments)
             {
-                return ((Func<double, double, double>)function).Invoke(arguments[0], arguments[1]);
+                return func2Arguments.Invoke(arguments[0], arguments[1]);
             }
-            else if (function is Func<double, double, double, double>)
+
+            if (function is Func<double, double, double, double> func3Arguments)
             {
-                return ((Func<double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2]);
+                return func3Arguments.Invoke(arguments[0], arguments[1], arguments[2]);
             }
-            else if (function is Func<double, double, double, double, double>)
+
+            if (function is Func<double, double, double, double, double> func4Arguments)
             {
-                return ((Func<double, double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2], arguments[3]);
+                return func4Arguments.Invoke(arguments[0], arguments[1], arguments[2], arguments[3]);
             }
-            else if (function is Func<double, double, double, double, double, double>)
+
+            if (function is Func<double, double, double, double, double, double> func5Arguments)
             {
-                return ((Func<double, double, double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+                return func5Arguments.Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
             }
-            else if (function is Func<double, double, double, double, double, double, double>)
+
+            if (function is Func<double, double, double, double, double, double, double> func6Arguments)
             {
-                return ((Func<double, double, double, double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5]);
+                return func6Arguments.Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5]);
             }
-            else if (function is Func<double, double, double, double, double, double, double, double>)
+
+            if (function is Func<double, double, double, double, double, double, double, double> func7Arguments)
             {
-                return ((Func<double, double, double, double, double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6]);
+                return func7Arguments.Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6]);
             }
-            else if (function is Func<double, double, double, double, double, double, double, double, double>)
+
+            if (function is Func<double, double, double, double, double, double, double, double, double> func8Arguments)
             {
-                return ((Func<double, double, double, double, double, double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7]);
+                return func8Arguments.Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7]);
             }
-            else if (function is Func<double, double, double, double, double, double, double, double, double, double>)
+
+            if (function is Func<double, double, double, double, double, double, double, double, double, double> func9Arguments)
             {
-                return ((Func<double, double, double, double, double, double, double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8]);
+                return func9Arguments.Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8]);
             }
-            else if (function is Func<double, double, double, double, double, double, double, double, double, double, double>)
+
+            if (function is Func<double, double, double, double, double, double, double, double, double, double, double> func10Arguments)
             {
-                return ((Func<double, double, double, double, double, double, double, double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9]);
+                return func10Arguments.Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9]);
             }
-            else if (function is Func<double, double, double, double, double, double, double, double, double, double, double, double>)
+
+            if (function is Func<double, double, double, double, double, double, double, double, double, double, double, double> func11Arguments)
             {
-                return ((Func<double, double, double, double, double, double, double, double, double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10]);
+                return func11Arguments.Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10]);
             }
-            else if (function is Func<double, double, double, double, double, double, double, double, double, double, double, double, double>)
+
+            if (function is Func<double, double, double, double, double, double, double, double, double, double, double, double, double> func12Arguments)
             {
-                return ((Func<double, double, double, double, double, double, double, double, double, double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10], arguments[11]);
+                return func12Arguments.Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10], arguments[11]);
             }
-            else if (function is Func<double, double, double, double, double, double, double, double, double, double, double, double, double, double>)
+
+            if (function is Func<double, double, double, double, double, double, double, double, double, double, double, double, double, double> func13Arguments)
             {
-                return ((Func<double, double, double, double, double, double, double, double, double, double, double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10], arguments[11], arguments[12]);
+                return func13Arguments.Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10], arguments[11], arguments[12]);
             }
-            else if (function is Func<double, double, double, double, double, double, double, double, double, double, double, double, double, double, double>)
+
+            if (function is Func<double, double, double, double, double, double, double, double, double, double, double, double, double, double, double> func14Arguments)
             {
-                return ((Func<double, double, double, double, double, double, double, double, double, double, double, double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10], arguments[11], arguments[12], arguments[13]);
+                return func14Arguments.Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10], arguments[11], arguments[12], arguments[13]);
             }
-            else if (function is Func<double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double>)
+
+            if (function is Func<double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double> func15Arguments)
             {
-                return ((Func<double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10], arguments[11], arguments[12], arguments[13], arguments[14]);
+                return func15Arguments.Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10], arguments[11], arguments[12], arguments[13], arguments[14]);
             }
-            else if (function is Func<double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double>)
+
+            if (function is Func<double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double> func16Arguments)
             {
-                return ((Func<double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double>)function).Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10], arguments[11], arguments[12], arguments[13], arguments[14], arguments[15]);
+                return func16Arguments.Invoke(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10], arguments[11], arguments[12], arguments[13], arguments[14], arguments[15]);
             }
-            else if (function is DynamicFunc<double, double>)
+
+            if (function is DynamicFunc<double, double> dynamicFunc)
             {
-                return ((DynamicFunc<double, double>)function).Invoke(arguments);
+                return dynamicFunc.Invoke(arguments);
             }
-            else
-            {
-                return (double)function.DynamicInvoke((from s in arguments select (object)s).ToArray());
-            }
+
+            return (double)function.DynamicInvoke((from s in arguments select (object)s).ToArray());
         }
     }
 }

@@ -2,7 +2,7 @@
 {
     public abstract class Operation
     {
-        public Operation(DataType dataType, bool dependsOnVariables, bool isIdempotent)
+        protected Operation(DataType dataType, bool dependsOnVariables, bool isIdempotent)
         {
             this.DataType = dataType;
             this.DependsOnVariables = dependsOnVariables;

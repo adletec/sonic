@@ -7,13 +7,14 @@ namespace Jace.Execution
 {
     public class FormulaBuilder
     {
-        private readonly CalculationEngine engine;
 
-        private string formulaText;
-        private bool caseSensitive;
+        private readonly List<ParameterInfo> parameters;
+        private readonly IDictionary<string, double> constants;
+        private readonly string formulaText;
+        private readonly bool caseSensitive;
+        private readonly CalculationEngine engine;
+        
         private DataType? resultDataType;
-        private List<ParameterInfo> parameters;
-        private IDictionary<string, double> constants;
 
         /// <summary>
         /// Creates a new instance of the FormulaBuilder class.
@@ -43,15 +44,15 @@ namespace Jace.Execution
         public FormulaBuilder Parameter(string name, DataType dataType)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
 
             if (engine.FunctionRegistry.IsFunctionName(name))
-                throw new ArgumentException(string.Format("The name \"{0}\" is a function name. Parameters cannot have this name.", name), "name");
+                throw new ArgumentException($"The name \"{name}\" is a function name. Parameters cannot have this name.", nameof(name));
 
             if (parameters.Any(p => p.Name == name))
-                throw new ArgumentException(string.Format("A parameter with the name \"{0}\" was already defined.", name), "name");
+                throw new ArgumentException($"A parameter with the name \"{name}\" was already defined.", nameof(name));
 
-            parameters.Add(new ParameterInfo() {Name = name, DataType = dataType});
+            parameters.Add(new ParameterInfo {Name = name, DataType = dataType});
             return this;
         }
 
@@ -75,10 +76,10 @@ namespace Jace.Execution
         public FormulaBuilder Constant(string name, double constantValue)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
 
             if (constants.Any(p => p.Key == name))
-                throw new ArgumentException(string.Format("A constant with the name \"{0}\" was already defined.", name), "name");
+                throw new ArgumentException($"A constant with the name \"{name}\" was already defined.", nameof(name));
 
             constants[name] = constantValue;
             return this;
@@ -108,9 +109,9 @@ namespace Jace.Execution
             if (!resultDataType.HasValue)
                 throw new Exception("Please define a result data type for the formula.");
 
-            Func<IDictionary<string, double>, double> formula = engine.Build(formulaText, constants);
+            var formula = engine.Build(formulaText, constants);
 
-            FuncAdapter adapter = new FuncAdapter();
+            var adapter = new FuncAdapter();
             return adapter.Wrap(parameters, variables => {
 
                 if(!caseSensitive)

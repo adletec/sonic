@@ -8,6 +8,6 @@
             this.Argument = argument;
         }
 
-        public Operation Argument { get; internal set; }
+        public Operation Argument { get; }
     }
 }

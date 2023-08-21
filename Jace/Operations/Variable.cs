@@ -11,17 +11,12 @@
             this.Name = name;
         }
 
-        public string Name { get; private set; }
+        public string Name { get; }
 
         public override bool Equals(object obj)
         {
-            Variable other = obj as Variable;
-            if (other != null)
-            {
-                return this.Name.Equals(other.Name);
-            }
-            else
-                return false;
+            var other = obj as Variable;
+            return other != null && this.Name.Equals(other.Name);
         }
 
         public override int GetHashCode()

@@ -17,10 +17,7 @@ namespace Jace.Operations
         public string FunctionName { get; private set; }
 
         public IList<Operation> Arguments {
-            get
-            {
-                return arguments;
-            }
+            get => arguments;
             internal set
             {
                 this.arguments = value;
