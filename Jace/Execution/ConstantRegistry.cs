@@ -62,10 +62,7 @@ namespace Jace.Execution
 
             ConstantInfo constantInfo = new ConstantInfo(constantName, value, isOverWritable);
 
-            if (constants.ContainsKey(constantName))
-                constants[constantName] = constantInfo;
-            else
-                constants.Add(constantName, constantInfo);
+            constants[constantName] = constantInfo;
         }
 
         private string ConvertConstantName(string constantName)

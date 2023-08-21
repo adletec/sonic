@@ -95,10 +95,7 @@ namespace Jace.Execution
 
             FunctionInfo functionInfo = new FunctionInfo(functionName, numberOfParameters, isIdempotent, isOverWritable, isDynamicFunc, function);
 
-            if (functions.ContainsKey(functionName))
-                functions[functionName] = functionInfo;
-            else
-                functions.Add(functionName, functionInfo);
+            functions[functionName] = functionInfo;
         }
 
             public bool IsFunctionName(string functionName)
