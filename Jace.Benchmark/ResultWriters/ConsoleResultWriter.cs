@@ -4,7 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 
-namespace Jace.Benchmark.Properties.ResultWriters;
+namespace Jace.Benchmark.ResultWriters;
 
 public class ConsoleResultWriter : IResultWriter
 {

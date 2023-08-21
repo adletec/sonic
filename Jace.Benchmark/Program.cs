@@ -4,7 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Threading.Tasks;
 using CommandLine;
-using Jace.Benchmark.Properties.ResultWriters;
+using Jace.Benchmark.ResultWriters;
 using Jace.Execution;
 
 namespace Jace.Benchmark

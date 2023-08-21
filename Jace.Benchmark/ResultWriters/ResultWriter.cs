@@ -1,6 +1,6 @@
 using System.Data;
 
-namespace Jace.Benchmark.Properties.ResultWriters;
+namespace Jace.Benchmark.ResultWriters;
 
 public interface IResultWriter
 {
