@@ -24,17 +24,17 @@ namespace Jace.DemoApp
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-            formulaTextBox = this.FindControl<TextBox>("formulaTextBox");
-            tokensTextBox = this.FindControl<TextBox>("tokensTextBox");
-            astTreeView = this.FindControl<TreeView>("astTreeView");
-            resultTextBox = this.FindControl<TextBox>("resultTextBox");
+            FormulaTextBox = this.FindControl<TextBox>("FormulaTextBox");
+            TokensTextBox = this.FindControl<TextBox>("TokensTextBox");
+            AstTreeView = this.FindControl<TreeView>("AstTreeView");
+            ResultTextBox = this.FindControl<TextBox>("ResultTextBox");
 
-            if (formulaTextBox == null || tokensTextBox == null || astTreeView == null || resultTextBox == null)
+            if (FormulaTextBox == null || TokensTextBox == null || AstTreeView == null || ResultTextBox == null)
             {
                 throw new InvalidOperationException("Could not find required controls.");
             }
             
-            formulaTextBox.AttachedToVisualTree += (_, _) => formulaTextBox.Focus();
+            FormulaTextBox.AttachedToVisualTree += (_, _) => FormulaTextBox.Focus();
         }
 
         private async void calculateButton_Click(object sender, RoutedEventArgs e)
@@ -43,7 +43,7 @@ namespace Jace.DemoApp
             {
                 ClearScreen();
 
-                var formula = formulaTextBox.Text;
+                var formula = FormulaTextBox.Text;
 
                 var reader = new TokenReader();
                 var tokens = reader.Read(formula);
@@ -67,7 +67,7 @@ namespace Jace.DemoApp
                 IExecutor executor = new Interpreter();
                 var result = executor.Execute(operation, null, null, variables);
 
-                resultTextBox.Text = result.ToString(CultureInfo.CurrentCulture);
+                ResultTextBox.Text = result.ToString(CultureInfo.CurrentCulture);
             }
             catch (Exception ex)
             {
@@ -82,9 +82,9 @@ namespace Jace.DemoApp
 
         private void ClearScreen()
         {
-            tokensTextBox.Text = "";
-            astTreeView.Items.Clear();
-            resultTextBox.Text = "";
+            TokensTextBox.Text = "";
+            AstTreeView.Items.Clear();
+            ResultTextBox.Text = "";
         }
 
         private void ShowTokens(IList<Token> tokens)
@@ -115,14 +115,14 @@ namespace Jace.DemoApp
 
             result += " ]";
 
-            tokensTextBox.Text = result;
+            TokensTextBox.Text = result;
         }
 
         private void ShowAbstractSyntaxTree(Operation operation)
         {
-            astTreeView.Items.Clear();
+            AstTreeView.Items.Clear();
             var item = CreateTreeViewItem(operation);
-            astTreeView.Items.Add(item);
+            AstTreeView.Items.Add(item);
         }
 
         private TreeViewItem CreateTreeViewItem(Operation operation)

@@ -20,27 +20,27 @@ namespace Jace.DemoApp
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-            questionLabel = this.FindControl<TextBlock>("questionLabel");
-            valueTextBox = this.FindControl<TextBox>("valueTextBox");
+            QuestionLabel = this.FindControl<TextBlock>("QuestionLabel");
+            ValueTextBox = this.FindControl<TextBox>("ValueTextBox");
             
-            if (questionLabel == null || valueTextBox == null)
+            if (QuestionLabel == null || ValueTextBox == null)
             {
                 throw new InvalidOperationException("Could not find required controls.");
             }
             
-            valueTextBox.AttachedToVisualTree += (_, _) => valueTextBox.Focus();
+            ValueTextBox.AttachedToVisualTree += (_, _) => ValueTextBox.Focus();
         }
 
         private void OK_Click(object sender, RoutedEventArgs e)
         {
-            if (double.TryParse(valueTextBox.Text, out double value))
+            if (double.TryParse(ValueTextBox.Text, out double value))
             {
                 taskCompletionSource.SetResult(value); // Set the result of the dialog
             }
             else
             {
                 taskCompletionSource.SetResult(null); // Indicate that the input was invalid
-                Console.WriteLine($"Invalid input: {valueTextBox.Text}. Will use 0.0 instead.");
+                Console.WriteLine($"Invalid input: {ValueTextBox.Text}. Will use 0.0 instead.");
             }
 
             Close();
@@ -48,7 +48,7 @@ namespace Jace.DemoApp
         
         public async Task<double?> ShowDialogAsync(string variableName, Window parent)
         {
-            questionLabel.Text = $"Please provide a value for variable \"{variableName}\":";
+            QuestionLabel.Text = $"Please provide a value for variable \"{variableName}\":";
             await ShowDialog(parent);
             return await taskCompletionSource.Task;
         }

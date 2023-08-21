@@ -10,7 +10,7 @@ namespace Jace.Execution
 {
     public class DynamicCompiler : IExecutor
     {
-        private string FuncAssemblyQualifiedName;
+        private string funcAssemblyQualifiedName;
         private readonly bool caseSensitive;
 
         public DynamicCompiler(): this(false) { }
@@ -19,7 +19,7 @@ namespace Jace.Execution
             this.caseSensitive = caseSensitive;
             // The lower func reside in mscorelib, the higher ones in another assembly.
             // This is  an easy cross platform way to to have this AssemblyQualifiedName.
-            FuncAssemblyQualifiedName =
+            funcAssemblyQualifiedName =
                 typeof(Func<double, double, double, double, double, double, double, double, double, double>).GetTypeInfo().Assembly.FullName;
         }
 
@@ -299,7 +299,7 @@ namespace Jace.Execution
             if (numberOfParameters < 9)
                 funcTypeName = string.Format("System.Func`{0}", numberOfParameters + 1);
             else
-                funcTypeName = string.Format("System.Func`{0}, {1}", numberOfParameters + 1, FuncAssemblyQualifiedName);
+                funcTypeName = string.Format("System.Func`{0}, {1}", numberOfParameters + 1, funcAssemblyQualifiedName);
             Type funcType = Type.GetType(funcTypeName);
 
             Type[] typeArguments = new Type[numberOfParameters + 1];
