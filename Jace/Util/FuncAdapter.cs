@@ -33,31 +33,6 @@ namespace Jace.Util
             return GenerateDelegate(parameterArray, function);
         }
 
-        // Uncomment for debugging purposes
-        //public void CreateDynamicModuleBuilder()
-        //{
-        //    AssemblyName assemblyName = new AssemblyName("JaceDynamicAssembly");
-        //    AppDomain domain = AppDomain.CurrentDomain;
-        //    AssemblyBuilder assemblyBuilder = domain.DefineDynamicAssembly(assemblyName,
-        //        AssemblyBuilderAccess.RunAndSave);
-        //    ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName.Name, "test.dll");
-
-        //    TypeBuilder typeBuilder = moduleBuilder.DefineType("MyTestClass");
-
-        //    MethodBuilder method = typeBuilder.DefineMethod("MyTestMethod", MethodAttributes.Static, typeof(double),
-        //       new Type[] { typeof(FuncAdapterArguments), typeof(int), typeof(double) });
-
-        //    ILGenerator generator = method.GetILGenerator();
-        //    GenerateMethodBody(generator, new List<Calculator.Execution.ParameterInfo>() { 
-        //        new Calculator.Execution.ParameterInfo() { Name = "test1", DataType = DataType.Integer },
-        //        new Calculator.Execution.ParameterInfo() { Name = "test2", DataType = DataType.FloatingPoint }},
-        //        (a) => 0.0);
-
-        //    typeBuilder.CreateType();
-
-        //    assemblyBuilder.Save(@"test.dll");
-        //}
-
         private Delegate GenerateDelegate(ParameterInfo[] parameterArray,
             Func<Dictionary<string, double>, double> function)
         {
@@ -110,14 +85,39 @@ namespace Jace.Util
             return funcType.MakeGenericType(typeArguments);
         }
 
-        private class FuncAdapterArguments
-        {
-            private readonly Func<Dictionary<string, double>, double> function;
-
-            public FuncAdapterArguments(Func<Dictionary<string, double>, double> function)
-            {
-                this.function = function;
-            }
-        }
+        // Uncomment for debugging purposes
+        // public void CreateDynamicModuleBuilder()
+        // {
+        //     AssemblyName assemblyName = new AssemblyName("JaceDynamicAssembly");
+        //     AppDomain domain = AppDomain.CurrentDomain;
+        //     AssemblyBuilder assemblyBuilder = domain.DefineDynamicAssembly(assemblyName,
+        //         AssemblyBuilderAccess.RunAndSave);
+        //     ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName.Name, "test.dll");
+        //
+        //     TypeBuilder typeBuilder = moduleBuilder.DefineType("MyTestClass");
+        //
+        //     MethodBuilder method = typeBuilder.DefineMethod("MyTestMethod", MethodAttributes.Static, typeof(double),
+        //        new Type[] { typeof(FuncAdapterArguments), typeof(int), typeof(double) });
+        //
+        //     ILGenerator generator = method.GetILGenerator();
+        //     GenerateMethodBody(generator, new List<Calculator.Execution.ParameterInfo>() { 
+        //         new Calculator.Execution.ParameterInfo() { Name = "test1", DataType = DataType.Integer },
+        //         new Calculator.Execution.ParameterInfo() { Name = "test2", DataType = DataType.FloatingPoint }},
+        //         (a) => 0.0);
+        //
+        //     typeBuilder.CreateType();
+        //
+        //     assemblyBuilder.Save(@"test.dll");
+        // }
+        //
+        // private class FuncAdapterArguments
+        // {
+        //     private readonly Func<Dictionary<string, double>, double> function;
+        //
+        //     public FuncAdapterArguments(Func<Dictionary<string, double>, double> function)
+        //     {
+        //         this.function = function;
+        //     }
+        // }
     }
 }
