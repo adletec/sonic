@@ -297,6 +297,10 @@ namespace Jace.Execution
             else
                 funcTypeName = string.Format("System.Func`{0}, {1}", numberOfParameters + 1, funcAssemblyQualifiedName);
             Type funcType = Type.GetType(funcTypeName);
+            if (funcType == null)
+            {
+                throw new InvalidOperationException($"Couldn't get type of ${funcTypeName}.");
+            }
 
             Type[] typeArguments = new Type[numberOfParameters + 1];
             for (int i = 0; i < typeArguments.Length; i++)
