@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using Jace.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq.Expressions;
 
 namespace Jace.Tests
 {

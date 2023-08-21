@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Jace.Execution;
 using Jace.Operations;
 using Jace.Tokenizer;

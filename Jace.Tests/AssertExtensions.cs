@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-#if NETFX_CORE
+﻿#if NETFX_CORE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 #elif __ANDROID__
 using NUnit.Framework;
 #else
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 #endif
+using System;
 
 namespace Jace.Tests
 {

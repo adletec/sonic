@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 
 namespace Jace.Tokenizer
@@ -129,7 +128,7 @@ namespace Jace.Tokenizer
                 }
                 if (characters[i] == this.argumentSeparator)
                 {
-                    tokens.Add(new Token() { TokenType = Tokenizer.TokenType.ArgumentSeparator, Value = characters[i], StartPosition = i, Length = 1 });
+                    tokens.Add(new Token() { TokenType = TokenType.ArgumentSeparator, Value = characters[i], StartPosition = i, Length = 1 });
                     isFormulaSubPart = false;
                 }
                 else

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Jace.Operations
+﻿namespace Jace.Operations
 {
     public class Or : Operation
     {

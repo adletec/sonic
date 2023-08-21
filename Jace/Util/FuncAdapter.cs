@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Reflection.Emit;
-using System.Text;
-using Jace.Operations;
+using ParameterInfo = Jace.Execution.ParameterInfo;
 
 namespace Jace.Util
 {
@@ -28,10 +25,10 @@ namespace Jace.Util
         /// <param name="parameters">The required parameters of the wrapping function delegate.</param>
         /// <param name="function">The function that must be wrapped.</param>
         /// <returns>A delegate instance of the required type.</returns>
-        public Delegate Wrap(IEnumerable<Jace.Execution.ParameterInfo> parameters, 
+        public Delegate Wrap(IEnumerable<ParameterInfo> parameters, 
             Func<IDictionary<string, double>, double> function)
         {
-            Jace.Execution.ParameterInfo[] parameterArray = parameters.ToArray();
+            ParameterInfo[] parameterArray = parameters.ToArray();
 
             return GenerateDelegate(parameterArray, function);
         }
@@ -61,7 +58,7 @@ namespace Jace.Util
         //    assemblyBuilder.Save(@"test.dll");
         //}
 
-        private Delegate GenerateDelegate(Jace.Execution.ParameterInfo[] parameterArray,
+        private Delegate GenerateDelegate(ParameterInfo[] parameterArray,
             Func<Dictionary<string, double>, double> function)
         {
             Type delegateType = GetDelegateType(parameterArray);
@@ -100,7 +97,7 @@ namespace Jace.Util
             return lambdaExpression.Compile();
         }
 
-        private Type GetDelegateType(Jace.Execution.ParameterInfo[] parameters)
+        private Type GetDelegateType(ParameterInfo[] parameters)
         {
             string funcTypeName = string.Format("System.Func`{0}", parameters.Length + 1);
             Type funcType = Type.GetType(funcTypeName);
