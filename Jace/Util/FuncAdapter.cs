@@ -81,7 +81,7 @@ namespace Jace.Util
                 parameterExpressions[i] = Expression.Parameter(parameterType, parameterArray[i].Name);
 
                 methodBody.Add(Expression.Call(dictionaryExpression,
-                    dictionaryType.GetRuntimeMethod("Add", new Type[] { typeof(string), typeof(double) }),
+                    dictionaryType.GetRuntimeMethod("Add", new[] { typeof(string), typeof(double) }),
                     Expression.Constant(parameterArray[i].Name),
                     Expression.Convert(parameterExpressions[i], typeof(double)))
                     );

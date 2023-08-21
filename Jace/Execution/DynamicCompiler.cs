@@ -140,7 +140,7 @@ namespace Jace.Execution
                 Expression @base = GenerateMethodBody(exponentation.Base, contextParameter, functionRegistry);
                 Expression exponent = GenerateMethodBody(exponentation.Exponent, contextParameter, functionRegistry);
 
-                return Expression.Call(null, typeof(Math).GetRuntimeMethod("Pow", new Type[] { typeof(double), typeof(double) }), @base, exponent);
+                return Expression.Call(null, typeof(Math).GetRuntimeMethod("Pow", new[] { typeof(double), typeof(double) }), @base, exponent);
             }
             else if (operation.GetType() == typeof(UnaryMinus))
             {
@@ -240,7 +240,7 @@ namespace Jace.Execution
                 if (functionInfo.IsDynamicFunc)
                 {
                     funcType = typeof(DynamicFunc<double, double>);
-                    parameterTypes = new Type[] { typeof(double[]) };
+                    parameterTypes = new[] { typeof(double[]) };
 
 
                     Expression[] arrayArguments = new Expression[function.Arguments.Count];
@@ -270,7 +270,7 @@ namespace Jace.Execution
                         Expression.Property(
                             Expression.Call(
                                 getFunctionRegistry,
-                                typeof(IFunctionRegistry).GetRuntimeMethod("GetFunctionInfo", new Type[] { typeof(string) }),
+                                typeof(IFunctionRegistry).GetRuntimeMethod("GetFunctionInfo", new[] { typeof(string) }),
                                 Expression.Constant(function.FunctionName)),
                             "Function"),
                         funcType);

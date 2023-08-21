@@ -10,7 +10,7 @@ namespace Jace.Tests.Mocks
         private readonly HashSet<string> constantNames;
 
         public MockConstantRegistry()
-            : this(new string[] { "e", "pi" })
+            : this(new[] { "e", "pi" })
         {
         }
 

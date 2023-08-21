@@ -10,7 +10,7 @@ namespace Jace.Tests.Mocks
         private HashSet<string> functionNames;
 
         public MockFunctionRegistry()
-            : this(new string[] { "sin", "cos", "csc", "sec", "asin", "acos", "tan", "cot", "atan", "acot", "loge", "log10", "logn", "sqrt", "abs" })
+            : this(new[] { "sin", "cos", "csc", "sec", "asin", "acos", "tan", "cot", "atan", "acot", "loge", "log10", "logn", "sqrt", "abs" })
         {
         }
 
