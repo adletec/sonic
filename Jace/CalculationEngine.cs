@@ -460,7 +460,7 @@ namespace Jace
 
         private string GenerateFormulaCacheKey(string formulaText, ConstantRegistry compiledConstants)
         {
-            return (compiledConstants != null && compiledConstants.Any()) ? $"{formulaText}@{String.Join(",", compiledConstants?.Select(x => $"{x.ConstantName}:{x.Value}"))}" : formulaText;
+            return (compiledConstants != null && compiledConstants.Any()) ? $"{formulaText}@{String.Join(",", compiledConstants.Select(x => $"{x.ConstantName}:{x.Value}"))}" : formulaText;
         }
 
         /// <summary>
