@@ -1,7 +1,9 @@
 # jace
-_jace_ is a high performance calculation engine for the .NET platform. It can interpret and execute strings containing mathematical formulas. _jace_ is a fork of [_Jace.NET_ by Pieter De Rycke](https://github.com/pieterderycke/Jace), which is no longer actively maintained. Our fork contains bugfixes, performance improvements and a lot of maintenance work when compared to the upstream. See the changelog for a full list.
+_jace_ is a high performance calculation engine for the .NET platform. It can interpret and execute strings containing mathematical formulas. _jace_ is a fork of [_Jace.NET_ by Pieter De Rycke](https://github.com/pieterderycke/Jace), which is no longer actively maintained.
 
-_jace_ is also the version of _Jace.NET_ we're using in our commercial products. _jace_ is a core component in a demanding real-time simulation for virtual prototyping and continuously stress tested. The development is backed by our product sales and we're sponsoring the maintenance of the open source library.
+Our fork is **considerably faster** (up to 3.5 times) than the upstream version. It also contains numerous **bugfixes** and a lot of **maintenance work** over the latest Jace.NET release (1.0.0). See the changelog for a full list.
+
+_jace_ is also the version of _Jace.NET_ we're using in our commercial products. _jace_ is a core component in a demanding real-time simulation tool for virtual vehicle and ADAS prototyping and continuously stress tested. The development is backed by our product sales and we're sponsoring the maintenance of the open source library.
 
 ## Build Status
 * [![Build status](https://github.com/adletec/jace/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/adletec/jace/actions/workflows/dotnet.yml?query=branch%3Amaster) (master)
@@ -37,6 +39,118 @@ _jace_ can execute formulas in two modes: **dynamic compilation mode** and **int
 
 For specific use-cases (e.g. Unity with IL2CPP) dynamic code generation can be limited. In those cases, you can use the **interpreted mode** as a fallback.
 
+## Installation
+_jace_ is available via [nuget](https://www.nuget.org/packages/adletec-jace):
+
+```bash
+dotnet add package adletec-jace --version 1.1.0
+```
+
+## Usage
+### Evaluating an Expression
+#### Directly Evaluate an Expression
+Provide the variables in a dictionary and the expression as string:
+
+```csharp
+Dictionary<string, double> variables = new Dictionary<string, double>();
+variables.Add("var1", 2.5);
+variables.Add("var2", 3.4);
+
+CalculationEngine engine = new CalculationEngine();
+double result = engine.Calculate("var1*var2", variables);
+```
+
+#### Build a Delegate for an Expression
+
+_jace_ can also build a [delegate (Func)](https://learn.microsoft.com/en-us/dotnet/api/system.func-2?view=net-7.0) from your expression which will take the variable dictionary as argument:
+
+```csharp
+CalculationEngine engine = new CalculationEngine();
+Func<Dictionary<string, double>, double> formula = engine.Build("var1+2/(3*otherVariable)");
+
+Dictionary<string, double> variables = new Dictionary<string, double>();
+variables.Add("var1", 2);
+variables.Add("otherVariable", 4.2);
+	
+double result = formula(variables);
+```
+
+#### Build a Specific Delegate for an Expression
+If you don't want to initialize a dictionary for the evaluation, you can also generate a delegate which will take the individual variable values as arguments instead:
+
+```csharp
+CalculationEngine engine = new CalculationEngine();
+Func<int, double, double> formula = (Func<int, double, double>)engine.Formula("var1+2/(3*otherVariable)")
+	.Parameter("var1", DataType.Integer)
+    .Parameter("otherVariable", DataType.FloatingPoint)
+    .Result(DataType.FloatingPoint)
+    .Build();
+	
+double result = formula(2, 4.2);
+```
+
+### Using Mathematical Functions
+You can also use mathematical functions in your expressions:
+
+```csharp
+Dictionary<string, double> variables = new Dictionary<string, double>();
+variables.Add("var1", 2.5);
+variables.Add("var2", 3.4);
+
+CalculationEngine engine = new CalculationEngine();
+double result = engine.Calculate("logn(var1,var2)+4", variables);
+```
+
+_jace_ supports most common functions out-of-the-box:
+
+| Function |  Signature | Parameters|
+|-----|-----|-----|
+| Sine |  `sin(a)` | `a` -> Angle in radians |
+| Cosine |  `cos(a)` |`a` -> Angle in radians |
+| Secant |  `sec(a)` |`a` -> Angle in radians |
+| Cosecant |  `csc(a)` |`a` -> Angle in radians |
+| Tangent |  `tan(a)` |`a` -> Angle in radians |
+| Cotangent |  `cot(a)` |`a` -> Angle in radians |
+| Arcsine |  `asin(a)` |`a` -> Angle in radians |
+| Arccosine |  `acos(a)` |`a` -> Angle in radians |
+| Arctangent |  `atan(a)` |`a` -> Angle in radians |
+| Arccotangent |  `acot(a)` |`a` -> Angle in radians |
+| Natural logarithm |  `loge(a)` | `a` -> Number whose logarithm is to be found |
+| Common logarithm | `log10(a)` |`a` -> Number whose logarithm is to be found |
+| Logarithm | `logn(a, base)` | `a` -> Number whose logarithm is to be found<br/>`base` -> base of the logarithm |
+| Square root | `sqrt(a)` | `a` -> Number whose square root is to be found |
+| Absolute | `abs(a)` | `a` -> Number whose absolute value is to be found |
+| If (Condition)| `if(a,b,c)` | `a` -> Boolean expression, e.g. `x > 2`<br/>`b` -> result if true(`!= 0`)<br/>`c` -> result if false (`== 0`)|
+| If less | `ifless(a,b,c,d)` | `a` -> first value<br/>`b` -> second value<br/>`c` -> result if `a < b`<br/>`d` -> result if `a >= b`|
+| If more | `ifmore(a,b,c,d)` | `a` -> first value<br/>`b` -> second value<br/>`c` -> result if `a > b`<br/>`d` -> result if `a <= b`|
+| If equal | `ifequal(a,b,c,d)` | `a` -> first value<br/>`b` -> second value<br/>`c` -> result if `a == b`<br/>`d` -> result if `a != b`|
+| Ceiling (rounding towards `+∞`) | `ceiling(a)` | `a` -> Number to be rounded|
+| Floor (rounding towards `-∞`) | `floor(a)` | `a` -> Number to be rounded|
+| Truncate (integral part) | `truncate(a)` | `a` -> Number to be truncated|
+| Round | `round(a)` | `a` -> Number to be rounded (to even)|
+| Maximum | `max(a,b,...)` | `a,b,...` -> series of numbers to find the maximum of |
+| Minimum | `min(a,b,...)` | `a,b,...` -> series of numbers to find the minimum of |
+| Average | `avg(a,b,...)` | `a,b,...` -> series of numbers to find the average of |
+| Median | `median(a,b,...)` | `a,b,...` -> series of numbers to find the median of |
+| Sum | `median(a,b,...)` | `a,b,...` -> series of numbers to build the sum of |
+| Random | `random()` | no parameters, returns random number in `[0..1]` |
+
+Todo:
+
+Define own functions
+
+Constants
+
+Define own constants
+
+## Performance
+Below you can find the results of Jace.NET benchmark that show its high performance calculation engine. Tests were done on an Intel i7 2640M laptop.
+1000 random formulas were generated, each containing 3 variables and a number of constants (a mix of integers and floating point numbers). Each random generated formula was executed 10 000 times. So in total 10 000 000 calculations are done during the benchmark. You can find the benchmark application in "Jace.Benchmark" if you want to run it on your system.
+
+* Interpreted Mode : 00:00:06.7860119
+* Dynamic Compilation Mode: 00:00:02.5584045
+
+
 ## Architecture
 _jace_ follows a design similar to most of the modern compilers. Interpretation and execution is done in a number of phases:
 
@@ -51,61 +165,6 @@ During the optimization phase, the abstract syntax tree is optimized for executi
 
 ### Interpreted Execution/Dynamic Compilation
 In this phase the abstract syntax tree is executed in either interpreted mode or in dynamic compilation mode.
-
-## Examples
-_jace_ can be used in a couple of ways:
-
-To directly execute a given mathematical formula using the provided variables:
-```csharp
-Dictionary<string, double> variables = new Dictionary<string, double>();
-variables.Add("var1", 2.5);
-variables.Add("var2", 3.4);
-
-CalculationEngine engine = new CalculationEngine();
-double result = engine.Calculate("var1*var2", variables);
-```
-
-To build a .NET Func accepting a dictionary as input containing the values for each variable:
-```csharp
-CalculationEngine engine = new CalculationEngine();
-Func<Dictionary<string, double>, double> formula = engine.Build("var1+2/(3*otherVariable)");
-
-Dictionary<string, double> variables = new Dictionary<string, double>();
-variables.Add("var1", 2);
-variables.Add("otherVariable", 4.2);
-	
-double result = formula(variables);
-```
-
-To build a typed .NET Func:
-```csharp
-CalculationEngine engine = new CalculationEngine();
-Func<int, double, double> formula = (Func<int, double, double>)engine.Formula("var1+2/(3*otherVariable)")
-	.Parameter("var1", DataType.Integer)
-    .Parameter("otherVariable", DataType.FloatingPoint)
-    .Result(DataType.FloatingPoint)
-    .Build();
-	
-double result = formula(2, 4.2);
-```
-
-Functions can be used inside the mathemical formulas. _jace_ currently offers four functions accepting one argument (sin, cos, loge and log10) and one function accepting two arguments (logn).
-
-```csharp
-Dictionary<string, double> variables = new Dictionary<string, double>();
-variables.Add("var1", 2.5);
-variables.Add("var2", 3.4);
-
-CalculationEngine engine = new CalculationEngine();
-double result = engine.Calculate("logn(var1,var2)+4", variables);
-```
-
-## Performance
-Below you can find the results of Jace.NET benchmark that show its high performance calculation engine. Tests were done on an Intel i7 2640M laptop.
-1000 random formulas were generated, each containing 3 variables and a number of constants (a mix of integers and floating point numbers). Each random generated formula was executed 10 000 times. So in total 10 000 000 calculations are done during the benchmark. You can find the benchmark application in "Jace.Benchmark" if you want to run it on your system.
-
-* Interpreted Mode : 00:00:06.7860119
-* Dynamic Compilation Mode: 00:00:02.5584045
 
 ## Compatibility
 If you are using _jace_ inside a Unity project using IL2CPP you must use _jace_ in interpreted mode due to limitations of IL2CPP with dynamic code generation.
