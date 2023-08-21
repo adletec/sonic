@@ -83,13 +83,13 @@ namespace Jace.Execution
 
             if (functions.ContainsKey(functionName) && functions[functionName].NumberOfParameters != numberOfParameters)
             {
-                string message = string.Format("The number of parameters cannot be changed when overwriting a method.");
+                string message = "The number of parameters cannot be changed when overwriting a method.";
                 throw new Exception(message);
             }
 
             if (functions.ContainsKey(functionName) && functions[functionName].IsDynamicFunc != isDynamicFunc)
             {
-                string message = string.Format("A Func can only be overwritten by another Func and a DynamicFunc can only be overwritten by another DynamicFunc.");
+                string message = "A Func can only be overwritten by another Func and a DynamicFunc can only be overwritten by another DynamicFunc.";
                 throw new Exception(message);
             }
 
