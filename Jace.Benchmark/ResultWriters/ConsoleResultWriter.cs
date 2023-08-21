@@ -51,7 +51,10 @@ private static string GetFormattedRow(IEnumerable<object> values, int[] maxLengt
         // If the value is numeric, format with decimal separator and pad left; otherwise, pad right
         if (IsNumeric(formattedValue))
         {
-            var numericValue = double.Parse(formattedValue, CultureInfo.InvariantCulture);
+            var numericValue = double.Parse(formattedValue ?? 
+                throw new InvalidOperationException($"{nameof(values)} may not contain null."), 
+                CultureInfo.InvariantCulture);
+            
             formattedValue = numericValue.ToString("N0", CultureInfo.CurrentCulture).PadLeft(maxLengths[i]);
         }
         else
