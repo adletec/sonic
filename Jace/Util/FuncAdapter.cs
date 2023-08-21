@@ -46,10 +46,10 @@ namespace Jace.Util
 
             ParameterExpression[] parameterExpressions = new ParameterExpression[parameterArray.Length];
 
-            List<Expression> methodBody = new List<Expression>();
+            var methodBody = new List<Expression>();
             methodBody.Add(dictionaryAssignExpression);
 
-            for (int i = 0; i < parameterArray.Length; i++)
+            for (var i = 0; i < parameterArray.Length; i++)
             {
                 // Create parameter expression for each func parameter
                 Type parameterType = parameterArray[i].DataType == DataType.FloatingPoint ? typeof(double) : typeof(int);
@@ -74,15 +74,15 @@ namespace Jace.Util
 
         private Type GetDelegateType(ParameterInfo[] parameters)
         {
-            string funcTypeName = string.Format("System.Func`{0}", parameters.Length + 1);
-            Type funcType = Type.GetType(funcTypeName);
+            var funcTypeName = $"System.Func`{parameters.Length + 1}";
+            var funcType = Type.GetType(funcTypeName);
             if (funcType == null)
             {
                 throw new InvalidOperationException($"Couldn't get type of ${funcTypeName}.");
             }
 
             Type[] typeArguments = new Type[parameters.Length + 1];
-            for (int i = 0; i < parameters.Length; i++)
+            for (var i = 0; i < parameters.Length; i++)
                 typeArguments[i] = (parameters[i].DataType == DataType.FloatingPoint) ? typeof(double) : typeof(int);
             typeArguments[typeArguments.Length - 1] = typeof(double);
 

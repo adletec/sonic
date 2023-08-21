@@ -10,7 +10,7 @@ namespace Jace.Util
         /// Partitions the given list around a pivot element such that all elements on left of pivot are &lt;= pivot
         /// and the ones at thr right are > pivot. This method can be used for sorting, N-order statistics such as
         /// as median finding algorithms.
-        /// Pivot is selected ranodmly if random number generator is supplied else its selected as last element in the list.
+        /// Pivot is selected randomly if random number generator is supplied else its selected as last element in the list.
         /// Reference: Introduction to Algorithms 3rd Edition, Corman et al, pp 171
         /// </summary>
         private static int Partition<T>(this IList<T> list, int start, int end, Random rnd = null) where T : IComparable<T>
