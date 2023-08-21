@@ -76,6 +76,10 @@ namespace Jace.Util
         {
             string funcTypeName = string.Format("System.Func`{0}", parameters.Length + 1);
             Type funcType = Type.GetType(funcTypeName);
+            if (funcType == null)
+            {
+                throw new InvalidOperationException($"Couldn't get type of ${funcTypeName}.");
+            }
 
             Type[] typeArguments = new Type[parameters.Length + 1];
             for (int i = 0; i < parameters.Length; i++)
