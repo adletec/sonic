@@ -248,7 +248,7 @@ namespace Jace.Execution
                         arrayArguments[i] = GenerateMethodBody(function.Arguments[i], contextParameter, functionRegistry);
 
                     arguments = new Expression[1];
-                    arguments[0] = NewArrayExpression.NewArrayInit(typeof(double), arrayArguments);
+                    arguments[0] = Expression.NewArrayInit(typeof(double), arrayArguments);
                 }
                 else
                 {
