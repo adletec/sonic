@@ -12,7 +12,6 @@ namespace Jace
     {
         private readonly IFunctionRegistry functionRegistry;
         private readonly IConstantRegistry localConstantRegistry;
-        private readonly bool caseSensitive;
         private readonly Dictionary<char, int> operationPrecedence = new Dictionary<char, int>();
         private readonly Stack<Operation> resultStack = new Stack<Operation>();
         private readonly Stack<Token> operatorStack = new Stack<Token>();
@@ -22,7 +21,6 @@ namespace Jace
         {
             this.functionRegistry = functionRegistry ?? throw new ArgumentNullException(nameof(functionRegistry));
             this.localConstantRegistry = compiledConstants ?? new ConstantRegistry(caseSensitive);
-            this.caseSensitive = caseSensitive;
 
             operationPrecedence.Add('(', 0);
             operationPrecedence.Add('&', 1);
@@ -74,10 +72,6 @@ namespace Jace
                             }
                             else
                             {
-                                if (!caseSensitive)
-                                {
-                                    tokenValue = tokenValue.ToLowerFast();
-                                }
                                 resultStack.Push(new Variable(tokenValue));
                             }
                         }
