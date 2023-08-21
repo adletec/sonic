@@ -56,8 +56,6 @@ namespace Jace.Execution
         {
             ParameterExpression contextParameter = Expression.Parameter(typeof(FormulaContext), "context");
 
-            LabelTarget returnLabel = Expression.Label(typeof(double));
-
             Expression<Func<FormulaContext, double>> lambda = Expression.Lambda<Func<FormulaContext, double>>(
                 GenerateMethodBody(operation, contextParameter, functionRegistry),
                 contextParameter
@@ -264,8 +262,6 @@ namespace Jace.Execution
                 }
 
                 Expression getFunctionRegistry = Expression.Property(contextParameter, "FunctionRegistry");
-
-                ParameterExpression functionInfoVariable = Expression.Variable(typeof(FunctionInfo));
 
                 Expression funcInstance;
                 if (!functionInfo.IsOverWritable)

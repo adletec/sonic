@@ -54,8 +54,6 @@ namespace Jace
 
             foreach (Token token in tokens)
             {
-                object value = token.Value;
-
                 switch (token.TokenType)
                 {
                     case TokenType.Integer:

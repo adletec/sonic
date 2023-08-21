@@ -17,7 +17,7 @@ namespace Jace.Benchmark
 
         static void Main(string[] args)
         {
-            var result = Parser.Default.ParseArguments<Options>(args)
+            Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(options =>
                 {
                     IResultWriter resultWriter = options.FileName != null ? 

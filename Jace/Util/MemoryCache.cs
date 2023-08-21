@@ -110,8 +110,6 @@ namespace Jace.Util
             CacheItem cacheItem = dictionary.GetOrAdd(key, k => 
                 {
                     EnsureCacheStorageAvailable();
-
-                    TValue value = valueFactory(k);
                     return new CacheItem(this, valueFactory(k));
                 });
             return cacheItem.Value;
