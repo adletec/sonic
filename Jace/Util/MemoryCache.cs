@@ -22,7 +22,7 @@ namespace Jace.Util
         private readonly ConcurrentDictionary<TKey, CacheItem> dictionary;
 
         /// <summary>
-        /// Create a new instance of the <see cref="MemoryCache"/>.
+        /// Create a new instance of the <see cref="MemoryCache{TKey,TValue}"/>.
         /// </summary>
         /// <param name="maximumSize">The maximum allowed number of items in the cache.</param>
         /// <param name="reductionSize">The number of items to be deleted per cleanup of the cache.</param>

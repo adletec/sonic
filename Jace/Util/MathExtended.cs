@@ -7,7 +7,7 @@ namespace Jace.Util
     static class MathExtended
     {
         /// <summary>
-        /// Partitions the given list around a pivot element such that all elements on left of pivot are <= pivot
+        /// Partitions the given list around a pivot element such that all elements on left of pivot are &lt;= pivot
         /// and the ones at thr right are > pivot. This method can be used for sorting, N-order statistics such as
         /// as median finding algorithms.
         /// Pivot is selected ranodmly if random number generator is supplied else its selected as last element in the list.

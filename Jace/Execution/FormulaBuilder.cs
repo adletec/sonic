@@ -22,6 +22,8 @@ namespace Jace.Execution
         /// A calculation engine instance that can be used for interpreting and executing 
         /// the formula.
         /// </param>
+        /// <param name="caseSensitive">Whether the formula should be evaluated case-sensitive.</param>
+        /// <param name="engine">The calculation engine which should evaluate the formula later on. Will be used for naming collision detection.</param>
         internal FormulaBuilder(string formulaText, bool caseSensitive, CalculationEngine engine)
         {
             this.parameters = new List<ParameterInfo>();

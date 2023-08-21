@@ -431,6 +431,7 @@ namespace Jace
         /// </summary>
         /// <param name="formulaText">A string containing the mathematical formula that must be converted 
         /// into an abstract syntax tree.</param>
+        /// <param name="compiledConstants">The constants which are to be available in the given formula.</param>
         /// <returns>The abstract syntax tree of the formula.</returns>
         private Operation BuildAbstractSyntaxTree(string formulaText, ConstantRegistry compiledConstants)
         {
