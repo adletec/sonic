@@ -27,7 +27,7 @@ namespace Jace.Tokenizer
         }
 
         /// <summary>
-        /// Read in the provided formula and convert it into a list of takens that can be processed by the
+        /// Read in the provided formula and convert it into a list of tokens that can be processed by the
         /// Abstract Syntax Tree Builder.
         /// </summary>
         /// <param name="formula">The formula that must be converted into a list of tokens.</param>
@@ -35,29 +35,28 @@ namespace Jace.Tokenizer
         public List<Token> Read(string formula)
         {
             if (string.IsNullOrEmpty(formula))
-                throw new ArgumentNullException("formula");
+                throw new ArgumentNullException(nameof(formula));
 
-            List<Token> tokens = new List<Token>();
+            var tokens = new List<Token>();
 
-            char[] characters = formula.ToCharArray();
+            var characters = formula.ToCharArray();
 
-            bool isFormulaSubPart = true;
-            bool isScientific = false;
+            var isFormulaSubPart = true;
+            var isScientific = false;
 
-            for(int i = 0; i < characters.Length; i++)
+            for(var i = 0; i < characters.Length; i++)
             {
                 if (IsPartOfNumeric(characters[i], true, false, isFormulaSubPart))
                 {
-                    StringBuilder buffer = new StringBuilder();
+                    var buffer = new StringBuilder();
                     buffer.Append(characters[i]);
-                    //string buffer = "" + characters[i];
-                    int startPosition = i;
+                    var startPosition = i;
                                        
 
                     while (++i < characters.Length && IsPartOfNumeric(characters[i], false, characters[i-1] == '-', isFormulaSubPart))
                     {
                         if (isScientific && IsScientificNotation(characters[i]))
-                            throw new ParseException(string.Format("Invalid token \"{0}\" detected at position {1}.", characters[i], i));
+                            throw new ParseException($"Invalid token \"{characters[i]}\" detected at position {i}.");
 
                         if (IsScientificNotation(characters[i]))
                         {
@@ -73,22 +72,20 @@ namespace Jace.Tokenizer
                     }
 
                     // Verify if we do not have an int
-                    int intValue;
-                    if (int.TryParse(buffer.ToString(), out intValue))
+                    if (int.TryParse(buffer.ToString(), out var intValue))
                     {
                         tokens.Add(new Token() { TokenType = TokenType.Integer, Value = intValue, StartPosition = startPosition, Length = i - startPosition });
                         isFormulaSubPart = false;
                     }
                     else
                     {
-                        double doubleValue;
                         if (buffer.ToString() == "-")
                         {
                             // Verify if we have a unary minus, we use the token '_' for a unary minus in the AST builder
                             tokens.Add(new Token() { TokenType = TokenType.Operation, Value = '_', StartPosition = startPosition, Length = 1 });
                         }
                         else if (double.TryParse(buffer.ToString(), NumberStyles.Float | NumberStyles.AllowThousands,
-                            cultureInfo, out doubleValue))
+                            cultureInfo, out var doubleValue))
                         {
                             tokens.Add(new Token() { TokenType = TokenType.FloatingPoint, Value = doubleValue, StartPosition = startPosition, Length = i - startPosition });
                             isScientific = false;
@@ -96,7 +93,7 @@ namespace Jace.Tokenizer
                         }
                         else
                         {
-                            throw new ParseException(string.Format("Invalid floating point number: {0}", buffer));
+                            throw new ParseException($"Invalid floating point number: {buffer}");
                         }
                     }
 
@@ -109,8 +106,8 @@ namespace Jace.Tokenizer
 
                 if (IsPartOfVariable(characters[i], true))
                 {
-                    string buffer = "" + characters[i];
-                    int startPosition = i;
+                    var buffer = "" + characters[i];
+                    var startPosition = i;
 
                     while (++i < characters.Length && IsPartOfVariable(characters[i], false))
                     {
@@ -186,7 +183,7 @@ namespace Jace.Tokenizer
                                 isFormulaSubPart = false;
                             }
                             else
-                                throw new ParseException(string.Format("Invalid token \"{0}\" detected at position {1}.", characters[i], i));
+                                throw new ParseException($"Invalid token \"{characters[i]}\" detected at position {i}.");
                             break;
                         case '&':
                             if (i + 1 < characters.Length && characters[i + 1] == '&')
@@ -195,7 +192,7 @@ namespace Jace.Tokenizer
                                 isFormulaSubPart = false;
                             }
                             else
-                                throw new ParseException(string.Format("Invalid token \"{0}\" detected at position {1}.", characters[i], i));
+                                throw new ParseException($"Invalid token \"{characters[i]}\" detected at position {i}.");
                             break;
                         case '|':
                             if (i + 1 < characters.Length && characters[i + 1] == '|')
@@ -204,7 +201,7 @@ namespace Jace.Tokenizer
                                 isFormulaSubPart = false;
                             }
                             else
-                                throw new ParseException(string.Format("Invalid token \"{0}\" detected at position {1}.", characters[i], i));
+                                throw new ParseException($"Invalid token \"{characters[i]}\" detected at position {i}.");
                             break;
                         case '=':
                             if (i + 1 < characters.Length && characters[i + 1] == '=')
@@ -213,10 +210,10 @@ namespace Jace.Tokenizer
                                 isFormulaSubPart = false;
                             }
                             else
-                                throw new ParseException(string.Format("Invalid token \"{0}\" detected at position {1}.", characters[i], i));
+                                throw new ParseException($"Invalid token \"{characters[i]}\" detected at position {i}.");
                             break;
                         default:
-                            throw new ParseException(string.Format("Invalid token \"{0}\" detected at position {1}.", characters[i], i));
+                            throw new ParseException($"Invalid token \"{characters[i]}\" detected at position {i}.");
                     }
                 }
             }
@@ -236,17 +233,14 @@ namespace Jace.Tokenizer
 
         private bool IsUnaryMinus(char currentToken, List<Token> tokens)
         {
-            if (currentToken == '-')
-            {
-                Token previousToken = tokens[tokens.Count - 1];
+            if (currentToken != '-') return false;
+            var previousToken = tokens[tokens.Count - 1];
 
-                return !(previousToken.TokenType == TokenType.FloatingPoint ||
-                         previousToken.TokenType == TokenType.Integer ||
-                         previousToken.TokenType == TokenType.Text ||
-                         previousToken.TokenType == TokenType.RightBracket);
-            }
-            else
-                return false;
+            return !(previousToken.TokenType == TokenType.FloatingPoint ||
+                     previousToken.TokenType == TokenType.Integer ||
+                     previousToken.TokenType == TokenType.Text ||
+                     previousToken.TokenType == TokenType.RightBracket);
+
         }
 
         private bool IsScientificNotation(char currentToken)
