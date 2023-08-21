@@ -35,8 +35,7 @@ namespace Jace.Execution
             if (string.IsNullOrEmpty(functionName))
                 throw new ArgumentNullException("functionName");
 
-            FunctionInfo functionInfo = null;
-            return functions.TryGetValue(ConvertFunctionName(functionName), out functionInfo) ? functionInfo : null;
+            return functions.TryGetValue(ConvertFunctionName(functionName), out var functionInfo) ? functionInfo : null;
         }
 
         public void RegisterFunction(string functionName, Delegate function)

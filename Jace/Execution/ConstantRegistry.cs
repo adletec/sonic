@@ -31,8 +31,7 @@ namespace Jace.Execution
             if (string.IsNullOrEmpty(constantName))
                 throw new ArgumentNullException("constantName");
 
-            ConstantInfo constantInfo = null;
-            return constants.TryGetValue(ConvertConstantName(constantName), out constantInfo) ? constantInfo : null;
+            return constants.TryGetValue(ConvertConstantName(constantName), out var constantInfo) ? constantInfo : null;
         }
 
         public bool IsConstantName(string constantName)
