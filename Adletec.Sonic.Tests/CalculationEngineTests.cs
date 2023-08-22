@@ -436,7 +436,9 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestPiMultiplication()
     {
-        CalculationEngine engine = new CalculationEngine();
+        var sonicOptions = new SonicOptions();
+        sonicOptions.CaseSensitive = false;
+        CalculationEngine engine = new CalculationEngine(sonicOptions);
         double result = engine.Calculate("2 * pI");
 
         Assert.AreEqual(2 * Math.PI, result);
@@ -461,7 +463,12 @@ public class CalculationEngineTests
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("blabla", 42.5);
 
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var sonicOptions = new SonicOptions
+        {
+            CultureInfo = CultureInfo.InvariantCulture,
+            CaseSensitive = false
+        };
+        var engine = new CalculationEngine(sonicOptions);
         double result = engine.Calculate("2 * BlAbLa", variables);
 
         Assert.AreEqual(85.0, result);
@@ -473,7 +480,14 @@ public class CalculationEngineTests
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("blabla", 42.5);
 
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var sonicOptions = new SonicOptions
+        {
+            CultureInfo = CultureInfo.InvariantCulture,
+            ExecutionMode = ExecutionMode.Interpreted,
+            CaseSensitive = false
+        };
+
+        CalculationEngine engine = new CalculationEngine(sonicOptions);
         double result = engine.Calculate("2 * BlAbLa", variables);
 
         Assert.AreEqual(85.0, result);
@@ -571,12 +585,20 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestVariableCaseFuncInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var sonicOptions = new SonicOptions
+        {
+            CaseSensitive = false,
+            CultureInfo = CultureInfo.InvariantCulture,
+            ExecutionMode = ExecutionMode.Interpreted
+        };
+        var engine = new CalculationEngine(sonicOptions);
         Func<Dictionary<string, double>, double> formula = engine.Build("var1+2/(3*otherVariablE)");
 
-        Dictionary<string, double> variables = new Dictionary<string, double>();
-        variables.Add("var1", 2);
-        variables.Add("otherVariable", 4.2);
+        var variables = new Dictionary<string, double>
+        {
+            { "var1", 2 },
+            { "otherVariable", 4.2 }
+        };
 
         double result = formula(variables);
     }
@@ -610,12 +632,19 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestVariableCaseFuncCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var sonicOptions = new SonicOptions
+        {
+            CaseSensitive = false,
+            CultureInfo = CultureInfo.InvariantCulture
+        };
+        var engine = new CalculationEngine(sonicOptions);
         Func<Dictionary<string, double>, double> formula = engine.Build("var1+2/(3*otherVariablE)");
 
-        Dictionary<string, double> variables = new Dictionary<string, double>();
-        variables.Add("var1", 2);
-        variables.Add("otherVariable", 4.2);
+        var variables = new Dictionary<string, double>
+        {
+            { "var1", 2 },
+            { "otherVariable", 4.2 }
+        };
 
         double result = formula(variables);
     }
@@ -623,11 +652,17 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestVariableCaseNonFunc()
     {
-        CalculationEngine engine = new CalculationEngine();
+        var sonicOptions = new SonicOptions
+        {
+            CaseSensitive = false,
+        };
+        var engine = new CalculationEngine(sonicOptions);
 
-        Dictionary<string, double> variables = new Dictionary<string, double>();
-        variables.Add("var1", 2);
-        variables.Add("otherVariable", 4.2);
+        var variables = new Dictionary<string, double>
+        {
+            { "var1", 2 },
+            { "otherVariable", 4.2 }
+        };
 
         double result = engine.Calculate("var1+2/(3*otherVariablE)", variables);
     }

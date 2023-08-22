@@ -15,7 +15,7 @@ namespace Adletec.Sonic
             ExecutionMode = ExecutionMode.Compiled;
             CacheEnabled = true;
             OptimizerEnabled = true;
-            CaseSensitive = false;
+            CaseSensitive = true;
             DefaultFunctions = true;
             DefaultConstants = true;
             CacheMaximumSize = DefaultCacheMaximumSize;
