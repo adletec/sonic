@@ -1,16 +1,18 @@
-# jace
-_jace_ is a high performance calculation engine for the .NET platform. It can interpret and execute strings containing mathematical formulas. _jace_ is a fork of [_Jace.NET_ by Pieter De Rycke](https://github.com/pieterderycke/Jace), which is no longer actively maintained.
+# sonic | rapid expression evaluation for .NET
+_sonic_ is a rapid evaluation engine for mathematical expressions. It can parse and execute strings containing mathematical expressions. _sonic_ is an extended fork of [_Jace.NET_ by Pieter De Rycke](https://github.com/pieterderycke/Jace), which is no longer actively maintained.
 
-Our fork is **considerably faster** (up to 3.5 times) than the upstream version. It also contains numerous **bugfixes** and a lot of **maintenance work** over the latest Jace.NET release (1.0.0). See the changelog for a full list.
+_sonic_ is **considerably faster** (up to 3.5 times) than _Jace.NET_. It contains numerous **bugfixes** and a lot of **maintenance work** over the latest _Jace.NET_ release (1.0.0). Many of them were originally suggested and developed by the community for _Jace.NET_, but never merged due to the dormant state of the project. See the changelog for details and a complete list.
 
-_jace_ is also the version of _Jace.NET_ we're using in our commercial products. _jace_ is a core component in a demanding real-time simulation tool for virtual vehicle and ADAS prototyping and continuously stress tested. The development is backed by our product sales and we're sponsoring the maintenance of the open source library.
+_sonic_ is also the expression evaluator we use in our commercial products. It is a core component of our real-time simulation tools for virtual vehicle and ADAS prototyping and is continuously stress tested in a demanding environment. Its development and maintenance is funded by our product sales.
 
 ## Build Status
-* [![Build status](https://github.com/adletec/jace/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/adletec/jace/actions/workflows/dotnet.yml?query=branch%3Amaster) (master)
-* [![Build status](https://github.com/adletec/jace/actions/workflows/release.yml/badge.svg)](https://github.com/adletec/jace/actions/workflows/release.yml?query=) (release)
+| branch | status |
+| -----  | -----   |
+| master (development) | [![Build status](https://github.com/adletec/jace/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/adletec/jace/actions/workflows/dotnet.yml?query=branch%3Amaster) |
+| release |  ![Build status](https://github.com/adletec/jace/actions/workflows/release.yml/badge.svg)|
 
-## What does it do?
-_jace_ can interpret and execute strings containing mathematical formulas. These formulas can rely on variables. If variables are used, values can be provided for these variables at execution time of the mathematical formula.
+## Quick Start
+_sonic_ can interpret and execute strings containing mathematical formulas. These formulas can rely on variables. If variables are used, values can be provided for these variables at execution time of the mathematical formula.
 
 Consider this simple example:
 
@@ -35,15 +37,15 @@ double result = engine.Calculate("ft2m(30)"); // 9.144
 
 You can find more examples below.
 
-_jace_ can execute formulas in two modes: **dynamic compilation mode** and **interpreted mode**. If **dynamic compilation mode** is used, _jace_ will create a dynamic method at runtime and will generate the necessary MSIL opcodes for native execution of the formula. If a formula is re-executed with other variables, _jace_ will take the dynamically generated method from its cache. Dynamic compilation mode is a lot faster and the sane default for most applications.
+_sonic_ can execute formulas in two modes: **dynamic compilation mode** and **interpreted mode**. If **dynamic compilation mode** is used, _sonic_ will create a dynamic method at runtime and will generate the necessary MSIL opcodes for native execution of the formula. If a formula is re-executed with other variables, _sonic_ will take the dynamically generated method from its cache. Dynamic compilation mode is a lot faster and the sane default for most applications.
 
 For specific use-cases (e.g. Unity with IL2CPP) dynamic code generation can be limited. In those cases, you can use the **interpreted mode** as a fallback.
 
 ## Installation
-_jace_ is available via [nuget](https://www.nuget.org/packages/adletec-jace):
+_sonic_ is available via [nuget](https://www.nuget.org/packages/adletec-sonic):
 
 ```bash
-dotnet add package adletec-jace --version 1.1.0
+dotnet add package adletec-sonic --version 1.1.0
 ```
 
 ## Usage
@@ -62,7 +64,7 @@ double result = engine.Calculate("var1*var2", variables);
 
 #### Build a Delegate for an Expression
 
-_jace_ can also build a [delegate (Func)](https://learn.microsoft.com/en-us/dotnet/api/system.func-2?view=net-7.0) from your expression which will take the variable dictionary as argument:
+_sonic_ can also build a [delegate (Func)](https://learn.microsoft.com/en-us/dotnet/api/system.func-2?view=net-7.0) from your expression which will take the variable dictionary as argument:
 
 ```csharp
 CalculationEngine engine = new CalculationEngine();
@@ -101,7 +103,7 @@ CalculationEngine engine = new CalculationEngine();
 double result = engine.Calculate("logn(var1,var2)+4", variables);
 ```
 
-_jace_ supports most common functions out-of-the-box:
+_sonic_ supports most common functions out-of-the-box:
 
 | Function |  Signature | Parameters|
 |-----|-----|-----|
@@ -152,7 +154,7 @@ Below you can find the results of Jace.NET benchmark that show its high performa
 
 
 ## Architecture
-_jace_ follows a design similar to most of the modern compilers. Interpretation and execution is done in a number of phases:
+_sonic_ follows a design similar to most of the modern compilers. Interpretation and execution is done in a number of phases:
 
 ### Tokenizing
 During the tokenizing phase, the string is converted into the different kind of tokens: variables, operators, and constants.
@@ -167,7 +169,7 @@ During the optimization phase, the abstract syntax tree is optimized for executi
 In this phase the abstract syntax tree is executed in either interpreted mode or in dynamic compilation mode.
 
 ## Compatibility
-If you are using _jace_ inside a Unity project using IL2CPP you must use _jace_ in interpreted mode due to limitations of IL2CPP with dynamic code generation.
+If you are using _sonic_ inside a Unity project using IL2CPP you must use _sonic_ in interpreted mode due to limitations of IL2CPP with dynamic code generation.
 
 ## More Information
 For more information, you can read the following articles from Pieter de Rycke, original author of Jace.NET:
