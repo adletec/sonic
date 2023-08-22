@@ -41,8 +41,7 @@ namespace Adletec.Sonic
                 multiplication.Argument1 = Optimize(multiplication.Argument1, functionRegistry, constantRegistry);
                 multiplication.Argument2 = Optimize(multiplication.Argument2, functionRegistry, constantRegistry);
 
-                if ((multiplication.Argument1.GetType() == typeof(FloatingPointConstant) && ((FloatingPointConstant)multiplication.Argument1).Value == 0.0)
-                    || (multiplication.Argument2.GetType() == typeof(FloatingPointConstant) && ((FloatingPointConstant)multiplication.Argument2).Value == 0.0))
+                if (IsZero(multiplication.Argument1) || IsZero(multiplication.Argument2))
                 {
                     return new FloatingPointConstant(0.0);
                 }
@@ -52,7 +51,7 @@ namespace Adletec.Sonic
                 var division = (Division)operation;
                 division.Dividend = Optimize(division.Dividend, functionRegistry, constantRegistry);
                 division.Divisor = Optimize(division.Divisor, functionRegistry, constantRegistry);
-                if (division.Dividend.GetType() == typeof(FloatingPointConstant) && ((FloatingPointConstant)division.Dividend).Value == 0.0)
+                if (IsZero(division.Dividend))
                 {
                     return new FloatingPointConstant(0.0);
                 }
@@ -63,8 +62,12 @@ namespace Adletec.Sonic
                 exponentiation.Base = Optimize(exponentiation.Base, functionRegistry, constantRegistry);
                 exponentiation.Exponent = Optimize(exponentiation.Exponent, functionRegistry, constantRegistry);
 
-                if (exponentiation.Exponent.GetType() == typeof(FloatingPointConstant) &&
-                    ((FloatingPointConstant)exponentiation.Exponent).Value == 0.0)
+                if (IsZero(exponentiation.Base))
+                {
+                    return new FloatingPointConstant(0.0);
+                }
+
+                if (IsZero(exponentiation.Exponent))
                 {
                     return new FloatingPointConstant(1.0);
                 }
@@ -77,6 +80,21 @@ namespace Adletec.Sonic
             }
 
             return operation;
+        }
+        
+        private bool IsZero(Operation operation)
+        {
+            if (operation.GetType() == typeof(FloatingPointConstant))
+            {
+                return ((FloatingPointConstant)operation).Value == 0.0;
+            }
+
+            if (operation.GetType() == typeof(IntegerConstant))
+            {
+                return ((IntegerConstant)operation).Value == 0;
+            }
+
+            return false;
         }
     }
 }
