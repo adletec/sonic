@@ -105,34 +105,34 @@ _jace_ supports most common functions out-of-the-box:
 
 | Function |  Signature | Parameters|
 |-----|-----|-----|
-| Sine |  `sin(a)` | `a` -> Angle in radians |
-| Cosine |  `cos(a)` |`a` -> Angle in radians |
-| Secant |  `sec(a)` |`a` -> Angle in radians |
-| Cosecant |  `csc(a)` |`a` -> Angle in radians |
-| Tangent |  `tan(a)` |`a` -> Angle in radians |
-| Cotangent |  `cot(a)` |`a` -> Angle in radians |
-| Arcsine |  `asin(a)` |`a` -> Angle in radians |
-| Arccosine |  `acos(a)` |`a` -> Angle in radians |
-| Arctangent |  `atan(a)` |`a` -> Angle in radians |
-| Arccotangent |  `acot(a)` |`a` -> Angle in radians |
-| Natural logarithm |  `loge(a)` | `a` -> Number whose logarithm is to be found |
-| Common logarithm | `log10(a)` |`a` -> Number whose logarithm is to be found |
-| Logarithm | `logn(a, base)` | `a` -> Number whose logarithm is to be found<br/>`base` -> base of the logarithm |
-| Square root | `sqrt(a)` | `a` -> Number whose square root is to be found |
-| Absolute | `abs(a)` | `a` -> Number whose absolute value is to be found |
-| If (Condition)| `if(a,b,c)` | `a` -> Boolean expression, e.g. `x > 2`<br/>`b` -> result if true(`!= 0`)<br/>`c` -> result if false (`== 0`)|
-| If less | `ifless(a,b,c,d)` | `a` -> first value<br/>`b` -> second value<br/>`c` -> result if `a < b`<br/>`d` -> result if `a >= b`|
-| If more | `ifmore(a,b,c,d)` | `a` -> first value<br/>`b` -> second value<br/>`c` -> result if `a > b`<br/>`d` -> result if `a <= b`|
-| If equal | `ifequal(a,b,c,d)` | `a` -> first value<br/>`b` -> second value<br/>`c` -> result if `a == b`<br/>`d` -> result if `a != b`|
-| Ceiling (rounding towards `+∞`) | `ceiling(a)` | `a` -> Number to be rounded|
-| Floor (rounding towards `-∞`) | `floor(a)` | `a` -> Number to be rounded|
-| Truncate (integral part) | `truncate(a)` | `a` -> Number to be truncated|
-| Round | `round(a)` | `a` -> Number to be rounded (to even)|
-| Maximum | `max(a,b,...)` | `a,b,...` -> series of numbers to find the maximum of |
-| Minimum | `min(a,b,...)` | `a,b,...` -> series of numbers to find the minimum of |
-| Average | `avg(a,b,...)` | `a,b,...` -> series of numbers to find the average of |
-| Median | `median(a,b,...)` | `a,b,...` -> series of numbers to find the median of |
-| Sum | `median(a,b,...)` | `a,b,...` -> series of numbers to build the sum of |
+| Sine |  `sin(a)` | `a`: angle in radians |
+| Cosine |  `cos(a)` |`a`: angle in radians |
+| Secant |  `sec(a)` |`a`: angle in radians |
+| Cosecant |  `csc(a)` |`a`: angle in radians |
+| Tangent |  `tan(a)` |`a`: angle in radians |
+| Cotangent |  `cot(a)` |`a`: angle in radians |
+| Arcsine |  `asin(a)` |`a`: angle in radians |
+| Arccosine |  `acos(a)` |`a`: angle in radians |
+| Arctangent |  `atan(a)` |`a`: angle in radians |
+| Arccotangent |  `acot(a)` |`a`: angle in radians |
+| Natural logarithm |  `loge(a)` | `a`: number whose logarithm is to be found |
+| Common logarithm | `log10(a)` |`a`: number whose logarithm is to be found |
+| Logarithm | `logn(a, b)` | `a`: number whose logarithm is to be found<br/>`b`: base of the logarithm |
+| Square root | `sqrt(a)` | `a`: number whose square root is to be found |
+| Absolute | `abs(a)` | `a`: number whose absolute value is to be found |
+| If | `if(a,b,c)` | `a`: boolean expression, e.g. `x > 2`<br/>`b`: result if true(`!= 0`)<br/>`c`: result if false (`== 0`)|
+| If less | `ifless(a,b,c,d)` | `a`: first value<br/>`b`: second value<br/>`c`: result if `a < b`<br/>`d`: result if `a >= b`|
+| If more | `ifmore(a,b,c,d)` | `a`: first value<br/>`b`: second value<br/>`c`: result if `a > b`<br/>`d`: result if `a <= b`|
+| If equal | `ifequal(a,b,c,d)` | `a`: first value<br/>`b`: second value<br/>`c`: result if `a == b`<br/>`d`: result if `a != b`|
+| Ceiling | `ceiling(a)` | `a`: number to be rounded towards `+∞`|
+| Floor | `floor(a)` | `a`: number to be rounded towards `-∞`|
+| Truncate | `truncate(a)` | `a`: number to be truncated (to integral part)|
+| Round | `round(a)` | `a`: number to be rounded (to even)|
+| Maximum | `max(a,b,...)` | `a,b,...`: series of numbers to find the maximum of |
+| Minimum | `min(a,b,...)` | `a,b,...`: series of numbers to find the minimum of |
+| Average | `avg(a,b,...)` | `a,b,...`: series of numbers to find the average of |
+| Median | `median(a,b,...)` | `a,b,...`: series of numbers to find the median of |
+| Sum | `median(a,b,...)` | `a,b,...`: series of numbers to build the sum of |
 | Random | `random()` | no parameters, returns random number in `[0..1]` |
 
 Todo:
