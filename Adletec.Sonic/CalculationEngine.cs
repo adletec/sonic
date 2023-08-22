@@ -112,10 +112,9 @@ namespace Adletec.Sonic
             if (variables == null)
                 throw new ArgumentNullException(nameof(variables));
 
-            if (!caseSensitive)
-            {
-                variables = EngineUtil.ConvertVariableNamesToLowerCase(variables);
-            }
+            // We're writing to that dictionary so let's create a copy.
+            variables = !caseSensitive ? EngineUtil.ConvertVariableNamesToLowerCase(variables) : new Dictionary<string, double>(variables);
+            
             VerifyVariableNames(variables);
 
             // Add the reserved variables to the dictionary

@@ -112,10 +112,10 @@ namespace Adletec.Sonic.Execution
             var formula = engine.Build(formulaText, constants);
 
             var adapter = new FuncAdapter();
-            return adapter.Wrap(parameters, variables => {
-
-                if(!caseSensitive)
-                    variables = EngineUtil.ConvertVariableNamesToLowerCase(variables);
+            return adapter.Wrap(parameters, variables =>
+            {
+                // We're writing to that dictionary so let's create a copy.
+                variables = !caseSensitive ? EngineUtil.ConvertVariableNamesToLowerCase(variables) : new Dictionary<string, double>(variables);
 
                 engine.VerifyVariableNames(variables);
 
