@@ -8,7 +8,7 @@ namespace Adletec.Sonic.Execution
 {
     public class FunctionRegistry : IFunctionRegistry
     {
-        private const string DynamicFuncName = "Sonic.DynamicFunc";
+        private const string DynamicFuncName = "Adletec.Sonic.DynamicFunc";
 
         private readonly Dictionary<string, FunctionInfo> functions;
 
