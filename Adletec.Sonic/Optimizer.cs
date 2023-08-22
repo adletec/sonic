@@ -52,6 +52,10 @@ namespace Adletec.Sonic
                 var division = (Division)operation;
                 division.Dividend = Optimize(division.Dividend, functionRegistry, constantRegistry);
                 division.Divisor = Optimize(division.Divisor, functionRegistry, constantRegistry);
+                if (division.Dividend.GetType() == typeof(FloatingPointConstant) && ((FloatingPointConstant)division.Dividend).Value == 0.0)
+                {
+                    return new FloatingPointConstant(0.0);
+                }
             }
             else if (operation.GetType() == typeof(Exponentiation))
             {
