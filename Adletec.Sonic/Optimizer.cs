@@ -16,24 +16,33 @@ namespace Adletec.Sonic
 
         public Operation Optimize(Operation operation, IFunctionRegistry functionRegistry, IConstantRegistry constantRegistry)
         {
-            if (!operation.DependsOnVariables && operation.IsIdempotent && operation.GetType() != typeof(IntegerConstant)
-                && operation.GetType() != typeof(FloatingPointConstant))
-            {
-                double result = executor.Execute(operation, functionRegistry, constantRegistry);
-                return new FloatingPointConstant(result);
-            }
-
             if (operation.GetType() == typeof(Addition))
             {
                 var addition = (Addition)operation;
                 addition.Argument1 = Optimize(addition.Argument1, functionRegistry, constantRegistry);
                 addition.Argument2 = Optimize(addition.Argument2, functionRegistry, constantRegistry);
+                if (addition.Argument1.DependsOnVariables == false && addition.Argument2.DependsOnVariables == false)
+                {
+                    addition.DependsOnVariables = false;
+                }
+                if (addition.Argument1.IsIdempotent && addition.Argument2.IsIdempotent)
+                {
+                    addition.IsIdempotent = true;
+                }
             }
             else if (operation.GetType() == typeof(Subtraction))
             {
                 var subtraction = (Subtraction)operation;
                 subtraction.Argument1 = Optimize(subtraction.Argument1, functionRegistry, constantRegistry);
                 subtraction.Argument2 = Optimize(subtraction.Argument2, functionRegistry, constantRegistry);
+                if (subtraction.Argument1.DependsOnVariables == false && subtraction.Argument2.DependsOnVariables == false)
+                {
+                    subtraction.DependsOnVariables = false;
+                }
+                if (subtraction.Argument1.IsIdempotent && subtraction.Argument2.IsIdempotent)
+                {
+                    subtraction.IsIdempotent = true;
+                }
             }
             else if (operation.GetType() == typeof(Multiplication))
             {
@@ -45,6 +54,16 @@ namespace Adletec.Sonic
                 {
                     return new FloatingPointConstant(0.0);
                 }
+
+                if (multiplication.Argument1.DependsOnVariables == false &&
+                    multiplication.Argument2.DependsOnVariables == false)
+                {
+                    multiplication.DependsOnVariables = false;
+                }
+                if (multiplication.Argument1.IsIdempotent && multiplication.Argument2.IsIdempotent)
+                {
+                    multiplication.IsIdempotent = true;
+                }
             }
             else if (operation.GetType() == typeof(Division))
             {
@@ -54,6 +73,14 @@ namespace Adletec.Sonic
                 if (IsZero(division.Dividend))
                 {
                     return new FloatingPointConstant(0.0);
+                }
+                if (division.Dividend.DependsOnVariables == false && division.Divisor.DependsOnVariables == false)
+                {
+                    division.DependsOnVariables = false;
+                }
+                if (division.Dividend.IsIdempotent && division.Divisor.IsIdempotent)
+                {
+                    division.IsIdempotent = true;
                 }
             }
             else if (operation.GetType() == typeof(Exponentiation))
@@ -71,16 +98,35 @@ namespace Adletec.Sonic
                 {
                     return new FloatingPointConstant(1.0);
                 }
+                
+                if (exponentiation.Base.DependsOnVariables == false && exponentiation.Exponent.DependsOnVariables == false)
+                {
+                    exponentiation.DependsOnVariables = false;
+                }
+                if (exponentiation.Base.IsIdempotent && exponentiation.Exponent.IsIdempotent)
+                {
+                    exponentiation.IsIdempotent = true;
+                }
             }
             else if(operation.GetType() == typeof(Function))
             {
                 var function = (Function)operation;
                 IList<Operation> arguments = function.Arguments.Select(a => Optimize(a, functionRegistry, constantRegistry)).ToList();
                 function.Arguments = arguments;
+                // todo check if can be evaluated after optimization (as in other cases)
             }
+            
+            if (!operation.DependsOnVariables && operation.IsIdempotent && operation.GetType() != typeof(IntegerConstant)
+                && operation.GetType() != typeof(FloatingPointConstant))
+            {
+                double result = executor.Execute(operation, functionRegistry, constantRegistry);
+                return new FloatingPointConstant(result);
+            }
+
 
             return operation;
         }
+
         
         private bool IsZero(Operation operation)
         {

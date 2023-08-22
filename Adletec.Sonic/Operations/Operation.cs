@@ -13,6 +13,6 @@
 
         public bool DependsOnVariables { get; internal set; }
 
-        public bool IsIdempotent { get; private set; }
+        public bool IsIdempotent { get; internal set; }
     }
 }

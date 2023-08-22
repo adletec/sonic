@@ -90,6 +90,24 @@ public class OptimizerTests
     }
     
     [TestMethod]
+    public void TestOptimizerCombined()
+    {
+        Optimizer optimizer = new Optimizer(new Interpreter());
+
+        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        IList<Token> tokens = tokenReader.Read("(var1 + var2 * var3 / 2) * 0 + 0 / (var1 + var2 * var3 / 2) + (var1 + var2 * var3 / 2)^0");
+
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, true);
+        Operation operation = astBuilder.Build(tokens);
+
+        Operation optimizedOperation = optimizer.Optimize(operation, functionRegistry, null);
+
+        Assert.AreEqual(typeof(FloatingPointConstant), optimizedOperation.GetType());
+        Assert.AreEqual(1.0, ((FloatingPointConstant)optimizedOperation).Value);
+    }
+    [TestMethod]
     public void TestOptimizerBaseZero()
     {
         Optimizer optimizer = new Optimizer(new Interpreter());
