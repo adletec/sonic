@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>Adletec.Sonic.Benchmark</AssemblyName>
+    <RootNamespace>Adletec.Sonic.Benchmark</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Adletec.Sonic\Adletec.Sonic.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.3" />
+  </ItemGroup>
+</Project>
