@@ -1,0 +1,10 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Adletec.Sonic.DemoApp.InputDialog"
+        Title="Variable Value Input" Width="474" Height="138" ShowInTaskbar="False" CanResize="False">
+    <DockPanel Margin="5">
+        <TextBlock Name="QuestionLabel" Text="Value:" HorizontalAlignment="Left" Margin="5" DockPanel.Dock="Top"/>
+        <TextBox Name="ValueTextBox" Height="23" Margin="5" TextWrapping="Wrap" DockPanel.Dock="Top"/>
+        <Button Content="OK" HorizontalAlignment="Right" Margin="5" VerticalAlignment="Top" HorizontalContentAlignment="Center" Width="75" IsDefault="True" Click="OK_Click" DockPanel.Dock="Top"/>
+    </DockPanel>
+</Window>
