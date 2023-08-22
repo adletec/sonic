@@ -1279,9 +1279,52 @@ public class CalculationEngineTests
         double result = engine.Calculate("test(2, 3)");
         Assert.AreEqual(5.0, result);
     }
+
+    [TestMethod]
+    public void TestRerunCalculation()
+    {
+        const string expression = "var1 + var2 * var3 / 2";
+        var values = new Dictionary<string, double>
+        {
+            { "var1", 1 },
+            { "var2", 2 },
+            { "var3", 3 }
+        };
+        
+        var engine = new CalculationEngine(Options.CompiledCaseSensitive);
+        for (var i = 0; i < 3; i++)
+        {
+            engine.Calculate(expression, values);
+        }
+        // assert "does not throw an exception"
+        Assert.IsTrue(true);
+    }
+
+    [TestMethod]
+    public void TestRerunCalculationFunc()
+    {
+        const string expression = "var1 + var2 * var3 / 2";
+        var values = new Dictionary<string, double>
+        {
+            { "var1", 1 },
+            { "var2", 2 },
+            { "var3", 3 }
+        };
+        
+        var engine = new CalculationEngine(Options.CompiledCaseSensitive);
+        var func = engine.Build(expression);
+        for (var i = 0; i < 3; i++)
+        {
+            func(values);
+        }
+        // assert "does not throw an exception"
+        Assert.IsTrue(true);
+        
+    }
+    
 }
 
-static class Options
+internal static class Options
 {
     public static readonly SonicOptions CompiledNoOptimizer = new()
     {
