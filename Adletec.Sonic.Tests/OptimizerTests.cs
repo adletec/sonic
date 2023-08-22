@@ -68,4 +68,62 @@ public class OptimizerTests
         Assert.AreEqual(typeof(FloatingPointConstant), optimizedOperation.GetType());
         Assert.AreEqual(0.0, ((FloatingPointConstant)optimizedOperation).Value);
     }
+    
+    
+    [TestMethod]
+    public void TestOptimizerDividendZero()
+    {
+        Optimizer optimizer = new Optimizer(new Interpreter());
+
+        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        IList<Token> tokens = tokenReader.Read("0 / var1");
+
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, true);
+        Operation operation = astBuilder.Build(tokens);
+
+        Operation optimizedOperation = optimizer.Optimize(operation, functionRegistry, null);
+
+        Assert.AreEqual(typeof(FloatingPointConstant), optimizedOperation.GetType());
+        Assert.AreEqual(0.0, ((FloatingPointConstant)optimizedOperation).Value);
+    }
+    
+    [TestMethod]
+    public void TestOptimizerBaseZero()
+    {
+        Optimizer optimizer = new Optimizer(new Interpreter());
+
+        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        IList<Token> tokens = tokenReader.Read("0 ^ 2");
+
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, true);
+        Operation operation = astBuilder.Build(tokens);
+
+        Operation optimizedOperation = optimizer.Optimize(operation, functionRegistry, null);
+
+        Assert.AreEqual(typeof(FloatingPointConstant), optimizedOperation.GetType());
+        Assert.AreEqual(0.0, ((FloatingPointConstant)optimizedOperation).Value);
+    }
+    
+    [TestMethod]
+    public void TestOptimizerExponentZero()
+    {
+        Optimizer optimizer = new Optimizer(new Interpreter());
+
+        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        IList<Token> tokens = tokenReader.Read("0 ^ 0");
+
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, true);
+        Operation operation = astBuilder.Build(tokens);
+
+        Operation optimizedOperation = optimizer.Optimize(operation, functionRegistry, null);
+
+        Assert.AreEqual(typeof(FloatingPointConstant), optimizedOperation.GetType());
+        Assert.AreEqual(1.0, ((FloatingPointConstant)optimizedOperation).Value);
+    }
 }
