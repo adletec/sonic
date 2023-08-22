@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <Title>adletec sonic</Title>
+    <PackageId>Adletec.Sonic</PackageId>
+    <PackageVersion>1.1.0-beta-2</PackageVersion>
+    <Authors>Florian Engel, Pieter de Rycke</Authors>
+    <Company>adletec Software Engineering</Company>
+    <Product>sonic</Product>
+    <PackageTags>math parse mathematical symbolic formula calculation expression parse evaluate interpret</PackageTags>
+    <Description>
+      sonic is a rapid evaluation engine for mathematical expressions. It can parse and execute strings containing mathematical expressions. It started as a fork of the dormant Jace.NET project.
+    </Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/adletec/sonic</RepositoryUrl>
+    <AssemblyName>Adletec.Sonic</AssemblyName>
+    <RootNamespace>Adletec.Sonic</RootNamespace>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+  </PropertyGroup>
+  <ItemGroup>
+	  <None Include="..\README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+</Project>
