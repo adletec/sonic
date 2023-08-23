@@ -113,7 +113,23 @@ namespace Adletec.Sonic
                 var function = (Function)operation;
                 IList<Operation> arguments = function.Arguments.Select(a => Optimize(a, functionRegistry, constantRegistry)).ToList();
                 function.Arguments = arguments;
-                // todo check if can be evaluated after optimization (as in other cases)
+                function.IsIdempotent = functionRegistry.GetFunctionInfo(function.FunctionName).IsIdempotent;
+                for (int i = 0; i < arguments.Count; i++)
+                {
+                    if (!function.DependsOnVariables && arguments[i].DependsOnVariables)
+                    {
+                        function.DependsOnVariables = true;
+                    }
+                    if (function.IsIdempotent && !arguments[i].IsIdempotent)
+                    {
+                        function.IsIdempotent = false;
+                    }
+                    if (function.DependsOnVariables && !function.IsIdempotent)
+                    {
+                        break;
+                    }
+                }
+                function.DependsOnVariables = arguments.Any(a => a.DependsOnVariables);
             }
             
             if (!operation.DependsOnVariables && operation.IsIdempotent && operation.GetType() != typeof(IntegerConstant)

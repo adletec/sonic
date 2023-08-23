@@ -144,4 +144,24 @@ public class OptimizerTests
         Assert.AreEqual(typeof(FloatingPointConstant), optimizedOperation.GetType());
         Assert.AreEqual(1.0, ((FloatingPointConstant)optimizedOperation).Value);
     }
+
+    [TestMethod]
+    public void TestOptimizerFunction()
+    {
+        Optimizer optimizer = new Optimizer(new Interpreter());
+
+        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        IList<Token> tokens = tokenReader.Read("sin(0 * var1)");
+
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+        functionRegistry.RegisterFunction("sin", new Func<double, double>(Math.Sin), true, false);
+
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, true);
+        Operation operation = astBuilder.Build(tokens);
+
+        Operation optimizedOperation = optimizer.Optimize(operation, functionRegistry, null);
+
+        Assert.AreEqual(typeof(FloatingPointConstant), optimizedOperation.GetType());
+        Assert.AreEqual(0.0, ((FloatingPointConstant)optimizedOperation).Value);
+    }
 }
