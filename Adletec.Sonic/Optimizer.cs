@@ -89,16 +89,16 @@ namespace Adletec.Sonic
                 exponentiation.Base = Optimize(exponentiation.Base, functionRegistry, constantRegistry);
                 exponentiation.Exponent = Optimize(exponentiation.Exponent, functionRegistry, constantRegistry);
 
-                if (IsZero(exponentiation.Base))
-                {
-                    return new FloatingPointConstant(0.0);
-                }
-
                 if (IsZero(exponentiation.Exponent))
                 {
                     return new FloatingPointConstant(1.0);
                 }
                 
+                if (IsZero(exponentiation.Base))
+                {
+                    return new FloatingPointConstant(0.0);
+                }
+
                 if (exponentiation.Base.DependsOnVariables == false && exponentiation.Exponent.DependsOnVariables == false)
                 {
                     exponentiation.DependsOnVariables = false;
