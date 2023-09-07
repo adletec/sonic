@@ -208,18 +208,16 @@ public static class Program
     {
         var start = DateTime.Now;
 
-        var function = (Func<int, int, int, double>)engine.Formula(functionText)
-            .Parameter("var1", DataType.Integer)
-            .Parameter("var2", DataType.Integer)
-            .Parameter("something", DataType.Integer)
-            .Result(DataType.FloatingPoint)
-            .Build();
-
+        var function = engine.CreateDelegate(functionText);
         var random = new Random();
 
+        var values = new Dictionary<string, double>();
         for (var i = 0; i < NumberOfTests; i++)
         {
-            function(random.Next(), random.Next(), random.Next());
+            values["var1"] = random.Next();
+            values["var2"] = random.Next();
+            values["something"] = random.Next();
+            function(values);
         }
 
         var end = DateTime.Now;
@@ -247,16 +245,15 @@ public static class Program
 
         Parallel.ForEach(functions, functionText =>
         {
-            var function = (Func<int, int, int, double>)engine.Formula(functionText)
-                .Parameter("var1", DataType.Integer)
-                .Parameter("var2", DataType.Integer)
-                .Parameter("var3", DataType.Integer)
-                .Result(DataType.FloatingPoint)
-                .Build();
+            var function = engine.CreateDelegate(functionText);
+            var values = new Dictionary<string, double>();
 
             for (var i = 0; i < numberOfTests; i++)
             {
-                function(random.Next(), random.Next(), random.Next());
+                values["var1"] = random.Next();
+                values["var2"] = random.Next();
+                values["var3"] = random.Next();
+                function(values);
             }
         });
 

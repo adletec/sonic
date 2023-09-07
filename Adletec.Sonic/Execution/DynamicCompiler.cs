@@ -349,8 +349,6 @@ namespace Adletec.Sonic.Execution
             {
                 if (context.Variables.TryGetValue(variableName, out double result))
                     return result;
-                if (context.ConstantRegistry.IsConstantName(variableName))
-                    return context.ConstantRegistry.GetConstantInfo(variableName).Value;
                 throw new VariableNotDefinedException($"The variable \"{variableName}\" used is not defined.");
             }
         }

@@ -11,16 +11,16 @@ namespace Adletec.Sonic
     public class AstBuilder
     {
         private readonly IFunctionRegistry functionRegistry;
-        private readonly IConstantRegistry localConstantRegistry;
+        private readonly IConstantRegistry constantRegistry;
         private readonly Dictionary<char, int> operationPrecedence = new Dictionary<char, int>();
         private readonly Stack<Operation> resultStack = new Stack<Operation>();
         private readonly Stack<Token> operatorStack = new Stack<Token>();
         private readonly Stack<int> parameterCount = new Stack<int>();
 
-        public AstBuilder(IFunctionRegistry functionRegistry, bool caseSensitive, IConstantRegistry compiledConstants = null)
+        public AstBuilder(IFunctionRegistry functionRegistry, IConstantRegistry constantRegistry)
         {
             this.functionRegistry = functionRegistry ?? throw new ArgumentNullException(nameof(functionRegistry));
-            this.localConstantRegistry = compiledConstants ?? new ConstantRegistry(caseSensitive);
+            this.constantRegistry = constantRegistry ?? throw new ArgumentNullException(nameof(constantRegistry));
 
             operationPrecedence.Add('(', 0);
             operationPrecedence.Add('&', 1);
@@ -66,9 +66,9 @@ namespace Adletec.Sonic
                         else
                         {
                             var tokenValue = (string)token.Value;
-                            if (localConstantRegistry.IsConstantName(tokenValue))
+                            if (constantRegistry.IsConstantName(tokenValue))
                             {
-                                resultStack.Push(new FloatingPointConstant(localConstantRegistry.GetConstantInfo(tokenValue).Value));
+                                resultStack.Push(new FloatingPointConstant(constantRegistry.GetConstantInfo(tokenValue).Value));
                             }
                             else
                             {

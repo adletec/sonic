@@ -12,8 +12,14 @@ namespace Adletec.Sonic
     /// </summary>
     public interface ICalculationEngine
     {
+        /// <summary>
+        /// All functions registered with the engine.
+        /// </summary>
         IEnumerable<FunctionInfo> Functions { get; }
         
+        /// <summary>
+        /// All constants registered with the engine.
+        /// </summary>
         IEnumerable<ConstantInfo> Constants { get; }
         
         /// <summary>
@@ -31,21 +37,12 @@ namespace Adletec.Sonic
         /// <returns>the result of the evaluation as double</returns>
         double Evaluate(string expression, IDictionary<string, double> variables);
         
-        FormulaBuilder Formula(string formulaText);
-
         /// <summary>
-        /// Build a .NET func for the provided formula.
+        /// Creates a <see cref="Func{T, Double}"/> delegate for the string expression, which takes the variable dictionary as input.
         /// </summary>
-        /// <param name="formulaText">The formula that must be converted into a .NET func.</param>
-        /// <returns>A .NET func for the provided formula.</returns>
-        Func<IDictionary<string, double>, double> Build(string formulaText);
+        /// <param name="expression">The expression string for which a delegate should be created.</param>
+        /// <returns>A delegate which takes an <see cref="IDictionary{TKey,TValue}"/> with variable values and evaluates the expression using those values.</returns>
+        Func<IDictionary<string, double>, double> CreateDelegate(string expression);
 
-        /// <summary>
-        /// Build a .NET func for the provided formula.
-        /// </summary>
-        /// <param name="formulaText">The formula that must be converted into a .NET func.</param>
-        /// <param name="constants">Constant values for variables defined into the formula. They variables will be replaced by the constant value at pre-compilation time.</param>
-        /// <returns>A .NET func for the provided formula.</returns>
-        Func<IDictionary<string, double>, double> Build(string formulaText, IDictionary<string, double> constants);
     }
 }

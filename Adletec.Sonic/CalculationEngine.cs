@@ -86,7 +86,7 @@ namespace Adletec.Sonic
                 foreach (var constant in options.Constants)
                 {
                     // todo isOverwritable should go
-                    ConstantRegistry.RegisterConstant(constant.Name, constant.Value, true);
+                    ConstantRegistry.RegisterConstant(constant.Name, constant.Value, false);
                 }
             }
             
@@ -96,7 +96,7 @@ namespace Adletec.Sonic
                 foreach (var function in options.Functions)
                 {
                     // todo isOverwritable should go
-                    FunctionRegistry.RegisterFunction(function.Name, function.Function, function.IsIdempotent, true);
+                    FunctionRegistry.RegisterFunction(function.Name, function.Function, function.IsIdempotent, false);
                 }
             }
         }
@@ -136,55 +136,23 @@ namespace Adletec.Sonic
                 return function(variables);
             }
 
-            Operation operation = BuildAbstractSyntaxTree(expression, new ConstantRegistry(caseSensitive));
+            Operation operation = BuildAbstractSyntaxTree(expression, ConstantRegistry);
             function = BuildFormula(expression, null, operation);
             return function(variables);
         }
 
-        public FormulaBuilder Formula(string formulaText)
+        public Func<IDictionary<string, double>, double> CreateDelegate(string expression)
         {
-            if (string.IsNullOrEmpty(formulaText))
-                throw new ArgumentNullException(nameof(formulaText));
+            if (string.IsNullOrEmpty(expression))
+                throw new ArgumentNullException(nameof(expression));
 
-            return new FormulaBuilder(formulaText, caseSensitive, this);
-        }
-
-        public Func<IDictionary<string, double>, double> Build(string formulaText)
-        {
-            if (string.IsNullOrEmpty(formulaText))
-                throw new ArgumentNullException(nameof(formulaText));
-
-            if (IsInFormulaCache(formulaText, null, out var result))
+            if (IsInFormulaCache(expression, null, out var result))
             {
                 return result;
             }
 
-            Operation operation = BuildAbstractSyntaxTree(formulaText, new ConstantRegistry(caseSensitive));
-            return BuildFormula(formulaText, null, operation);
-        }
-
-        public Func<IDictionary<string, double>, double> Build(string formulaText, IDictionary<string, double> constants)
-        {
-            if (string.IsNullOrEmpty(formulaText))
-                throw new ArgumentNullException(nameof(formulaText));
-
-
-            ConstantRegistry compiledConstants = new ConstantRegistry(caseSensitive);
-            if (constants != null)
-            {
-                foreach (var constant in constants)
-                {
-                    compiledConstants.RegisterConstant(constant.Key, constant.Value);
-                }
-            }
-
-            if (IsInFormulaCache(formulaText, compiledConstants, out var result))
-            {
-                return result;
-            }
-
-            Operation operation = BuildAbstractSyntaxTree(formulaText, compiledConstants);
-            return BuildFormula(formulaText, compiledConstants,  operation);
+            Operation operation = BuildAbstractSyntaxTree(expression, ConstantRegistry);
+            return BuildFormula(expression, null, operation);
         }
 
         private void RegisterDefaultFunctions()
@@ -243,7 +211,7 @@ namespace Adletec.Sonic
             var tokenReader = new TokenReader(cultureInfo);
             List<Token> tokens = tokenReader.Read(formulaText);
             
-            var astBuilder = new AstBuilder(FunctionRegistry, caseSensitive, compiledConstants);
+            var astBuilder = new AstBuilder(FunctionRegistry, compiledConstants);
             Operation operation = astBuilder.Build(tokens);
 
             return optimizerEnabled ? optimizer.Optimize(operation, this.FunctionRegistry, this.ConstantRegistry) : operation;
@@ -254,6 +222,7 @@ namespace Adletec.Sonic
             return executionFormulaCache.GetOrAdd(GenerateFormulaCacheKey(formulaText, compiledConstants), v => executor.BuildFormula(operation, this.FunctionRegistry, this.ConstantRegistry));
         }
 
+        // todo compiled constants won't be an issue. refactor this.
         private bool IsInFormulaCache(string formulaText, ConstantRegistry compiledConstants, out Func<IDictionary<string, double>, double> function)
         {
             function = null;

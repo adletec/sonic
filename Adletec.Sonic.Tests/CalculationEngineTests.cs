@@ -354,7 +354,7 @@ public class CalculationEngineTests
     public void TestBuild()
     {
         var engine = CalculationEngine.CreateWithDefaults();
-        Func<Dictionary<string, double>, double> function = engine.Build("var1+2*(3*age)");
+        Func<Dictionary<string, double>, double> function = engine.CreateDelegate("var1+2*(3*age)");
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
@@ -365,90 +365,61 @@ public class CalculationEngineTests
     }
 
     [TestMethod]
-    public void TestFormulaBuilder()
-    {
-        var engine = CalculationEngine.CreateWithDefaults();
-        Func<int, double, double> function = (Func<int, double, double>)engine.Formula("var1+2*(3*age)")
-            .Parameter("var1", DataType.Integer)
-            .Parameter("age", DataType.FloatingPoint)
-            .Result(DataType.FloatingPoint)
-            .Build();
-
-        double result = function(2, 4);
-        Assert.AreEqual(26.0, result);
-    }
-
-    [TestMethod]
-    public void TestFormulaBuilderCompiled()
-    {
-        var engine = SonicEngines.Compiled();
-        Func<int, double, double> function = (Func<int, double, double>)engine.Formula("var1+2*(3*age)")
-            .Parameter("var1", DataType.Integer)
-            .Parameter("age", DataType.FloatingPoint)
-            .Result(DataType.FloatingPoint)
-            .Build();
-
-        double result = function(2, 4);
-        Assert.AreEqual(26.0, result);
-    }
-
-    [TestMethod]
-    public void TestFormulaBuilderConstantInterpreted()
-    {
-        var engine = SonicBuilders.Interpreted()
-            .AddConstant("age", 18.0)
-            .Build();
-
-        Func<int, double> function = (Func<int, double>)engine.Formula("age+var1")
-            .Parameter("var1", DataType.Integer)
-            .Result(DataType.FloatingPoint)
-            .Build();
-
-        double result = function(3);
-        Assert.AreEqual(21.0, result);
-    }
-
-    [TestMethod]
-    public void TestFormulaBuilderConstantCompiled()
+    public void TestConstantsCompiled()
     {
         var engine = SonicBuilders.Compiled()
             .AddConstant("age", 18.0)
             .Build();
-
-        Func<int, double> function = (Func<int, double>)engine.Formula("age+var1")
-            .Parameter("var1", DataType.Integer)
-            .Result(DataType.FloatingPoint)
-            .Build();
-
-        double result = function(3);
-        Assert.AreEqual(21.0, result);
+        
+        double result = engine.Evaluate("age+2");
+        Assert.AreEqual(20.0, result);
     }
 
+    [TestMethod]
+    public void TestConstantsInterpreted()
+    {
+        var engine = SonicBuilders.Interpreted()
+            .AddConstant("age", 18.0)
+            .Build();
+        
+        double result = engine.Evaluate("age+2");
+        Assert.AreEqual(20.0, result);
+    }
+
+    [TestMethod]
+    public void TestConstantsAndVariablesCompiled()
+    {
+        var engine = SonicBuilders.Compiled()
+            .AddConstant("age", 18.0)
+            .Build();
+        
+        double result = engine.Evaluate("age+var1", new Dictionary<string, double>{{"var1", 2.0}});
+        Assert.AreEqual(20.0, result);
+    }
+
+    [TestMethod]
+    public void TestConstantsAndVariablesInterpreted()
+    {
+        var engine = SonicBuilders.Interpreted()
+            .AddConstant("age", 18.0)
+            .Build();
+        
+        double result = engine.Evaluate("age+var1", new Dictionary<string, double>{{"var1", 2.0}});
+        Assert.AreEqual(20.0, result);
+    }
+    
     [TestMethod]
     public void TestFormulaBuilderInvalidParameterName()
     {
+        // todo this should also work with CalculationEngine.Build();
         AssertExtensions.ThrowsException<ArgumentException>(() =>
         {
             var engine = CalculationEngine.CreateWithDefaults();
-            Func<int, double, double> function = (Func<int, double, double>)engine.Formula("sin+2")
-                .Parameter("sin", DataType.Integer)
-                .Build();
+            engine.Evaluate("sin+2", new Dictionary<string, double>{{"sin", 2.0}});
         });
     }
-
-    [TestMethod]
-    public void TestFormulaBuilderDuplicateParameterName()
-    {
-        AssertExtensions.ThrowsException<ArgumentException>(() =>
-        {
-            var engine = CalculationEngine.CreateWithDefaults();
-            Func<int, double, double> function = (Func<int, double, double>)engine.Formula("var1+2")
-                .Parameter("var1", DataType.Integer)
-                .Parameter("var1", DataType.FloatingPoint)
-                .Build();
-        });
-    }
-
+    
+    
     [TestMethod]
     public void TestPiMultiplication()
     {
@@ -586,7 +557,7 @@ public class CalculationEngineTests
     public void TestVariableCaseInsensitiveFuncInterpreted()
     {
         var engine = SonicEngines.InterpretedCaseInsensitive();
-        Func<Dictionary<string, double>, double> formula = engine.Build("var1+2/(3*otherVariablE)");
+        Func<Dictionary<string, double>, double> formula = engine.CreateDelegate("var1+2/(3*otherVariablE)");
 
         var variables = new Dictionary<string, double>
         {
@@ -601,7 +572,7 @@ public class CalculationEngineTests
     public void TestConstantBuildCompiled()
     {
         var engine = SonicEngines.Compiled();
-        Func<Dictionary<string, double>, double> formula = engine.Build("pi");
+        Func<Dictionary<string, double>, double> formula = engine.CreateDelegate("pi");
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
 
@@ -614,7 +585,7 @@ public class CalculationEngineTests
     public void TestConstantBuildInterpreted()
     {
         var engine = SonicEngines.Interpreted();
-        Func<Dictionary<string, double>, double> formula = engine.Build("pi");
+        Func<Dictionary<string, double>, double> formula = engine.CreateDelegate("pi");
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
 
@@ -627,7 +598,7 @@ public class CalculationEngineTests
     public void TestVariableCaseInsensitiveFuncCompiled()
     {
         var engine = SonicEngines.CompiledCaseInsensitive();
-        Func<Dictionary<string, double>, double> formula = engine.Build("var1+2/(3*otherVariablE)");
+        Func<Dictionary<string, double>, double> formula = engine.CreateDelegate("var1+2/(3*otherVariablE)");
 
         var variables = new Dictionary<string, double>
         {
@@ -1046,8 +1017,11 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstants1Compiled()
     {
-        var engine = SonicEngines.Compiled();
-        var fn = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 1 } });
+        var engine = SonicBuilders.Compiled()
+            .AddConstant("a", 1)
+            .Build();
+        
+        var fn = engine.CreateDelegate("a+b+c");
         double result = fn(new Dictionary<string, double> { { "b", 2 }, { "c", 2 } });
         Assert.AreEqual(5.0, result);
     }
@@ -1055,8 +1029,10 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstants1Interpreted()
     {
-        var engine = SonicEngines.Interpreted();
-        var fn = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 1 } });
+        var engine = SonicBuilders.Interpreted()
+            .AddConstant("a", 1)
+            .Build();
+        var fn = engine.CreateDelegate("a+b+c");
         double result = fn(new Dictionary<string, double> { { "b", 2 }, { "c", 2 } });
         Assert.AreEqual(5.0, result);
     }
@@ -1064,186 +1040,156 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstants2Compiled()
     {
-        var engine = SonicEngines.Compiled();
-
-        Func<double, double, double> formula = (Func<double, double, double>)engine.Formula("a+b+c")
-            .Parameter("b", DataType.FloatingPoint)
-            .Parameter("c", DataType.FloatingPoint)
-            .Constant("a", 1)
-            .Result(DataType.FloatingPoint)
+        var engine = SonicBuilders.Compiled()
+            .AddConstant("a", 1)
+            .AddConstant("A", 2.0)
             .Build();
-
-        double result = formula(2.0, 2.0);
-        Assert.AreEqual(5.0, result);
+    
+        var fn = engine.CreateDelegate("a+A");
+        
+        double result = fn(new Dictionary<string, double>());
+        Assert.AreEqual(3.0, result);
     }
 
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstants2Interpreted()
     {
-        var engine = SonicEngines.Interpreted();
-
-        Func<double, double, double> formula = (Func<double, double, double>)engine.Formula("a+b+c")
-            .Parameter("b", DataType.FloatingPoint)
-            .Parameter("c", DataType.FloatingPoint)
-            .Constant("a", 1)
-            .Result(DataType.FloatingPoint)
+        var engine = SonicBuilders.Interpreted()
+            .AddConstant("a", 1)
+            .AddConstant("A", 2.0)
             .Build();
-
-        double result = formula(2.0, 2.0);
-        Assert.AreEqual(5.0, result);
+    
+        var fn = engine.CreateDelegate("a+A");
+        
+        double result = fn(new Dictionary<string, double>());
+        Assert.AreEqual(3.0, result);
     }
-
+    
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstants3Compiled()
     {
-        var engine = SonicEngines.Compiled();
-
-        Func<double, double> formula = (Func<double, double>)engine.Formula("a+A")
-            .Parameter("A", DataType.FloatingPoint)
-            .Constant("a", 1)
-            .Result(DataType.FloatingPoint)
+        var engine = SonicBuilders.Compiled()
+            .AddConstant("a", 1.0)
             .Build();
-
-        double result = formula(2.0);
+    
+        var fn = engine.CreateDelegate("a+A");
+        
+        double result = fn(new Dictionary<string, double>{{"A", 2.0}});
         Assert.AreEqual(3.0, result);
     }
-
+    
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstants3Interpreted()
     {
-        var engine = SonicEngines.Interpreted();
-
-        Func<double, double> formula = (Func<double, double>)engine.Formula("a+A")
-            .Parameter("A", DataType.FloatingPoint)
-            .Constant("a", 1)
-            .Result(DataType.FloatingPoint)
+        var engine = SonicBuilders.Interpreted()
+            .AddConstant("a", 1.0)
             .Build();
-
-        double result = formula(2.0);
+    
+        var fn = engine.CreateDelegate("a+A");
+        
+        double result = fn(new Dictionary<string, double>{{"A", 2.0}});
         Assert.AreEqual(3.0, result);
     }
 
+
     [TestMethod]
-    public void TestCalculationFormulaBuildingWithConstantsCache1()
+    public void TestDuplicateConstantCompiled()
     {
-        var engine = SonicEngines.Compiled();
-
-        var fn = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 1 } });
-        double result = fn(new Dictionary<string, double> { { "b", 2 }, { "c", 2 } });
-        Assert.AreEqual(5.0, result);
-
-        AssertExtensions.ThrowsException<VariableNotDefinedException>(() =>
+        AssertExtensions.ThrowsException<ArgumentException>(() =>
         {
-            var fn1 = engine.Build("a+b+c");
-            double result1 = fn1(new Dictionary<string, double> { { "b", 3 }, { "c", 3 } });
+            SonicBuilders.Compiled()
+                .AddConstant("a", 1)
+                .AddConstant("a", 2)
+                .Build();
+        });
+    }
+    
+    [TestMethod]
+    public void TestConflictingConstantAndVariableCompiled()
+    {
+        AssertExtensions.ThrowsException<ArgumentException>(() =>
+        {
+            var engine = SonicBuilders.Compiled()
+                .AddConstant("a", 1)
+                .Build();
+
+            engine.Evaluate("a+a", new Dictionary<string, double> { { "a", 2 } });
         });
     }
 
     [TestMethod]
-    public void TestCalculationFormulaBuildingWithConstantsCache2()
+    public void TestDuplicateFunctionCompiled()
     {
-        var engine = SonicEngines.Compiled();
-        
-        var fn = engine.Build("a+b+c");
-        double result = fn(new Dictionary<string, double> { { "a", 1 }, { "b", 2 }, { "c", 2 } });
-        Assert.AreEqual(5.0, result);
-
-
-        var fn1 = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 2 } });
-        double result1 = fn1(new Dictionary<string, double> { { "b", 2 }, { "c", 2 } });
-        Assert.AreEqual(6.0, result1);
+        AssertExtensions.ThrowsException<ArgumentException>(() =>
+        {
+            SonicBuilders.Compiled()
+                .AddFunction("a", x => x)
+                .AddFunction("a", x => 2*x)
+                .Build();
+        });
     }
-
-
+    
     [TestMethod]
-    public void TestCalculationFormulaBuildingWithConstantsCache3()
+    public void TestConflictingConstantAndFunctionCompiled()
     {
-        var engine = SonicEngines.Interpreted();
-
-        Func<double, double> formula = (Func<double, double>)engine.Formula("a+A")
-            .Parameter("A", DataType.FloatingPoint)
-            .Constant("a", 1)
-            .Result(DataType.FloatingPoint)
-            .Build();
-
-        double result = formula(2.0);
-        Assert.AreEqual(3.0, result);
-
-        Func<double, double, double> formula1 = (Func<double, double, double>)engine.Formula("a+A")
-            .Parameter("A", DataType.FloatingPoint)
-            .Parameter("a", DataType.FloatingPoint)
-            .Result(DataType.FloatingPoint)
-            .Build();
-
-        double result1 = formula1(2.0, 2.0);
-        Assert.AreEqual(4.0, result1);
+        AssertExtensions.ThrowsException<ArgumentException>(() =>
+        {
+            SonicBuilders.Compiled()
+                .AddFunction("a", x => x)
+                .AddFunction("a", x => 2*x)
+                .Build();
+        });
     }
-
-
+    
     [TestMethod]
-    public void TestCalculationFormulaBuildingWithConstantsCache4()
+    public void TestDuplicateConstantInterpreted()
     {
-        var engine = SonicEngines.Compiled();
+        AssertExtensions.ThrowsException<ArgumentException>(() =>
+        {
+            SonicBuilders.Interpreted()
+                .AddConstant("a", 1)
+                .AddConstant("a", 2)
+                .Build();
+        });
+    }
+    
+    [TestMethod]
+    public void TestConflictingConstantAndVariableInterpreted()
+    {
+        AssertExtensions.ThrowsException<ArgumentException>(() =>
+        {
+            var engine = SonicBuilders.Interpreted()
+                .AddConstant("a", 1)
+                .Build();
 
-        Func<double, double> formula = (Func<double, double>)engine.Formula("a+A")
-            .Parameter("A", DataType.FloatingPoint)
-            .Constant("a", 1)
-            .Result(DataType.FloatingPoint)
-            .Build();
-
-        double result = formula(2.0);
-        Assert.AreEqual(3.0, result);
-
-        Func<double, double, double> formula1 = (Func<double, double, double>)engine.Formula("a+A")
-            .Parameter("A", DataType.FloatingPoint)
-            .Parameter("a", DataType.FloatingPoint)
-            .Result(DataType.FloatingPoint)
-            .Build();
-
-        double result1 = formula1(2.0, 2.0);
-        Assert.AreEqual(4.0, result1);
+            engine.Evaluate("a+a", new Dictionary<string, double> { { "a", 2 } });
+        });
     }
 
     [TestMethod]
-    public void TestCalculationFormulaBuildingWithConstantsCache5()
+    public void TestDuplicateFunctionInterpreted()
     {
-        var engine = SonicEngines.Compiled();
-        var fn = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 1 } });
-        double result = fn(new Dictionary<string, double> { { "b", 2 }, { "c", 2 } });
-        Assert.AreEqual(5.0, result);
-
-        var fn1 = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 2 } });
-        double result1 = fn1(new Dictionary<string, double> { { "b", 2 }, { "c", 2 } });
-        Assert.AreEqual(6.0, result1);
+        AssertExtensions.ThrowsException<ArgumentException>(() =>
+        {
+            SonicBuilders.Interpreted()
+                .AddFunction("a", x => x)
+                .AddFunction("a", x => 2*x)
+                .Build();
+        });
     }
-
+    
     [TestMethod]
-    public void TestCalculationFormulaBuildingWithConstantsCache6()
+    public void TestConflictingConstantAndFunctionInterpreted()
     {
-        var engine = SonicEngines.Interpreted();
-        var fn = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 1 } });
-        double result = fn(new Dictionary<string, double> { { "b", 2 }, { "c", 2 } });
-        Assert.AreEqual(5.0, result);
-
-        var fn1 = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 2 } });
-        double result1 = fn1(new Dictionary<string, double> { { "b", 2 }, { "c", 2 } });
-        Assert.AreEqual(6.0, result1);
+        AssertExtensions.ThrowsException<ArgumentException>(() =>
+        {
+            SonicBuilders.Interpreted()
+                .AddFunction("a", x => x)
+                .AddFunction("a", x => 2*x)
+                .Build();
+        });
     }
-
-    [TestMethod]
-    public void TestCalculationFormulaBuildingWithConstantsCache7()
-    {
-        var engine = SonicEngines.Compiled();
-
-        var fn = engine.Build("a+b+c");
-        double result = fn(new Dictionary<string, double> { { "a", 1 }, { "b", 2 }, { "c", 2 } });
-        Assert.AreEqual(5.0, result);
-
-
-        var fn1 = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 2 } });
-        double result1 = fn1(new Dictionary<string, double> { { "b", 3 }, { "c", 3 } });
-        Assert.AreEqual(8.0, result1);
-    }
+    
 
     [TestMethod]
     public void TestCalculationCompiledExpressionCompiled()
@@ -1306,7 +1252,7 @@ public class CalculationEngineTests
         };
 
         var engine = SonicEngines.Compiled();
-        var func = engine.Build(expression);
+        var func = engine.CreateDelegate(expression);
         for (var i = 0; i < 3; i++)
         {
             func(values);

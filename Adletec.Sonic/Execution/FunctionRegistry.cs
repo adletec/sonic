@@ -78,17 +78,17 @@ namespace Adletec.Sonic.Execution
             if (functions.ContainsKey(functionName) && !functions[functionName].IsOverWritable)
             {
                 var message = $"The function \"{functionName}\" cannot be overwritten.";
-                throw new Exception(message);
+                throw new ArgumentException(message);
             }
 
             if (functions.ContainsKey(functionName) && functions[functionName].NumberOfParameters != numberOfParameters)
             {
-                throw new Exception("The number of parameters cannot be changed when overwriting a method.");
+                throw new ArgumentException("The number of parameters cannot be changed when overwriting a method.");
             }
 
             if (functions.ContainsKey(functionName) && functions[functionName].IsDynamicFunc != isDynamicFunc)
             {
-                throw new Exception(
+                throw new ArgumentException(
                     "A Func can only be overwritten by another Func and a DynamicFunc can only be overwritten by another DynamicFunc.");
             }
 

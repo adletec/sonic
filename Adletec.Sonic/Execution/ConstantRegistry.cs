@@ -53,7 +53,7 @@ namespace Adletec.Sonic.Execution
 
             if (constants.ContainsKey(constantName) && !constants[constantName].IsOverWritable)
             {
-                throw new Exception($"The constant \"{constantName}\" cannot be overwritten.");
+                throw new ArgumentException($"The constant \"{constantName}\" cannot be overwritten.");
             }
 
             var constantInfo = new ConstantInfo(constantName, value, isOverWritable);
