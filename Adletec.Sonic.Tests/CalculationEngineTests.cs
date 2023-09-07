@@ -11,12 +11,15 @@ namespace Adletec.Sonic.Tests;
 [TestClass]
 public class CalculationEngineTests
 {
-
     [TestMethod]
     public void TestCalculationFormula1FloatingPointCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
-        double result = engine.Calculate("2.0+3.0");
+        var engine = CalculationEngine.Create()
+            .UseCulture(CultureInfo.InvariantCulture)
+            .UseExecutionMode(ExecutionMode.Compiled)
+            .Build();
+
+        double result = engine.Evaluate("2.0+3.0");
 
         Assert.AreEqual(5.0, result);
     }
@@ -24,8 +27,12 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormula1IntegersCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
-        double result = engine.Calculate("2+3");
+        var engine = CalculationEngine.Create()
+            .UseCulture(CultureInfo.InvariantCulture)
+            .UseExecutionMode(ExecutionMode.Compiled)
+            .Build();
+
+        double result = engine.Evaluate("2+3");
 
         Assert.AreEqual(5.0, result);
     }
@@ -33,8 +40,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculateFormula1()
     {
-        CalculationEngine engine = new CalculationEngine();
-        double result = engine.Calculate("2+3");
+        var engine = CalculationEngine.CreateWithDefaults();
+        double result = engine.Evaluate("2+3");
 
         Assert.AreEqual(5.0, result);
     }
@@ -42,8 +49,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculateModuloCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoCacheNoOptimizer);
-        double result = engine.Calculate("5 % 3.0");
+        var engine = SonicEngines.CompiledNoCacheNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("5 % 3.0");
 
         Assert.AreEqual(2.0, result);
     }
@@ -51,8 +58,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculateModuloInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoCacheNoOptimizer);
-        double result = engine.Calculate("5 % 3.0");
+        var engine = SonicEngines.InterpretedNoCacheNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("5 % 3.0");
 
         Assert.AreEqual(2.0, result);
     }
@@ -60,8 +67,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculatePowCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
-        double result = engine.Calculate("2^3.0");
+        var engine = SonicEngines.Compiled();
+        double result = engine.Evaluate("2^3.0");
 
         Assert.AreEqual(8.0, result);
     }
@@ -69,8 +76,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculatePowInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
-        double result = engine.Calculate("2^3.0");
+        var engine = SonicEngines.Interpreted();
+        double result = engine.Evaluate("2^3.0");
 
         Assert.AreEqual(8.0, result);
     }
@@ -82,8 +89,8 @@ public class CalculationEngineTests
         variables.Add("var1", 2.5);
         variables.Add("var2", 3.4);
 
-        CalculationEngine engine = new CalculationEngine();
-        double result = engine.Calculate("var1*var2", variables);
+        var engine = CalculationEngine.CreateWithDefaults();
+        double result = engine.Evaluate("var1*var2", variables);
 
         Assert.AreEqual(8.5, result);
     }
@@ -97,8 +104,8 @@ public class CalculationEngineTests
         variables.Add("var1", 1);
         variables.Add("var2", 1);
 
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoCacheNoOptimizerCaseSensitive);
-        double result = engine.Calculate("VaR1*vAr2", variables);
+        var engine = SonicEngines.CompiledNoCacheNoOptimizer();
+        double result = engine.Evaluate("VaR1*vAr2", variables);
 
         Assert.AreEqual(8.5, result);
     }
@@ -106,26 +113,34 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculateFormulaWithCaseSensitiveThrows()
     {
-        Dictionary<string, double> variables = new Dictionary<string, double>();
-        variables.Add("var1", 1);
-        variables.Add("var2", 1);
+        var variables = new Dictionary<string, double>
+        {
+            { "var1", 1 },
+            { "var2", 1 }
+        };
 
-        CalculationEngine engine = new CalculationEngine(new SonicOptions { CaseSensitive = true });
-        var ex = AssertExtensions.ThrowsException<VariableNotDefinedException>( () => engine.Calculate("VaR1*vAr2", variables));
+        var engine = CalculationEngine.Create()
+            .EnableCaseSensitivity()
+            .Build();
+
+        var ex = AssertExtensions.ThrowsException<VariableNotDefinedException>(() =>
+            engine.Evaluate("VaR1*vAr2", variables));
         Assert.AreEqual("The variable \"VaR1\" used is not defined.", ex.Message);
     }
 
     [TestMethod]
     public void TestCalculateFormulaWithCaseSensitiveVariables1Interpreted()
     {
-        Dictionary<string, double> variables = new Dictionary<string, double>();
-        variables.Add("VaR1", 2.5);
-        variables.Add("vAr2", 3.4);
-        variables.Add("var1", 1);
-        variables.Add("var2", 1);
+        var variables = new Dictionary<string, double>
+        {
+            { "VaR1", 2.5 },
+            { "vAr2", 3.4 },
+            { "var1", 1 },
+            { "var2", 1 }
+        };
 
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoCacheNoOptimizerCaseSensitive);
-        double result = engine.Calculate("VaR1*vAr2", variables);
+        var engine = SonicEngines.InterpretedNoCacheNoOptimizer();
+        double result = engine.Evaluate("VaR1*vAr2", variables);
 
         Assert.AreEqual(8.5, result);
     }
@@ -133,13 +148,12 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculateFormulaVariableNotDefinedInterpreted()
     {
-        Dictionary<string, double> variables = new Dictionary<string, double>();
-        variables.Add("var1", 2.5);
+        var variables = new Dictionary<string, double> { { "var1", 2.5 } };
 
         AssertExtensions.ThrowsException<VariableNotDefinedException>(() =>
         {
-            CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
-            double result = engine.Calculate("var1*var2", variables);
+            var engine = SonicEngines.Interpreted();
+            double result = engine.Evaluate("var1*var2", variables);
         });
     }
 
@@ -151,16 +165,16 @@ public class CalculationEngineTests
 
         AssertExtensions.ThrowsException<VariableNotDefinedException>(() =>
         {
-            CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
-            double result = engine.Calculate("var1*var2", variables);
+            var engine = SonicEngines.Compiled();
+            double result = engine.Evaluate("var1*var2", variables);
         });
     }
 
     [TestMethod]
     public void TestCalculateSineFunctionInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
-        double result = engine.Calculate("sin(14)");
+        var engine = SonicEngines.Interpreted();
+        double result = engine.Evaluate("sin(14)");
 
         Assert.AreEqual(Math.Sin(14.0), result);
     }
@@ -168,8 +182,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculateSineFunctionCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("sin(14)");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("sin(14)");
 
         Assert.AreEqual(Math.Sin(14.0), result);
     }
@@ -177,8 +191,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculateCosineFunctionInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
-        double result = engine.Calculate("cos(41)");
+        var engine = SonicEngines.Interpreted();
+        double result = engine.Evaluate("cos(41)");
 
         Assert.AreEqual(Math.Cos(41.0), result);
     }
@@ -186,8 +200,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculateCosineFunctionCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("cos(41)");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("cos(41)");
 
         Assert.AreEqual(Math.Cos(41.0), result);
     }
@@ -195,8 +209,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculateLognFunctionInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoOptimizer);
-        double result = engine.Calculate("logn(14, 3)");
+        var engine = SonicEngines.InterpretedNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("logn(14, 3)");
 
         Assert.AreEqual(Math.Log(14.0, 3.0), result);
     }
@@ -204,8 +218,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculateLognFunctionCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("logn(14, 3)");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("logn(14, 3)");
 
         Assert.AreEqual(Math.Log(14.0, 3.0), result);
     }
@@ -213,8 +227,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestNegativeConstant()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("-100");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("-100");
 
         Assert.AreEqual(-100.0, result);
     }
@@ -222,8 +236,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestMultiplicationWithNegativeConstant()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("5*-100");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("5*-100");
 
         Assert.AreEqual(-500.0, result);
     }
@@ -231,8 +245,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestUnaryMinus1Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("-(1+2+(3+4))");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("-(1+2+(3+4))");
 
         Assert.AreEqual(-10.0, result);
     }
@@ -240,8 +254,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestUnaryMinus1Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoOptimizer);
-        double result = engine.Calculate("-(1+2+(3+4))");
+        var engine = SonicEngines.InterpretedNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("-(1+2+(3+4))");
 
         Assert.AreEqual(-10.0, result);
     }
@@ -249,8 +263,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestUnaryMinus2Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("5+(-(1*2))");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("5+(-(1*2))");
 
         Assert.AreEqual(3.0, result);
     }
@@ -258,8 +272,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestUnaryMinus2Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoOptimizer);
-        double result = engine.Calculate("5+(-(1*2))");
+        var engine = SonicEngines.InterpretedNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("5+(-(1*2))");
 
         Assert.AreEqual(3.0, result);
     }
@@ -267,8 +281,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestUnaryMinus3Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("5*(-(1*2)*3)");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("5*(-(1*2)*3)");
 
         Assert.AreEqual(-30.0, result);
     }
@@ -276,8 +290,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestUnaryMinus3Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoOptimizer);
-        double result = engine.Calculate("5*(-(1*2)*3)");
+        var engine = SonicEngines.InterpretedNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("5*(-(1*2)*3)");
 
         Assert.AreEqual(-30.0, result);
     }
@@ -285,8 +299,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestUnaryMinus4Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("5* -(1*2)");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("5* -(1*2)");
 
         Assert.AreEqual(-10.0, result);
     }
@@ -294,8 +308,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestUnaryMinus4Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoOptimizer);
-        double result = engine.Calculate("5* -(1*2)");
+        var engine = SonicEngines.InterpretedNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("5* -(1*2)");
 
         Assert.AreEqual(-10.0, result);
     }
@@ -303,8 +317,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestUnaryMinus5Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("-(1*2)^3");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("-(1*2)^3");
 
         Assert.AreEqual(-8.0, result);
     }
@@ -312,8 +326,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestUnaryMinus5Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoOptimizer);
-        double result = engine.Calculate("-(1*2)^3");
+        var engine = SonicEngines.InterpretedNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("-(1*2)^3");
 
         Assert.AreEqual(-8.0, result);
     }
@@ -321,8 +335,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestUnaryMinus6Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("-(1*2)^2");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("-(1*2)^2");
 
         Assert.AreEqual(-4.0, result);
     }
@@ -330,8 +344,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestUnaryMinus6Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoOptimizer);
-        double result = engine.Calculate("-(1*2)^2");
+        var engine = SonicEngines.InterpretedNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("-(1*2)^2");
 
         Assert.AreEqual(-4.0, result);
     }
@@ -339,7 +353,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestBuild()
     {
-        CalculationEngine engine = new CalculationEngine();
+        var engine = CalculationEngine.CreateWithDefaults();
         Func<Dictionary<string, double>, double> function = engine.Build("var1+2*(3*age)");
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
@@ -353,7 +367,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestFormulaBuilder()
     {
-        CalculationEngine engine = new CalculationEngine();
+        var engine = CalculationEngine.CreateWithDefaults();
         Func<int, double, double> function = (Func<int, double, double>)engine.Formula("var1+2*(3*age)")
             .Parameter("var1", DataType.Integer)
             .Parameter("age", DataType.FloatingPoint)
@@ -367,7 +381,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestFormulaBuilderCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var engine = SonicEngines.Compiled();
         Func<int, double, double> function = (Func<int, double, double>)engine.Formula("var1+2*(3*age)")
             .Parameter("var1", DataType.Integer)
             .Parameter("age", DataType.FloatingPoint)
@@ -381,8 +395,9 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestFormulaBuilderConstantInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
-        engine.AddConstant("age", 18.0);
+        var engine = SonicBuilders.Interpreted()
+            .AddConstant("age", 18.0)
+            .Build();
 
         Func<int, double> function = (Func<int, double>)engine.Formula("age+var1")
             .Parameter("var1", DataType.Integer)
@@ -396,8 +411,9 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestFormulaBuilderConstantCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
-        engine.AddConstant("age", 18.0);
+        var engine = SonicBuilders.Compiled()
+            .AddConstant("age", 18.0)
+            .Build();
 
         Func<int, double> function = (Func<int, double>)engine.Formula("age+var1")
             .Parameter("var1", DataType.Integer)
@@ -413,7 +429,7 @@ public class CalculationEngineTests
     {
         AssertExtensions.ThrowsException<ArgumentException>(() =>
         {
-            CalculationEngine engine = new CalculationEngine();
+            var engine = CalculationEngine.CreateWithDefaults();
             Func<int, double, double> function = (Func<int, double, double>)engine.Formula("sin+2")
                 .Parameter("sin", DataType.Integer)
                 .Build();
@@ -425,7 +441,7 @@ public class CalculationEngineTests
     {
         AssertExtensions.ThrowsException<ArgumentException>(() =>
         {
-            CalculationEngine engine = new CalculationEngine();
+            var engine = CalculationEngine.CreateWithDefaults();
             Func<int, double, double> function = (Func<int, double, double>)engine.Formula("var1+2")
                 .Parameter("var1", DataType.Integer)
                 .Parameter("var1", DataType.FloatingPoint)
@@ -436,10 +452,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestPiMultiplication()
     {
-        var sonicOptions = new SonicOptions();
-        sonicOptions.CaseSensitive = false;
-        CalculationEngine engine = new CalculationEngine(sonicOptions);
-        double result = engine.Calculate("2 * pI");
+        var engine = SonicEngines.CompiledCaseInsensitive();
+        double result = engine.Evaluate("2 * pI");
 
         Assert.AreEqual(2 * Math.PI, result);
     }
@@ -449,27 +463,20 @@ public class CalculationEngineTests
     {
         AssertExtensions.ThrowsException<ArgumentException>(() =>
         {
-            Dictionary<string, double> variables = new Dictionary<string, double>();
-            variables.Add("pi", 2.0);
+            var variables = new Dictionary<string, double> { { "pi", 2.0 } };
 
-            CalculationEngine engine = new CalculationEngine();
-            double result = engine.Calculate("2 * pI", variables);
+            var engine = CalculationEngine.CreateWithDefaults();
+            double result = engine.Evaluate("2 * pI", variables);
         });
     }
 
     [TestMethod]
     public void TestVariableNameCaseSensitivityCompiled()
     {
-        Dictionary<string, double> variables = new Dictionary<string, double>();
-        variables.Add("blabla", 42.5);
+        var variables = new Dictionary<string, double> { { "blabla", 42.5 } };
 
-        var sonicOptions = new SonicOptions
-        {
-            CultureInfo = CultureInfo.InvariantCulture,
-            CaseSensitive = false
-        };
-        var engine = new CalculationEngine(sonicOptions);
-        double result = engine.Calculate("2 * BlAbLa", variables);
+        var engine = SonicEngines.CompiledCaseInsensitive();
+        double result = engine.Evaluate("2 * BlAbLa", variables);
 
         Assert.AreEqual(85.0, result);
     }
@@ -477,18 +484,10 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestVariableNameCaseSensitivityInterpreted()
     {
-        Dictionary<string, double> variables = new Dictionary<string, double>();
-        variables.Add("blabla", 42.5);
+        var variables = new Dictionary<string, double> { { "blabla", 42.5 } };
 
-        var sonicOptions = new SonicOptions
-        {
-            CultureInfo = CultureInfo.InvariantCulture,
-            ExecutionMode = ExecutionMode.Interpreted,
-            CaseSensitive = false
-        };
-
-        CalculationEngine engine = new CalculationEngine(sonicOptions);
-        double result = engine.Calculate("2 * BlAbLa", variables);
+        var engine = SonicEngines.InterpretedCaseInsensitive();
+        double result = engine.Evaluate("2 * BlAbLa", variables);
 
         Assert.AreEqual(85.0, result);
     }
@@ -499,8 +498,8 @@ public class CalculationEngineTests
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("BlAbLa", 42.5);
 
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoCacheNoOptimizerCaseSensitive);
-        double result = engine.Calculate("2 * BlAbLa", variables);
+        var engine = SonicEngines.CompiledNoCacheNoOptimizer();
+        double result = engine.Evaluate("2 * BlAbLa", variables);
 
         Assert.AreEqual(85.0, result);
     }
@@ -508,11 +507,10 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestVariableNameCaseSensitivityNoToLowerInterpreted()
     {
-        Dictionary<string, double> variables = new Dictionary<string, double>();
-        variables.Add("BlAbLa", 42.5);
+        var variables = new Dictionary<string, double> { { "BlAbLa", 42.5 } };
 
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoCacheNoOptimizerCaseSensitive);
-        double result = engine.Calculate("2 * BlAbLa", variables);
+        var engine = SonicEngines.InterpretedNoCacheNoOptimizer();
+        double result = engine.Evaluate("2 * BlAbLa", variables);
 
         Assert.AreEqual(85.0, result);
     }
@@ -520,78 +518,74 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCustomFunctionInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoCacheNoOptimizerCaseSensitive);
-        engine.AddFunction("test", (a, b) => a + b);
+        var engine = SonicBuilders.InterpretedNoCacheNoOptimizer()
+            .AddFunction("test", (a, b) => a + b)
+            .Build();
 
-        double result = engine.Calculate("test(2,3)");
+        double result = engine.Evaluate("test(2,3)");
         Assert.AreEqual(5.0, result);
     }
 
     [TestMethod]
     public void TestCustomFunctionCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoCacheNoOptimizerCaseSensitive);
-        engine.AddFunction("test", (a, b) => a + b);
+        var engine = SonicBuilders.CompiledNoCacheNoOptimizer()
+            .AddFunction("test", (a, b) => a + b)
+            .Build();
 
-        double result = engine.Calculate("test(2,3)");
+        double result = engine.Evaluate("test(2,3)");
         Assert.AreEqual(5.0, result);
     }
 
     [TestMethod]
     public void TestComplicatedPrecedence1()
     {
-        CalculationEngine engine = new CalculationEngine();
+        var engine = CalculationEngine.CreateWithDefaults();
 
-        double result = engine.Calculate("1+2-3*4/5+6-7*8/9+0");
+        double result = engine.Evaluate("1+2-3*4/5+6-7*8/9+0");
         Assert.AreEqual(0.378, Math.Round(result, 3));
     }
 
     [TestMethod]
     public void TestComplicatedPrecedence2()
     {
-        CalculationEngine engine = new CalculationEngine();
+        var engine = CalculationEngine.CreateWithDefaults();
 
-        double result = engine.Calculate("1+2-3*4/sqrt(25)+6-7*8/9+0");
+        double result = engine.Evaluate("1+2-3*4/sqrt(25)+6-7*8/9+0");
         Assert.AreEqual(0.378, Math.Round(result, 3));
     }
 
     [TestMethod]
     public void TestExpressionArguments1()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture);
+        var engine = SonicEngines.Compiled();
 
-        double result = engine.Calculate("ifless(0.57, (3000-500)/(1500-500), 10, 20)");
+        double result = engine.Evaluate("ifless(0.57, (3000-500)/(1500-500), 10, 20)");
         Assert.AreEqual(10, result);
     }
 
     [TestMethod]
     public void TestExpressionArguments2()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture);
+        var engine = SonicEngines.Compiled();
 
-        double result = engine.Calculate("if(0.57 < (3000-500)/(1500-500), 10, 20)");
+        double result = engine.Evaluate("if(0.57 < (3000-500)/(1500-500), 10, 20)");
         Assert.AreEqual(10, result);
     }
 
     [TestMethod]
     public void TestNestedFunctions()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture);
+        var engine = SonicEngines.Compiled();
 
-        double result = engine.Calculate("max(sin(67), cos(67))");
+        double result = engine.Evaluate("max(sin(67), cos(67))");
         Assert.AreEqual(-0.517769799789505, Math.Round(result, 15));
     }
 
     [TestMethod]
-    public void TestVariableCaseFuncInterpreted()
+    public void TestVariableCaseInsensitiveFuncInterpreted()
     {
-        var sonicOptions = new SonicOptions
-        {
-            CaseSensitive = false,
-            CultureInfo = CultureInfo.InvariantCulture,
-            ExecutionMode = ExecutionMode.Interpreted
-        };
-        var engine = new CalculationEngine(sonicOptions);
+        var engine = SonicEngines.InterpretedCaseInsensitive();
         Func<Dictionary<string, double>, double> formula = engine.Build("var1+2/(3*otherVariablE)");
 
         var variables = new Dictionary<string, double>
@@ -606,7 +600,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestConstantBuildCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var engine = SonicEngines.Compiled();
         Func<Dictionary<string, double>, double> formula = engine.Build("pi");
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
@@ -619,7 +613,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestConstantBuildInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var engine = SonicEngines.Interpreted();
         Func<Dictionary<string, double>, double> formula = engine.Build("pi");
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
@@ -630,14 +624,9 @@ public class CalculationEngineTests
     }
 
     [TestMethod]
-    public void TestVariableCaseFuncCompiled()
+    public void TestVariableCaseInsensitiveFuncCompiled()
     {
-        var sonicOptions = new SonicOptions
-        {
-            CaseSensitive = false,
-            CultureInfo = CultureInfo.InvariantCulture
-        };
-        var engine = new CalculationEngine(sonicOptions);
+        var engine = SonicEngines.CompiledCaseInsensitive();
         Func<Dictionary<string, double>, double> formula = engine.Build("var1+2/(3*otherVariablE)");
 
         var variables = new Dictionary<string, double>
@@ -650,13 +639,9 @@ public class CalculationEngineTests
     }
 
     [TestMethod]
-    public void TestVariableCaseNonFunc()
+    public void TestVariableCaseInsensitiveNonFunc()
     {
-        var sonicOptions = new SonicOptions
-        {
-            CaseSensitive = false,
-        };
-        var engine = new CalculationEngine(sonicOptions);
+        var engine = SonicEngines.CompiledCaseInsensitive();
 
         var variables = new Dictionary<string, double>
         {
@@ -664,235 +649,237 @@ public class CalculationEngineTests
             { "otherVariable", 4.2 }
         };
 
-        double result = engine.Calculate("var1+2/(3*otherVariablE)", variables);
+        double result = engine.Evaluate("var1+2/(3*otherVariablE)", variables);
     }
 
     [TestMethod]
     public void TestLessThanInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var engine = SonicEngines.Interpreted();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 4.2);
 
-        double result = engine.Calculate("var1 < var2", variables);
+        double result = engine.Evaluate("var1 < var2", variables);
         Assert.AreEqual(1.0, result);
     }
 
     [TestMethod]
     public void TestLessThanCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var engine = SonicEngines.Compiled();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 4.2);
 
-        double result = engine.Calculate("var1 < var2", variables);
+        double result = engine.Evaluate("var1 < var2", variables);
         Assert.AreEqual(1.0, result);
     }
 
     [TestMethod]
     public void TestLessOrEqualThan1Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var engine = SonicEngines.Interpreted();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 2);
 
-        double result = engine.Calculate("var1 <= var2", variables);
+        double result = engine.Evaluate("var1 <= var2", variables);
         Assert.AreEqual(1.0, result);
     }
 
     [TestMethod]
     public void TestLessOrEqualThan1Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var engine = SonicEngines.Compiled();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 2);
 
-        double result = engine.Calculate("var1 <= var2", variables);
+        double result = engine.Evaluate("var1 <= var2", variables);
         Assert.AreEqual(1.0, result);
     }
 
     [TestMethod]
     public void TestLessOrEqualThan2Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var engine = SonicEngines.Interpreted();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 2);
 
-        double result = engine.Calculate("var1 ≤ var2", variables);
+        double result = engine.Evaluate("var1 ≤ var2", variables);
         Assert.AreEqual(1.0, result);
     }
 
     [TestMethod]
     public void TestLessOrEqualThan2Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var engine = SonicEngines.Compiled();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 2);
 
-        double result = engine.Calculate("var1 ≤ var2", variables);
+        double result = engine.Evaluate("var1 ≤ var2", variables);
         Assert.AreEqual(1.0, result);
     }
 
     [TestMethod]
     public void TestGreaterThan1Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var engine = SonicEngines.Interpreted();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 3);
 
-        double result = engine.Calculate("var1 > var2", variables);
+        double result = engine.Evaluate("var1 > var2", variables);
         Assert.AreEqual(0.0, result);
     }
 
     [TestMethod]
     public void TestGreaterThan1Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var engine = SonicEngines.Compiled();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 3);
 
-        double result = engine.Calculate("var1 > var2", variables);
+        double result = engine.Evaluate("var1 > var2", variables);
         Assert.AreEqual(0.0, result);
     }
 
     [TestMethod]
     public void TestGreaterOrEqualThan1Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var engine = SonicEngines.Interpreted();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 2);
 
-        double result = engine.Calculate("var1 >= var2", variables);
+        double result = engine.Evaluate("var1 >= var2", variables);
         Assert.AreEqual(1.0, result);
     }
 
     [TestMethod]
     public void TestGreaterOrEqualThan1Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var engine = SonicEngines.Compiled();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 2);
 
-        double result = engine.Calculate("var1 >= var2", variables);
+        double result = engine.Evaluate("var1 >= var2", variables);
         Assert.AreEqual(1.0, result);
     }
 
     [TestMethod]
     public void TestNotEqual1Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var engine = SonicEngines.Interpreted();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 2);
 
-        double result = engine.Calculate("var1 != 2", variables);
+        double result = engine.Evaluate("var1 != 2", variables);
         Assert.AreEqual(0.0, result);
     }
 
     [TestMethod]
     public void TestNotEqual2Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var engine = SonicEngines.Interpreted();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 2);
 
-        double result = engine.Calculate("var1 ≠ 2", variables);
+        double result = engine.Evaluate("var1 ≠ 2", variables);
         Assert.AreEqual(0.0, result);
     }
 
     [TestMethod]
     public void TestNotEqual2Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var engine = SonicEngines.Compiled();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 2);
 
-        double result = engine.Calculate("var1 ≠ 2", variables);
+        double result = engine.Evaluate("var1 ≠ 2", variables);
         Assert.AreEqual(0.0, result);
     }
 
     [TestMethod]
     public void TestEqualInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var engine = SonicEngines.Interpreted();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 2);
 
-        double result = engine.Calculate("var1 == 2", variables);
+        double result = engine.Evaluate("var1 == 2", variables);
         Assert.AreEqual(1.0, result);
     }
 
     [TestMethod]
     public void TestEqualCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var engine = SonicEngines.Compiled();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var1", 2);
         variables.Add("var2", 2);
 
-        double result = engine.Calculate("var1 == 2", variables);
+        double result = engine.Evaluate("var1 == 2", variables);
         Assert.AreEqual(1.0, result);
     }
 
     public void TestVariableUnderscoreInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var engine = SonicEngines.Interpreted();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var_var_1", 1);
         variables.Add("var_var_2", 2);
 
-        double result = engine.Calculate("var_var_1 + var_var_2", variables);
+        double result = engine.Evaluate("var_var_1 + var_var_2", variables);
         Assert.AreEqual(3.0, result);
     }
 
     [TestMethod]
     public void TestVariableUnderscoreCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var engine = SonicEngines.Compiled();
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
         variables.Add("var_var_1", 1);
         variables.Add("var_var_2", 2);
 
-        double result = engine.Calculate("var_var_1 + var_var_2", variables);
+        double result = engine.Evaluate("var_var_1 + var_var_2", variables);
         Assert.AreEqual(3.0, result);
     }
 
     [TestMethod]
     public void TestCustomFunctionFunc11Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoCacheNoOptimizerCaseSensitive);
-        engine.AddFunction("test", (a, b, c, d, e, f, g, h, i, j, k) => a + b + c + d + e + f + g + h + i + j + k);
-        double result = engine.Calculate("test(1,2,3,4,5,6,7,8,9,10,11)");
+        var engine = SonicBuilders.InterpretedNoCacheNoOptimizer()
+            .AddFunction("test", (a, b, c, d, e, f, g, h, i, j, k) => a + b + c + d + e + f + g + h + i + j + k)
+            .Build();
+
+        double result = engine.Evaluate("test(1,2,3,4,5,6,7,8,9,10,11)");
         double expected = (11 * (11 + 1)) / 2.0;
         Assert.AreEqual(expected, result);
     }
@@ -900,9 +887,10 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCustomFunctionFunc11Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoCacheNoOptimizerCaseSensitive);
-        engine.AddFunction("test", (a, b, c, d, e, f, g, h, i, j, k) => a + b + c + d + e + f + g + h + i + j + k);
-        double result = engine.Calculate("test(1,2,3,4,5,6,7,8,9,10,11)");
+        var engine = SonicBuilders.CompiledNoCacheNoOptimizer()
+            .AddFunction("test", (a, b, c, d, e, f, g, h, i, j, k) => a + b + c + d + e + f + g + h + i + j + k)
+            .Build();
+        double result = engine.Evaluate("test(1,2,3,4,5,6,7,8,9,10,11)");
         double expected = (11 * (11 + 1)) / 2.0;
         Assert.AreEqual(expected, result);
     }
@@ -910,15 +898,16 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCustomFunctionDynamicFuncInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoCacheNoOptimizerCaseSensitive);
-
         double DoSomething(params double[] a)
         {
             return a.Sum();
         }
 
-        engine.AddFunction("test", DoSomething);
-        double result = engine.Calculate("test(1,2,3,4,5,6,7,8,9,10,11)");
+        var engine = SonicBuilders.InterpretedNoCacheNoOptimizer()
+            .AddFunction("test", DoSomething)
+            .Build();
+
+        double result = engine.Evaluate("test(1,2,3,4,5,6,7,8,9,10,11)");
         double expected = (11 * (11 + 1)) / 2.0;
         Assert.AreEqual(expected, result);
     }
@@ -926,15 +915,16 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCustomFunctionDynamicFuncCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoCacheNoOptimizerCaseSensitive);
-
         double DoSomething(params double[] a)
         {
             return a.Sum();
         }
 
-        engine.AddFunction("test", DoSomething);
-        double result = engine.Calculate("test(1,2,3,4,5,6,7,8,9,10,11)");
+        var engine = SonicBuilders.CompiledNoCacheNoOptimizer()
+            .AddFunction("test", DoSomething)
+            .Build();
+        
+        double result = engine.Evaluate("test(1,2,3,4,5,6,7,8,9,10,11)");
         double expected = (11 * (11 + 1)) / 2.0;
         Assert.AreEqual(expected, result);
     }
@@ -942,15 +932,16 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCustomFunctionDynamicFuncNestedInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoCacheNoOptimizerCaseSensitive);
-
         double DoSomething(params double[] a)
         {
             return a.Sum();
         }
 
-        engine.AddFunction("test", DoSomething);
-        double result = engine.Calculate("test(1,2,3,test(4,5,6)) + test(7,8,9,10,11)");
+        var engine = SonicBuilders.InterpretedNoCacheNoOptimizer()
+            .AddFunction("test", DoSomething)
+            .Build();
+        
+        double result = engine.Evaluate("test(1,2,3,test(4,5,6)) + test(7,8,9,10,11)");
         double expected = (11 * (11 + 1)) / 2.0;
         Assert.AreEqual(expected, result);
     }
@@ -958,15 +949,16 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCustomFunctionDynamicFuncNestedDynamicCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoCacheNoOptimizerCaseSensitive);
-
         double DoSomething(params double[] a)
         {
             return a.Sum();
         }
 
-        engine.AddFunction("test", DoSomething);
-        double result = engine.Calculate("test(1,2,3,test(4,5,6)) + test(7,8,9,10,11)");
+        var engine = SonicBuilders.CompiledNoCacheNoOptimizer()
+            .AddFunction("test", DoSomething)
+            .Build();
+        
+        double result = engine.Evaluate("test(1,2,3,test(4,5,6)) + test(7,8,9,10,11)");
         double expected = (11 * (11 + 1)) / 2.0;
         Assert.AreEqual(expected, result);
     }
@@ -974,87 +966,87 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestAndCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("(1 && 0)");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("(1 && 0)");
         Assert.AreEqual(0, result);
     }
 
     [TestMethod]
     public void TestAndInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoOptimizer);
-        double result = engine.Calculate("(1 && 0)");
+        var engine = SonicEngines.InterpretedNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("(1 && 0)");
         Assert.AreEqual(0, result);
     }
 
     [TestMethod]
     public void TestOr1Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("(1 || 0)");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("(1 || 0)");
         Assert.AreEqual(1, result);
     }
 
     [TestMethod]
     public void TestOr1Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoOptimizer);
-        double result = engine.Calculate("(1 || 0)");
+        var engine = SonicEngines.InterpretedNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("(1 || 0)");
         Assert.AreEqual(1, result);
     }
 
     [TestMethod]
     public void TestOr2Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("(0 || 0)");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("(0 || 0)");
         Assert.AreEqual(0, result);
     }
 
     [TestMethod]
     public void TestOr2Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoOptimizer);
-        double result = engine.Calculate("(0 || 0)");
+        var engine = SonicEngines.InterpretedNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("(0 || 0)");
         Assert.AreEqual(0, result);
     }
 
     [TestMethod]
     public void TestMedian1Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("median(3,1,5,4,2)");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("median(3,1,5,4,2)");
         Assert.AreEqual(3, result);
     }
 
     [TestMethod]
     public void TestMedian1Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoOptimizer);
-        double result = engine.Calculate("median(3,1,5,4,2)");
+        var engine = SonicEngines.InterpretedNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("median(3,1,5,4,2)");
         Assert.AreEqual(3, result);
     }
 
     [TestMethod]
     public void TestMedian2Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledNoOptimizer);
-        double result = engine.Calculate("median(3,1,5,4)");
+        var engine = SonicEngines.CompiledNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("median(3,1,5,4)");
         Assert.AreEqual(3, result);
     }
 
     [TestMethod]
     public void TestMedian2Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedNoOptimizer);
-        double result = engine.Calculate("median(3,1,5,4)");
+        var engine = SonicEngines.InterpretedNoOptimizerCaseInsensitive();
+        double result = engine.Evaluate("median(3,1,5,4)");
         Assert.AreEqual(3, result);
     }
 
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstants1Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var engine = SonicEngines.Compiled();
         var fn = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 1 } });
         double result = fn(new Dictionary<string, double> { { "b", 2 }, { "c", 2 } });
         Assert.AreEqual(5.0, result);
@@ -1063,7 +1055,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstants1Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var engine = SonicEngines.Interpreted();
         var fn = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 1 } });
         double result = fn(new Dictionary<string, double> { { "b", 2 }, { "c", 2 } });
         Assert.AreEqual(5.0, result);
@@ -1072,7 +1064,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstants2Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var engine = SonicEngines.Compiled();
 
         Func<double, double, double> formula = (Func<double, double, double>)engine.Formula("a+b+c")
             .Parameter("b", DataType.FloatingPoint)
@@ -1088,7 +1080,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstants2Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var engine = SonicEngines.Interpreted();
 
         Func<double, double, double> formula = (Func<double, double, double>)engine.Formula("a+b+c")
             .Parameter("b", DataType.FloatingPoint)
@@ -1104,7 +1096,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstants3Compiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledCaseSensitive);
+        var engine = SonicEngines.Compiled();
 
         Func<double, double> formula = (Func<double, double>)engine.Formula("a+A")
             .Parameter("A", DataType.FloatingPoint)
@@ -1119,7 +1111,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstants3Interpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedCaseSensitive);
+        var engine = SonicEngines.Interpreted();
 
         Func<double, double> formula = (Func<double, double>)engine.Formula("a+A")
             .Parameter("A", DataType.FloatingPoint)
@@ -1134,7 +1126,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstantsCache1()
     {
-        CalculationEngine engine = new CalculationEngine(new SonicOptions { CacheEnabled = true });
+        var engine = SonicEngines.Compiled();
 
         var fn = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 1 } });
         double result = fn(new Dictionary<string, double> { { "b", 2 }, { "c", 2 } });
@@ -1150,7 +1142,8 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstantsCache2()
     {
-        CalculationEngine engine = new CalculationEngine(new SonicOptions { CacheEnabled = true });
+        var engine = SonicEngines.Compiled();
+        
         var fn = engine.Build("a+b+c");
         double result = fn(new Dictionary<string, double> { { "a", 1 }, { "b", 2 }, { "c", 2 } });
         Assert.AreEqual(5.0, result);
@@ -1165,7 +1158,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstantsCache3()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedCaseSensitive);
+        var engine = SonicEngines.Interpreted();
 
         Func<double, double> formula = (Func<double, double>)engine.Formula("a+A")
             .Parameter("A", DataType.FloatingPoint)
@@ -1190,7 +1183,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstantsCache4()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledCaseSensitive);
+        var engine = SonicEngines.Compiled();
 
         Func<double, double> formula = (Func<double, double>)engine.Formula("a+A")
             .Parameter("A", DataType.FloatingPoint)
@@ -1214,7 +1207,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstantsCache5()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Compiled);
+        var engine = SonicEngines.Compiled();
         var fn = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 1 } });
         double result = fn(new Dictionary<string, double> { { "b", 2 }, { "c", 2 } });
         Assert.AreEqual(5.0, result);
@@ -1227,7 +1220,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstantsCache6()
     {
-        CalculationEngine engine = new CalculationEngine(CultureInfo.InvariantCulture, ExecutionMode.Interpreted);
+        var engine = SonicEngines.Interpreted();
         var fn = engine.Build("a+b+c", new Dictionary<string, double> { { "a", 1 } });
         double result = fn(new Dictionary<string, double> { { "b", 2 }, { "c", 2 } });
         Assert.AreEqual(5.0, result);
@@ -1240,7 +1233,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormulaBuildingWithConstantsCache7()
     {
-        CalculationEngine engine = new CalculationEngine(new SonicOptions { CacheEnabled = true });
+        var engine = SonicEngines.Compiled();
 
         var fn = engine.Build("a+b+c");
         double result = fn(new Dictionary<string, double> { { "a", 1 }, { "b", 2 }, { "c", 2 } });
@@ -1255,28 +1248,28 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationCompiledExpressionCompiled()
     {
-        CalculationEngine engine = new CalculationEngine(Options.CompiledCaseSensitive);
-
         Expression<Func<double, double, double>> expression = (a, b) => a + b;
         expression.Compile();
 
-        engine.AddFunction("test", expression.Compile());
+        var engine = SonicBuilders.Compiled()
+            .AddFunction("test", expression.Compile())
+            .Build();
 
-        double result = engine.Calculate("test(2, 3)");
+        double result = engine.Evaluate("test(2, 3)");
         Assert.AreEqual(5.0, result);
     }
 
     [TestMethod]
     public void TestCalculationCompiledExpressionInterpreted()
     {
-        CalculationEngine engine = new CalculationEngine(Options.InterpretedCaseSensitive);
-
         Expression<Func<double, double, double>> expression = (a, b) => a + b;
         expression.Compile();
 
-        engine.AddFunction("test", expression.Compile());
+        var engine = SonicBuilders.Interpreted()
+            .AddFunction("test", expression.Compile())
+            .Build();
 
-        double result = engine.Calculate("test(2, 3)");
+        double result = engine.Evaluate("test(2, 3)");
         Assert.AreEqual(5.0, result);
     }
 
@@ -1290,12 +1283,13 @@ public class CalculationEngineTests
             { "var2", 2 },
             { "var3", 3 }
         };
-        
-        var engine = new CalculationEngine(Options.CompiledCaseSensitive);
+
+        var engine = SonicEngines.Compiled();
         for (var i = 0; i < 3; i++)
         {
-            engine.Calculate(expression, values);
+            engine.Evaluate(expression, values);
         }
+
         // assert "does not throw an exception"
         Assert.IsTrue(true);
     }
@@ -1310,92 +1304,157 @@ public class CalculationEngineTests
             { "var2", 2 },
             { "var3", 3 }
         };
-        
-        var engine = new CalculationEngine(Options.CompiledCaseSensitive);
+
+        var engine = SonicEngines.Compiled();
         var func = engine.Build(expression);
         for (var i = 0; i < 3; i++)
         {
             func(values);
         }
+
         // assert "does not throw an exception"
         Assert.IsTrue(true);
-        
     }
-    
 }
 
-internal static class Options
+internal static class SonicEngines
 {
-    public static readonly SonicOptions CompiledNoOptimizer = new()
-    {
-        CultureInfo = CultureInfo.InvariantCulture,
-        ExecutionMode = ExecutionMode.Compiled,
-        CacheEnabled = true,
-        OptimizerEnabled = false,
-        CaseSensitive = false
-    };
+    public static CalculationEngine CompiledNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Compiled)
+        .EnableCache()
+        .DisableOptimizer()
+        .DisableCaseSensitivity()
+        .Build();
 
-    public static readonly SonicOptions CompiledNoCacheNoOptimizer = new()
-    {
-        CultureInfo = CultureInfo.InvariantCulture,
-        ExecutionMode = ExecutionMode.Compiled,
-        CacheEnabled = false,
-        OptimizerEnabled = false,
-        CaseSensitive = false
-    };
+    public static CalculationEngine CompiledCaseInsensitive() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Compiled)
+        .EnableCache()
+        .EnableOptimizer()
+        .DisableCaseSensitivity()
+        .Build();
 
-    public static readonly SonicOptions CompiledNoCacheNoOptimizerCaseSensitive = new()
-    {
-        CultureInfo = CultureInfo.InvariantCulture,
-        ExecutionMode = ExecutionMode.Compiled,
-        CacheEnabled = false,
-        OptimizerEnabled = false,
-        CaseSensitive = true
-    };
+    public static CalculationEngine CompiledNoCacheNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Compiled)
+        .DisableCache()
+        .DisableOptimizer()
+        .DisableCaseSensitivity()
+        .Build();
 
-    public static readonly SonicOptions CompiledCaseSensitive = new()
-    {
-        CultureInfo = CultureInfo.InvariantCulture,
-        ExecutionMode = ExecutionMode.Compiled,
-        CacheEnabled = true,
-        OptimizerEnabled = true,
-        CaseSensitive = true
-    };
+    public static CalculationEngine CompiledNoCacheNoOptimizer() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Compiled)
+        .DisableCache()
+        .DisableOptimizer()
+        .EnableCaseSensitivity()
+        .Build();
 
-    public static readonly SonicOptions InterpretedNoCacheNoOptimizer = new()
-    {
-        CultureInfo = CultureInfo.InvariantCulture,
-        ExecutionMode = ExecutionMode.Interpreted,
-        CacheEnabled = false,
-        OptimizerEnabled = false,
-        CaseSensitive = false
-    };
+    public static CalculationEngine Compiled() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Compiled)
+        .EnableCache()
+        .EnableOptimizer()
+        .EnableCaseSensitivity()
+        .Build();
 
-    public static readonly SonicOptions InterpretedNoOptimizer = new()
-    {
-        CultureInfo = CultureInfo.InvariantCulture,
-        ExecutionMode = ExecutionMode.Interpreted,
-        CacheEnabled = true,
-        OptimizerEnabled = false,
-        CaseSensitive = false
-    };
+    public static CalculationEngine InterpretedNoCacheNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Interpreted)
+        .DisableCache()
+        .DisableOptimizer()
+        .DisableCaseSensitivity()
+        .Build();
 
-    public static readonly SonicOptions InterpretedNoCacheNoOptimizerCaseSensitive = new()
-    {
-        CultureInfo = CultureInfo.InvariantCulture,
-        ExecutionMode = ExecutionMode.Interpreted,
-        CacheEnabled = false,
-        OptimizerEnabled = false,
-        CaseSensitive = true
-    };
+    public static CalculationEngine InterpretedNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Interpreted)
+        .EnableCache()
+        .DisableOptimizer()
+        .DisableCaseSensitivity()
+        .Build();
 
-    public static readonly SonicOptions InterpretedCaseSensitive = new()
-    {
-        CultureInfo = CultureInfo.InvariantCulture,
-        ExecutionMode = ExecutionMode.Interpreted,
-        CacheEnabled = true,
-        OptimizerEnabled = true,
-        CaseSensitive = true
-    };
-        
+    public static CalculationEngine InterpretedNoCacheNoOptimizer() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Interpreted)
+        .DisableCache()
+        .DisableOptimizer()
+        .EnableCaseSensitivity()
+        .Build();
+
+    public static CalculationEngine InterpretedCaseInsensitive() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Interpreted)
+        .EnableCache()
+        .EnableOptimizer()
+        .DisableCaseSensitivity()
+        .Build();
+
+    public static CalculationEngine Interpreted() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Interpreted)
+        .EnableCache()
+        .EnableOptimizer()
+        .EnableCaseSensitivity()
+        .Build();
+}
+
+internal static class SonicBuilders
+{
+    public static CalculationEngineBuilder CompiledNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Compiled)
+        .EnableCache()
+        .DisableOptimizer()
+        .DisableCaseSensitivity();
+
+    public static CalculationEngineBuilder CompiledNoCacheNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Compiled)
+        .DisableCache()
+        .DisableOptimizer()
+        .DisableCaseSensitivity();
+
+    public static CalculationEngineBuilder CompiledNoCacheNoOptimizer() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Compiled)
+        .DisableCache()
+        .DisableOptimizer()
+        .EnableCaseSensitivity();
+
+    public static CalculationEngineBuilder Compiled() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Compiled)
+        .EnableCache()
+        .EnableOptimizer()
+        .EnableCaseSensitivity();
+
+    public static CalculationEngineBuilder InterpretedNoCacheNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Interpreted)
+        .DisableCache()
+        .DisableOptimizer()
+        .DisableCaseSensitivity();
+
+    public static CalculationEngineBuilder InterpretedNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Interpreted)
+        .EnableCache()
+        .DisableOptimizer()
+        .DisableCaseSensitivity();
+
+    public static CalculationEngineBuilder InterpretedNoCacheNoOptimizer() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Interpreted)
+        .DisableCache()
+        .DisableOptimizer()
+        .EnableCaseSensitivity();
+
+    public static CalculationEngineBuilder Interpreted() => CalculationEngine.Create()
+        .UseCulture(CultureInfo.InvariantCulture)
+        .UseExecutionMode(ExecutionMode.Interpreted)
+        .EnableCache()
+        .EnableOptimizer()
+        .EnableCaseSensitivity();
 }

@@ -34,43 +34,30 @@ public static class Program
     {
         TimeSpan duration;
 
-        // setup benchmark scenarios
-        var baseOptions = new SonicOptions
-        {
-            CultureInfo = CultureInfo.InvariantCulture,
-            CacheEnabled = true,
-            OptimizerEnabled = true
-        };
-
-        var interpretedEngineOptions = new SonicOptions(baseOptions)
-        {
-            ExecutionMode = ExecutionMode.Interpreted,
-            CaseSensitive = false
-        };
-
-        var interpretedEngineCaseSensitiveOptions = new SonicOptions(baseOptions)
-        {
-            ExecutionMode = ExecutionMode.Interpreted,
-            CaseSensitive = true
-        };
-
-        var compiledEngineOptions = new SonicOptions(baseOptions)
-        {
-            ExecutionMode = ExecutionMode.Compiled,
-            CaseSensitive = false
-        };
-
-        var compiledEngineCaseSensitiveOptions = new SonicOptions(baseOptions)
-        {
-            ExecutionMode = ExecutionMode.Compiled,
-            CaseSensitive = true
-        };
-
         // initialize engines with benchmark scenarios
-        var interpretedEngine = new CalculationEngine(interpretedEngineOptions);
-        var interpretedEngineCaseSensitive = new CalculationEngine(interpretedEngineCaseSensitiveOptions);
-        var compiledEngine = new CalculationEngine(compiledEngineOptions);
-        var compiledEngineCaseSensitive = new CalculationEngine(compiledEngineCaseSensitiveOptions);
+        var interpretedEngineCaseInsensitive = CalculationEngine.Create()
+            .UseCulture(CultureInfo.InvariantCulture)
+            .UseExecutionMode(ExecutionMode.Interpreted)
+            .DisableCaseSensitivity()
+            .Build();
+
+        var interpretedEngineCaseSensitive = CalculationEngine.Create()
+            .UseCulture(CultureInfo.InvariantCulture)
+            .UseExecutionMode(ExecutionMode.Interpreted)
+            .EnableCaseSensitivity()
+            .Build();
+        
+        var compiledEngineCaseInsensitive = CalculationEngine.Create()
+            .UseCulture(CultureInfo.InvariantCulture)
+            .UseExecutionMode(ExecutionMode.Compiled)
+            .DisableCaseSensitivity()
+            .Build();
+
+        var compiledEngineCaseSensitive = CalculationEngine.Create()
+            .UseCulture(CultureInfo.InvariantCulture)
+            .UseExecutionMode(ExecutionMode.Compiled)
+            .EnableCaseSensitivity()
+            .Build();
 
         // define benchmark operations
         BenchMarkOperation[] benchmarks =
@@ -115,7 +102,7 @@ public static class Program
             if (mode != BenchmarkMode.All && mode != benchmark.Mode) continue;
             if (caseSensitivity is CaseSensitivity.All or CaseSensitivity.CaseInSensitive)
             {
-                duration = benchmark.BenchMarkDelegate(interpretedEngine, benchmark.Formula,
+                duration = benchmark.BenchMarkDelegate(interpretedEngineCaseInsensitive, benchmark.Formula,
                     benchmark.VariableDict);
                 table.AddBenchmarkRecord("Interpreted", false, benchmark.Formula, null, NumberOfTests,
                     duration);
@@ -130,7 +117,7 @@ public static class Program
 
             if (caseSensitivity is CaseSensitivity.All or CaseSensitivity.CaseInSensitive)
             {
-                duration = benchmark.BenchMarkDelegate(compiledEngine, benchmark.Formula,
+                duration = benchmark.BenchMarkDelegate(compiledEngineCaseInsensitive, benchmark.Formula,
                     benchmark.VariableDict);
                 table.AddBenchmarkRecord("Compiled", false, benchmark.Formula, null, NumberOfTests, duration);
             }
@@ -150,7 +137,7 @@ public static class Program
         if (caseSensitivity is CaseSensitivity.All or CaseSensitivity.CaseInSensitive)
         {
             //Interpreted Mode
-            duration = BenchMarkCalculationEngineRandomFunctionBuild(interpretedEngine, functions,
+            duration = BenchMarkCalculationEngineRandomFunctionBuild(interpretedEngineCaseInsensitive, functions,
                 NumberExecutionsPerRandomFunction);
             table.AddBenchmarkRecord("Interpreted", false,
                 $"Random Mode {NumberOfFunctionsToGenerate} functions 3 variables",
@@ -172,7 +159,7 @@ public static class Program
         if (caseSensitivity is CaseSensitivity.All or CaseSensitivity.CaseInSensitive)
         {
             //Compiled Mode
-            duration = BenchMarkCalculationEngineRandomFunctionBuild(compiledEngine, functions,
+            duration = BenchMarkCalculationEngineRandomFunctionBuild(compiledEngineCaseInsensitive, functions,
                 NumberExecutionsPerRandomFunction);
             table.AddBenchmarkRecord("Compiled", false,
                 $"Random Mode {NumberOfFunctionsToGenerate} functions 3 variables",
@@ -203,11 +190,11 @@ public static class Program
         {
             if (variableDict == null)
             {
-                engine.Calculate(functionText);
+                engine.Evaluate(functionText);
             }
             else
             {
-                engine.Calculate(functionText, new Dictionary<string, double>(variableDict));
+                engine.Evaluate(functionText, new Dictionary<string, double>(variableDict));
             }
         }
 
