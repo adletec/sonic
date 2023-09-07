@@ -1261,7 +1261,34 @@ public class CalculationEngineTests
         // assert "does not throw an exception"
         Assert.IsTrue(true);
     }
+
+    [TestMethod]
+    public void TestConstantsInNonIdempotentFunctionsCompiled()
+    {
+        var engine = SonicBuilders.CompiledNoCacheNoOptimizer()
+            .AddConstant("a", 1.0)
+            // this is idempotent, but the engine does not know that
+            .AddFunction("b", x => x + 1, false)
+            .Build();
+
+        var result = engine.Evaluate("b(a)");
+        Assert.AreEqual(2.0, result);
+    }
+    
+    [TestMethod]
+    public void TestConstantsInNonIdempotentFunctionsInterpreted()
+    {
+        var engine = SonicBuilders.InterpretedNoCacheNoOptimizer()
+            .AddConstant("a", 1.0)
+            // this is idempotent, but the engine does not know that
+            .AddFunction("b", x => x + 1, false)
+            .Build();
+
+        var result = engine.Evaluate("b(a)");
+        Assert.AreEqual(2.0, result);
+    }
 }
+
 
 internal static class SonicEngines
 {

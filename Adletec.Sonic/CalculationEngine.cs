@@ -79,14 +79,13 @@ namespace Adletec.Sonic
             if (options.DefaultFunctions)
                 RegisterDefaultFunctions();
             
-            // todo check if we have to validate names
             // Register the user defined constants
             if (options.Constants != null)
             {
                 foreach (var constant in options.Constants)
                 {
                     // todo isOverwritable should go
-                    ConstantRegistry.RegisterConstant(constant.Name, constant.Value, false);
+                    ConstantRegistry.RegisterConstant(constant.Name, constant.Value);
                 }
             }
             
@@ -96,7 +95,7 @@ namespace Adletec.Sonic
                 foreach (var function in options.Functions)
                 {
                     // todo isOverwritable should go
-                    FunctionRegistry.RegisterFunction(function.Name, function.Function, function.IsIdempotent, false);
+                    FunctionRegistry.RegisterFunction(function.Name, function.Function, function.IsIdempotent);
                 }
             }
         }
@@ -131,13 +130,13 @@ namespace Adletec.Sonic
             foreach (ConstantInfo constant in ConstantRegistry)
                 variables.Add(constant.ConstantName, constant.Value);
 
-            if (IsInFormulaCache(expression, null, out var function))
+            if (IsInFormulaCache(expression, out var function))
             {
                 return function(variables);
             }
 
             Operation operation = BuildAbstractSyntaxTree(expression, ConstantRegistry);
-            function = BuildFormula(expression, null, operation);
+            function = BuildFormula(expression, operation);
             return function(variables);
         }
 
@@ -146,56 +145,56 @@ namespace Adletec.Sonic
             if (string.IsNullOrEmpty(expression))
                 throw new ArgumentNullException(nameof(expression));
 
-            if (IsInFormulaCache(expression, null, out var result))
+            if (IsInFormulaCache(expression, out var result))
             {
                 return result;
             }
 
             Operation operation = BuildAbstractSyntaxTree(expression, ConstantRegistry);
-            return BuildFormula(expression, null, operation);
+            return BuildFormula(expression, operation);
         }
 
         private void RegisterDefaultFunctions()
         {
-            FunctionRegistry.RegisterFunction("sin", (Func<double, double>)Math.Sin, true, false);
-            FunctionRegistry.RegisterFunction("cos", (Func<double, double>)Math.Cos, true, false);
-            FunctionRegistry.RegisterFunction("csc", (Func<double, double>)MathUtil.Csc, true, false);
-            FunctionRegistry.RegisterFunction("sec", (Func<double, double>)MathUtil.Sec, true, false);
-            FunctionRegistry.RegisterFunction("asin", (Func<double, double>)Math.Asin, true, false);
-            FunctionRegistry.RegisterFunction("acos", (Func<double, double>)Math.Acos, true, false);
-            FunctionRegistry.RegisterFunction("tan", (Func<double, double>)Math.Tan, true, false);
-            FunctionRegistry.RegisterFunction("cot", (Func<double, double>)MathUtil.Cot, true, false);
-            FunctionRegistry.RegisterFunction("atan", (Func<double, double>)Math.Atan, true, false);
-            FunctionRegistry.RegisterFunction("acot", (Func<double, double>)MathUtil.Acot, true, false);
-            FunctionRegistry.RegisterFunction("loge", (Func<double, double>)Math.Log, true, false);
-            FunctionRegistry.RegisterFunction("log10", (Func<double, double>)Math.Log10, true, false);
-            FunctionRegistry.RegisterFunction("logn", (Func<double, double, double>)Math.Log, true, false);
-            FunctionRegistry.RegisterFunction("sqrt", (Func<double, double>)Math.Sqrt, true, false);
-            FunctionRegistry.RegisterFunction("abs", (Func<double, double>)Math.Abs, true, false);
-            FunctionRegistry.RegisterFunction("if", (Func<double, double, double, double>)((a, b, c) => a != 0.0 ? b : c), true, false);
-            FunctionRegistry.RegisterFunction("ifless", (Func<double, double, double, double, double>)((a, b, c, d) => a < b ? c : d), true, false);
-            FunctionRegistry.RegisterFunction("ifmore", (Func<double, double, double, double, double>)((a, b, c, d) => a > b ? c : d), true, false);
-            FunctionRegistry.RegisterFunction("ifequal", (Func<double, double, double, double, double>)((a, b, c, d) => a == b ? c : d), true, false);
-            FunctionRegistry.RegisterFunction("ceiling", (Func<double, double>)Math.Ceiling, true, false);
-            FunctionRegistry.RegisterFunction("floor", (Func<double, double>)Math.Floor, true, false);
-            FunctionRegistry.RegisterFunction("truncate", (Func<double, double>)Math.Truncate, true, false);
-            FunctionRegistry.RegisterFunction("round", (Func<double, double>)Math.Round, true, false);
+            FunctionRegistry.RegisterFunction("sin", (Func<double, double>)Math.Sin, true);
+            FunctionRegistry.RegisterFunction("cos", (Func<double, double>)Math.Cos, true);
+            FunctionRegistry.RegisterFunction("csc", (Func<double, double>)MathUtil.Csc, true);
+            FunctionRegistry.RegisterFunction("sec", (Func<double, double>)MathUtil.Sec, true);
+            FunctionRegistry.RegisterFunction("asin", (Func<double, double>)Math.Asin, true);
+            FunctionRegistry.RegisterFunction("acos", (Func<double, double>)Math.Acos, true);
+            FunctionRegistry.RegisterFunction("tan", (Func<double, double>)Math.Tan, true);
+            FunctionRegistry.RegisterFunction("cot", (Func<double, double>)MathUtil.Cot, true);
+            FunctionRegistry.RegisterFunction("atan", (Func<double, double>)Math.Atan, true);
+            FunctionRegistry.RegisterFunction("acot", (Func<double, double>)MathUtil.Acot, true);
+            FunctionRegistry.RegisterFunction("loge", (Func<double, double>)Math.Log, true);
+            FunctionRegistry.RegisterFunction("log10", (Func<double, double>)Math.Log10, true);
+            FunctionRegistry.RegisterFunction("logn", (Func<double, double, double>)Math.Log, true);
+            FunctionRegistry.RegisterFunction("sqrt", (Func<double, double>)Math.Sqrt, true);
+            FunctionRegistry.RegisterFunction("abs", (Func<double, double>)Math.Abs, true);
+            FunctionRegistry.RegisterFunction("if", (Func<double, double, double, double>)((a, b, c) => a != 0.0 ? b : c), true);
+            FunctionRegistry.RegisterFunction("ifless", (Func<double, double, double, double, double>)((a, b, c, d) => a < b ? c : d), true);
+            FunctionRegistry.RegisterFunction("ifmore", (Func<double, double, double, double, double>)((a, b, c, d) => a > b ? c : d), true);
+            FunctionRegistry.RegisterFunction("ifequal", (Func<double, double, double, double, double>)((a, b, c, d) => a == b ? c : d), true);
+            FunctionRegistry.RegisterFunction("ceiling", (Func<double, double>)Math.Ceiling, true);
+            FunctionRegistry.RegisterFunction("floor", (Func<double, double>)Math.Floor, true);
+            FunctionRegistry.RegisterFunction("truncate", (Func<double, double>)Math.Truncate, true);
+            FunctionRegistry.RegisterFunction("round", (Func<double, double>)Math.Round, true);
 
             // Dynamic based arguments Functions
-            FunctionRegistry.RegisterFunction("max",  (DynamicFunc<double, double>)(a => a.Max()), true, false);
-            FunctionRegistry.RegisterFunction("min", (DynamicFunc<double, double>)(a => a.Min()), true, false);
-            FunctionRegistry.RegisterFunction("avg", (DynamicFunc<double, double>)(a => a.Average()), true, false);
-            FunctionRegistry.RegisterFunction("median", (DynamicFunc<double, double>)(a => a.Median()), true, false);
-            FunctionRegistry.RegisterFunction("sum", (DynamicFunc<double, double>)(a => a.Sum()), true, false);
+            FunctionRegistry.RegisterFunction("max",  (DynamicFunc<double, double>)(a => a.Max()), true);
+            FunctionRegistry.RegisterFunction("min", (DynamicFunc<double, double>)(a => a.Min()), true);
+            FunctionRegistry.RegisterFunction("avg", (DynamicFunc<double, double>)(a => a.Average()), true);
+            FunctionRegistry.RegisterFunction("median", (DynamicFunc<double, double>)(a => a.Median()), true);
+            FunctionRegistry.RegisterFunction("sum", (DynamicFunc<double, double>)(a => a.Sum()), true);
 
             // Non Idempotent Functions
-            FunctionRegistry.RegisterFunction("random", (Func<double>)random.NextDouble, false, false);
+            FunctionRegistry.RegisterFunction("random", (Func<double>)random.NextDouble, false);
         }
 
         private void RegisterDefaultConstants()
         {
-            ConstantRegistry.RegisterConstant("e", Math.E, false);
-            ConstantRegistry.RegisterConstant("pi", Math.PI, false);
+            ConstantRegistry.RegisterConstant("e", Math.E);
+            ConstantRegistry.RegisterConstant("pi", Math.PI);
         }
 
         /// <summary>
@@ -217,21 +216,15 @@ namespace Adletec.Sonic
             return optimizerEnabled ? optimizer.Optimize(operation, this.FunctionRegistry, this.ConstantRegistry) : operation;
         }
 
-        private Func<IDictionary<string, double>, double> BuildFormula(string formulaText, ConstantRegistry compiledConstants, Operation operation)
+        private Func<IDictionary<string, double>, double> BuildFormula(string formulaText, Operation operation)
         {
-            return executionFormulaCache.GetOrAdd(GenerateFormulaCacheKey(formulaText, compiledConstants), v => executor.BuildFormula(operation, this.FunctionRegistry, this.ConstantRegistry));
+            return executionFormulaCache.GetOrAdd(formulaText, v => executor.BuildFormula(operation, this.FunctionRegistry, this.ConstantRegistry));
         }
 
-        // todo compiled constants won't be an issue. refactor this.
-        private bool IsInFormulaCache(string formulaText, ConstantRegistry compiledConstants, out Func<IDictionary<string, double>, double> function)
+        private bool IsInFormulaCache(string formulaText, out Func<IDictionary<string, double>, double> function)
         {
             function = null;
-            return cacheEnabled && executionFormulaCache.TryGetValue(GenerateFormulaCacheKey(formulaText, compiledConstants), out function);
-        }
-
-        private string GenerateFormulaCacheKey(string formulaText, ConstantRegistry compiledConstants)
-        {
-            return compiledConstants != null && compiledConstants.Any() ? $"{formulaText}@{string.Join(",", compiledConstants.Select(x => $"{x.ConstantName}:{x.Value}"))}" : formulaText;
+            return cacheEnabled && executionFormulaCache.TryGetValue(formulaText, out function);
         }
 
         /// <summary>
@@ -244,7 +237,7 @@ namespace Adletec.Sonic
         {
             foreach (var variableName in variables.Keys)
             {
-                if(ConstantRegistry.IsConstantName(variableName) && !ConstantRegistry.GetConstantInfo(variableName).IsOverWritable)
+                if(ConstantRegistry.IsConstantName(variableName))
                     throw new ArgumentException(
                         $"The name \"{variableName}\" is a reserved variable name that cannot be overwritten.", nameof(variables));
 

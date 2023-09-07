@@ -39,7 +39,7 @@ public class OptimizerTests
         IList<Token> tokens = tokenReader.Read("test(500)");
 
         IFunctionRegistry functionRegistry = new FunctionRegistry(true);
-        functionRegistry.RegisterFunction("test", (Func<double, double>)(a => a), false, true);
+        functionRegistry.RegisterFunction("test", (Func<double, double>)(a => a), false);
 
         AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true));
         Operation operation = astBuilder.Build(tokens);
@@ -157,7 +157,7 @@ public class OptimizerTests
         IList<Token> tokens = tokenReader.Read("sin(0 * var1)");
 
         IFunctionRegistry functionRegistry = new FunctionRegistry(true);
-        functionRegistry.RegisterFunction("sin", new Func<double, double>(Math.Sin), true, false);
+        functionRegistry.RegisterFunction("sin", new Func<double, double>(Math.Sin), true);
 
         AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true));
         Operation operation = astBuilder.Build(tokens);
@@ -176,7 +176,7 @@ public class OptimizerTests
         IList<Token> tokens = tokenReader.Read("ident(a) + ident(a * b) + ident((a + b) * c) + c");
         
         IFunctionRegistry functionRegistry = new FunctionRegistry(true);
-        functionRegistry.RegisterFunction("ident", new Func<double, double>(x => x), true, false);
+        functionRegistry.RegisterFunction("ident", new Func<double, double>(x => x), true);
         
         IConstantRegistry constantRegistry = new ConstantRegistry(true);
         constantRegistry.RegisterConstant("a", 1);

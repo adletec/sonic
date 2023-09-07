@@ -43,20 +43,15 @@ namespace Adletec.Sonic.Execution
 
         public void RegisterConstant(string constantName, double value)
         {
-            RegisterConstant(constantName, value, true);
-        }
-
-        public void RegisterConstant(string constantName, double value, bool isOverWritable)
-        {
             if(string.IsNullOrEmpty(constantName))
                 throw new ArgumentNullException(nameof(constantName));
 
-            if (constants.ContainsKey(constantName) && !constants[constantName].IsOverWritable)
+            if (constants.ContainsKey(constantName))
             {
                 throw new ArgumentException($"The constant \"{constantName}\" cannot be overwritten.");
             }
 
-            var constantInfo = new ConstantInfo(constantName, value, isOverWritable);
+            var constantInfo = new ConstantInfo(constantName, value);
 
             constants[constantName] = constantInfo;
         }

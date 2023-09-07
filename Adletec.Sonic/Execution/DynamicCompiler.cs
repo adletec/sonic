@@ -299,10 +299,7 @@ namespace Adletec.Sonic.Execution
 
                 Expression getFunctionRegistry = Expression.Property(contextParameter, "FunctionRegistry");
 
-                Expression funcInstance;
-                if (!functionInfo.IsOverWritable)
-                {
-                    funcInstance = Expression.Convert(
+                Expression funcInstance = Expression.Convert(
                         Expression.Property(
                             Expression.Call(
                                 getFunctionRegistry,
@@ -310,9 +307,6 @@ namespace Adletec.Sonic.Execution
                                 Expression.Constant(function.FunctionName)),
                             "Function"),
                         funcType);
-                }
-                else
-                    funcInstance = Expression.Constant(functionInfo.Function, funcType);
 
                 return Expression.Call(
                     funcInstance,

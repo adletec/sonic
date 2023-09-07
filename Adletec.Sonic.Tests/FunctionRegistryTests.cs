@@ -34,17 +34,6 @@ public class FunctionRegistryTests
     }
 
     [TestMethod]
-    public void TestOverwritable()
-    {
-        FunctionRegistry registry = new FunctionRegistry(false);
-
-        Func<double, double, double> testFunction1 = (a, b) => a * b;
-        Func<double, double, double> testFunction2 = (a, b) => a * b;
-        registry.RegisterFunction("test", testFunction1);
-        registry.RegisterFunction("test", testFunction2);
-    }
-
-    [TestMethod]
     public void TestNotOverwritable()
     {
         FunctionRegistry registry = new FunctionRegistry(false);
@@ -52,11 +41,11 @@ public class FunctionRegistryTests
         Func<double, double, double> testFunction1 = (a, b) => a * b;
         Func<double, double, double> testFunction2 = (a, b) => a * b;
 
-        registry.RegisterFunction("test", testFunction1, true, false);
+        registry.RegisterFunction("test", testFunction1, true);
 
         AssertExtensions.ThrowsException<Exception>(() =>
         {
-            registry.RegisterFunction("test", testFunction2, true, false);
+            registry.RegisterFunction("test", testFunction2, true);
         });
     }
 }

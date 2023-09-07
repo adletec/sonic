@@ -39,10 +39,10 @@ namespace Adletec.Sonic.Execution
 
         public void RegisterFunction(string functionName, Delegate function)
         {
-            RegisterFunction(functionName, function, true, true);
+            RegisterFunction(functionName, function, true);
         }
 
-        public void RegisterFunction(string functionName, Delegate function, bool isIdempotent, bool isOverWritable)
+        public void RegisterFunction(string functionName, Delegate function, bool isIdempotent)
         {
             if (string.IsNullOrEmpty(functionName))
                 throw new ArgumentNullException(nameof(functionName));
@@ -75,7 +75,7 @@ namespace Adletec.Sonic.Execution
                 throw new ArgumentException($"Only System.Func and {DynamicFuncName} delegates are permitted.",
                     nameof(function));
 
-            if (functions.ContainsKey(functionName) && !functions[functionName].IsOverWritable)
+            if (functions.ContainsKey(functionName))
             {
                 var message = $"The function \"{functionName}\" cannot be overwritten.";
                 throw new ArgumentException(message);
@@ -92,7 +92,7 @@ namespace Adletec.Sonic.Execution
                     "A Func can only be overwritten by another Func and a DynamicFunc can only be overwritten by another DynamicFunc.");
             }
 
-            var functionInfo = new FunctionInfo(functionName, numberOfParameters, isIdempotent, isOverWritable,
+            var functionInfo = new FunctionInfo(functionName, numberOfParameters, isIdempotent,
                 isDynamicFunc, function);
 
             functions[functionName] = functionInfo;
