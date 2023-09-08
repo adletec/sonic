@@ -11,12 +11,15 @@ namespace Adletec.Sonic.Execution
         private const string DynamicFuncName = "Adletec.Sonic.DynamicFunc";
 
         private readonly Dictionary<string, FunctionInfo> functions;
+        private readonly bool guardedMode;
 
-        public FunctionRegistry(bool caseSensitive)
+        public FunctionRegistry(bool caseSensitive, bool guardedMode)
         {
             functions = caseSensitive
                 ? new Dictionary<string, FunctionInfo>()
                 : new Dictionary<string, FunctionInfo>(StringComparer.OrdinalIgnoreCase);
+
+            this.guardedMode = guardedMode;
         }
 
         public IEnumerator<FunctionInfo> GetEnumerator()
@@ -75,7 +78,7 @@ namespace Adletec.Sonic.Execution
                 throw new ArgumentException($"Only System.Func and {DynamicFuncName} delegates are permitted.",
                     nameof(function));
 
-            if (functions.ContainsKey(functionName))
+            if (guardedMode && functions.ContainsKey(functionName))
             {
                 var message = $"The function \"{functionName}\" cannot be overwritten.";
                 throw new ArgumentException(message);

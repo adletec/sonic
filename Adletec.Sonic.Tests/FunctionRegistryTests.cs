@@ -18,7 +18,7 @@ public class FunctionRegistryTests
     [TestMethod]
     public void TestAddFunc2()
     {
-        FunctionRegistry registry = new FunctionRegistry(false);
+        FunctionRegistry registry = new FunctionRegistry(false, false);
             
         Func<double, double, double> testFunction = (a, b) => a * b;
         registry.RegisterFunction("test", testFunction);
@@ -36,7 +36,7 @@ public class FunctionRegistryTests
     [TestMethod]
     public void TestNotOverwritable()
     {
-        FunctionRegistry registry = new FunctionRegistry(false);
+        FunctionRegistry registry = new FunctionRegistry(false, false);
 
         Func<double, double, double> testFunction1 = (a, b) => a * b;
         Func<double, double, double> testFunction2 = (a, b) => a * b;

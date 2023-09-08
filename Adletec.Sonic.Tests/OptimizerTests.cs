@@ -19,10 +19,10 @@ public class OptimizerTests
         TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
         IList<Token> tokens = tokenReader.Read("test(var1, (2+3) * 500)");
 
-        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
         functionRegistry.RegisterFunction("test", (Func<double, double, double>)((a, b) => a + b));
 
-        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true));
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true, false));
         Operation operation = astBuilder.Build(tokens);
 
         Function optimizedFunction = (Function)optimizer.Optimize(operation, functionRegistry, null);
@@ -38,10 +38,10 @@ public class OptimizerTests
         TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
         IList<Token> tokens = tokenReader.Read("test(500)");
 
-        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
         functionRegistry.RegisterFunction("test", (Func<double, double>)(a => a), false);
 
-        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true));
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true, false));
         Operation operation = astBuilder.Build(tokens);
 
         Operation optimizedFunction = optimizer.Optimize(operation, functionRegistry, null);
@@ -58,9 +58,9 @@ public class OptimizerTests
         TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
         IList<Token> tokens = tokenReader.Read("var1 * 0.0");
 
-        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
 
-        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true));
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true, false));
         Operation operation = astBuilder.Build(tokens);
 
         Operation optimizedOperation = optimizer.Optimize(operation, functionRegistry, null);
@@ -78,9 +78,9 @@ public class OptimizerTests
         TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
         IList<Token> tokens = tokenReader.Read("0 / var1");
 
-        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
 
-        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true));
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true, false));
         Operation operation = astBuilder.Build(tokens);
 
         Operation optimizedOperation = optimizer.Optimize(operation, functionRegistry, null);
@@ -99,9 +99,9 @@ public class OptimizerTests
             tokenReader.Read(
                 "(var1 + var2 * var3 / 2) * 0 + 0 / (var1 + var2 * var3 / 2) + (var1 + var2 * var3 / 2)^0");
 
-        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
 
-        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true));
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true, false));
         Operation operation = astBuilder.Build(tokens);
 
         Operation optimizedOperation = optimizer.Optimize(operation, functionRegistry, null);
@@ -118,9 +118,9 @@ public class OptimizerTests
         TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
         IList<Token> tokens = tokenReader.Read("0 ^ 2");
 
-        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
 
-        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true));
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true, false));
         Operation operation = astBuilder.Build(tokens);
 
         Operation optimizedOperation = optimizer.Optimize(operation, functionRegistry, null);
@@ -137,9 +137,9 @@ public class OptimizerTests
         TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
         IList<Token> tokens = tokenReader.Read("0 ^ 0");
 
-        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
 
-        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true));
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true, false));
         Operation operation = astBuilder.Build(tokens);
 
         Operation optimizedOperation = optimizer.Optimize(operation, functionRegistry, null);
@@ -156,10 +156,10 @@ public class OptimizerTests
         TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
         IList<Token> tokens = tokenReader.Read("sin(0 * var1)");
 
-        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
         functionRegistry.RegisterFunction("sin", new Func<double, double>(Math.Sin), true);
 
-        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true));
+        AstBuilder astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(true, false));
         Operation operation = astBuilder.Build(tokens);
 
         Operation optimizedOperation = optimizer.Optimize(operation, functionRegistry, null);
@@ -175,10 +175,10 @@ public class OptimizerTests
         TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
         IList<Token> tokens = tokenReader.Read("ident(a) + ident(a * b) + ident((a + b) * c) + c");
         
-        IFunctionRegistry functionRegistry = new FunctionRegistry(true);
+        IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
         functionRegistry.RegisterFunction("ident", new Func<double, double>(x => x), true);
         
-        IConstantRegistry constantRegistry = new ConstantRegistry(true);
+        IConstantRegistry constantRegistry = new ConstantRegistry(true, false);
         constantRegistry.RegisterConstant("a", 1);
         constantRegistry.RegisterConstant("b", 2);
         constantRegistry.RegisterConstant("c", 3);

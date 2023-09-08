@@ -7,12 +7,14 @@ namespace Adletec.Sonic.Execution
     public class ConstantRegistry : IConstantRegistry
     {
         private readonly Dictionary<string, ConstantInfo> constants;
+        private readonly bool guardedMode;
 
-        public ConstantRegistry(bool caseSensitive)
+        public ConstantRegistry(bool caseSensitive, bool guardedMode)
         {
             constants = caseSensitive
                 ? new Dictionary<string, ConstantInfo>()
                 : new Dictionary<string, ConstantInfo>(StringComparer.OrdinalIgnoreCase);
+            this.guardedMode = guardedMode;
         }
 
         public IEnumerator<ConstantInfo> GetEnumerator()
@@ -46,7 +48,7 @@ namespace Adletec.Sonic.Execution
             if(string.IsNullOrEmpty(constantName))
                 throw new ArgumentNullException(nameof(constantName));
 
-            if (constants.ContainsKey(constantName))
+            if (guardedMode && constants.ContainsKey(constantName))
             {
                 throw new ArgumentException($"The constant \"{constantName}\" cannot be overwritten.");
             }

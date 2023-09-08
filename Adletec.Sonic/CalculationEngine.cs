@@ -21,6 +21,7 @@ namespace Adletec.Sonic
         private readonly bool cacheEnabled;
         private readonly bool optimizerEnabled;
         private readonly bool caseSensitive;
+        private readonly bool guardedMode;
 
         private readonly Random random;
 
@@ -48,21 +49,22 @@ namespace Adletec.Sonic
         {
             this.caseSensitive = options.CaseSensitive;
             this.executionFormulaCache = new MemoryCache<string, Func<IDictionary<string, double>, double>>(options.CacheMaximumSize, options.CacheReductionSize);
-            this.FunctionRegistry = new FunctionRegistry(caseSensitive);
-            this.ConstantRegistry = new ConstantRegistry(caseSensitive);
+            this.FunctionRegistry = new FunctionRegistry(caseSensitive, options.GuardedMode);
+            this.ConstantRegistry = new ConstantRegistry(caseSensitive, options.GuardedMode);
             this.cultureInfo = options.CultureInfo;
             this.cacheEnabled = options.CacheEnabled;
             this.optimizerEnabled = options.OptimizerEnabled;
+            this.guardedMode = options.GuardedMode;
 
             this.random = new Random();
 
             switch (options.ExecutionMode)
             {
                 case ExecutionMode.Interpreted:
-                    executor = new Interpreter(caseSensitive);
+                    executor = new Interpreter(caseSensitive, guardedMode);
                     break;
                 case ExecutionMode.Compiled:
-                    executor = new DynamicCompiler(caseSensitive);
+                    executor = new DynamicCompiler(caseSensitive, guardedMode);
                     break;
                 default:
                     throw new ArgumentException($"Unsupported execution mode \"{options.ExecutionMode}\".",
@@ -84,7 +86,10 @@ namespace Adletec.Sonic
             {
                 foreach (var constant in options.Constants)
                 {
-                    // todo isOverwritable should go
+                    if (guardedMode && FunctionRegistry.IsFunctionName(constant.Name))
+                    {
+                        throw new ArgumentException("The constant name cannot be the same as a function name.");
+                    }
                     ConstantRegistry.RegisterConstant(constant.Name, constant.Value);
                 }
             }
@@ -94,7 +99,10 @@ namespace Adletec.Sonic
             {
                 foreach (var function in options.Functions)
                 {
-                    // todo isOverwritable should go
+                    if (guardedMode && ConstantRegistry.IsConstantName(function.Name))
+                    {
+                        throw new ArgumentException("The function name cannot be the same as a constant name.");
+                    }
                     FunctionRegistry.RegisterFunction(function.Name, function.Function, function.IsIdempotent);
                 }
             }
@@ -124,8 +132,6 @@ namespace Adletec.Sonic
             // We're writing to that dictionary so let's create a copy.
             variables = !caseSensitive ? EngineUtil.ConvertVariableNamesToLowerCase(variables) : new Dictionary<string, double>(variables);
             
-            VerifyVariableNames(variables);
-
             // Add the reserved variables to the dictionary
             foreach (ConstantInfo constant in ConstantRegistry)
                 variables.Add(constant.ConstantName, constant.Value);
@@ -227,24 +233,5 @@ namespace Adletec.Sonic
             return cacheEnabled && executionFormulaCache.TryGetValue(formulaText, out function);
         }
 
-        /// <summary>
-        /// Verify a collection of variables to ensure that all the variable names are valid.
-        /// Users are not allowed to overwrite reserved variables or use function names as variables.
-        /// If an invalid variable is detected an exception is thrown.
-        /// </summary>
-        /// <param name="variables">The collection of variables that must be verified.</param>
-        internal void VerifyVariableNames(IDictionary<string, double> variables)
-        {
-            foreach (var variableName in variables.Keys)
-            {
-                if(ConstantRegistry.IsConstantName(variableName))
-                    throw new ArgumentException(
-                        $"The name \"{variableName}\" is a reserved variable name that cannot be overwritten.", nameof(variables));
-
-                if (FunctionRegistry.IsFunctionName(variableName))
-                    throw new ArgumentException(
-                        $"The name \"{variableName}\" is a function name. Parameters cannot have this name.", nameof(variables));
-            }
-        }
     }
 }

@@ -30,6 +30,8 @@ namespace Adletec.Sonic
         internal int CacheMaximumSize { get; private set; } = DefaultCacheMaximumSize;
 
         internal int CacheReductionSize { get; private set; } = DefaultCacheReductionSize;
+        
+        internal bool GuardedMode { get; private set; } = false;
 
         internal List<FunctionDraft> Functions { get; }
 
@@ -199,6 +201,42 @@ namespace Adletec.Sonic
         public CalculationEngineBuilder DisableDefaultConstants()
         {
             DefaultConstants = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Enables guarded mode. This means that the engine will throw exceptions for non-fatal errors, i.e. if it
+        /// receives ambiguous input for which a sane default exist, but which is possibly not what the user intended.
+        ///
+        /// This includes:
+        ///  - the variable dictionary contains a variable with the same name as a constant (default: constant is used).
+        ///  - the same constant is defined multiple times (default: last definition is used).
+        ///  - the same function is defined multiple times (default: last definition is used).
+        ///
+        /// Default: guarded mode disabled.
+        /// </summary>
+        /// <returns></returns>
+        public CalculationEngineBuilder EnableGuardedMode()
+        {
+            GuardedMode = true;
+            return this;
+        }
+        
+        /// <summary>
+        /// Disables guarded mode. This means that the engine will not throw exceptions for non-fatal errors, i.e. if it
+        /// receives ambiguous input for which a sane default exist, but which is possibly not what the user intended.
+        ///
+        /// This includes:
+        ///  - the variable dictionary contains a variable with the same name as a constant (default: constant is used).
+        ///  - the same constant is defined multiple times (default: last definition is used).
+        ///  - the same function is defined multiple times (default: last definition is used).
+        ///
+        /// Default: guarded mode disabled.
+        /// </summary>
+        /// <returns></returns>
+        public CalculationEngineBuilder DisableGuardedMode()
+        {
+            GuardedMode = false;
             return this;
         }
 

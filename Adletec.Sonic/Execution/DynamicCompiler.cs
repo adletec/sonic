@@ -8,18 +8,20 @@ using Adletec.Sonic.Util;
 
 namespace Adletec.Sonic.Execution
 {
-    public class DynamicCompiler : IExecutor
+    public class DynamicCompiler : AbstractExecutor, IExecutor
     {
         private readonly string funcAssemblyQualifiedName;
         private readonly bool caseSensitive;
+        private readonly bool guardedMode;
 
-        public DynamicCompiler() : this(false)
+        public DynamicCompiler() : this(false, false)
         {
         }
 
-        public DynamicCompiler(bool caseSensitive)
+        public DynamicCompiler(bool caseSensitive, bool guardedMode)
         {
             this.caseSensitive = caseSensitive;
+            this.guardedMode = guardedMode;
             // The lower func reside in mscorelib, the higher ones in another assembly.
             // This is  an easy cross platform way to to have this AssemblyQualifiedName.
             funcAssemblyQualifiedName =
@@ -44,15 +46,45 @@ namespace Adletec.Sonic.Execution
             IFunctionRegistry functionRegistry, IConstantRegistry constantRegistry)
         {
             Func<FormulaContext, double> func = BuildFormulaInternal(operation, functionRegistry);
-            return caseSensitive
-                ? (Func<IDictionary<string, double>, double>)(variables => 
-                    func(new FormulaContext(variables, functionRegistry, constantRegistry)))
-                : (Func<IDictionary<string, double>, double>)(variables =>
+            
+            // the multiplication of modes is makes the code a bit more complex, but this way we can avoid pretty
+            // much all of the performance penalty for the additional checks in case they are disabled.
+            if (caseSensitive)
+            {
+                if (guardedMode)
+                {
+                    return variables =>
+                    {
+                        VerifyVariableNames(variables,constantRegistry, functionRegistry);
+                        var context = new FormulaContext(variables, functionRegistry, constantRegistry);
+                        return func(context);
+                    };
+                }
+
+                return variables =>
+                {
+                    var context = new FormulaContext(variables, functionRegistry, constantRegistry);
+                    return func(context);
+                };
+            }
+
+            if (guardedMode)
+            {
+                return variables =>
                 {
                     variables = EngineUtil.ConvertVariableNamesToLowerCase(variables);
-                    FormulaContext context = new FormulaContext(variables, functionRegistry, constantRegistry);
+                    VerifyVariableNames(variables, constantRegistry, functionRegistry);
+                    var context = new FormulaContext(variables, functionRegistry, constantRegistry);
                     return func(context);
-                });
+                };
+            }
+
+            return variables =>
+            {
+                variables = EngineUtil.ConvertVariableNamesToLowerCase(variables);
+                var context = new FormulaContext(variables, functionRegistry, constantRegistry);
+                return func(context);
+            };
         }
 
         private Func<FormulaContext, double> BuildFormulaInternal(Operation operation,
@@ -145,7 +177,7 @@ namespace Adletec.Sonic.Execution
 
                 return Expression.Modulo(dividend, divisor);
             }
-            
+
             if (operation.GetType() == typeof(Exponentiation))
             {
                 var exponentiation = (Exponentiation)operation;
@@ -300,13 +332,13 @@ namespace Adletec.Sonic.Execution
                 Expression getFunctionRegistry = Expression.Property(contextParameter, "FunctionRegistry");
 
                 Expression funcInstance = Expression.Convert(
-                        Expression.Property(
-                            Expression.Call(
-                                getFunctionRegistry,
-                                typeof(IFunctionRegistry).GetRuntimeMethod("GetFunctionInfo", new[] { typeof(string) }),
-                                Expression.Constant(function.FunctionName)),
-                            "Function"),
-                        funcType);
+                    Expression.Property(
+                        Expression.Call(
+                            getFunctionRegistry,
+                            typeof(IFunctionRegistry).GetRuntimeMethod("GetFunctionInfo", new[] { typeof(string) }),
+                            Expression.Constant(function.FunctionName)),
+                        "Function"),
+                    funcType);
 
                 return Expression.Call(
                     funcInstance,
@@ -323,7 +355,7 @@ namespace Adletec.Sonic.Execution
             var funcTypeName = numberOfParameters < 9
                 ? $"System.Func`{numberOfParameters + 1}"
                 : $"System.Func`{numberOfParameters + 1}, {funcAssemblyQualifiedName}";
-            
+
             Type funcType = Type.GetType(funcTypeName);
             if (funcType == null)
             {
@@ -336,7 +368,7 @@ namespace Adletec.Sonic.Execution
 
             return funcType.MakeGenericType(typeArguments);
         }
-
+        
         private static class PrecompiledMethods
         {
             public static double GetVariableValueOrThrow(string variableName, FormulaContext context)

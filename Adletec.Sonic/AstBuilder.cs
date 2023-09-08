@@ -319,7 +319,9 @@ namespace Adletec.Sonic
                 // the mathematical formula
                 throw new ParseException(
                     $"There is a syntax issue for the function \"{functionToken.Value}\" at position {functionToken.StartPosition}. " +
-                    "The number of arguments does not match with what is expected.");
+                    "The number of arguments does not match with what is expected. " +
+                    "This can also happen if the expression contains a variable with the same name as a function. " + 
+                    "In that case please rename either the variable or the function.");
             }
         }
 

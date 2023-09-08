@@ -18,7 +18,7 @@ public class ConstantRegistryTests
     [TestMethod]
     public void TestAddConstant()
     {
-        var registry = new ConstantRegistry(false);
+        var registry = new ConstantRegistry(false, false);
             
         registry.RegisterConstant("test", 42.0);
 
@@ -33,7 +33,7 @@ public class ConstantRegistryTests
     [TestMethod]
     public void TestNotOverwritable()
     {
-        var registry = new ConstantRegistry(false);
+        var registry = new ConstantRegistry(false, false);
 
         registry.RegisterConstant("test", 42.0);
 
