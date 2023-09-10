@@ -26,7 +26,7 @@ public class MockFunctionRegistry : IFunctionRegistry
 
     public FunctionInfo GetFunctionInfo(string functionName)
     {
-        return new FunctionInfo(functionName, 1, true, false, false, null);
+        return new FunctionInfo(functionName, 1, true, false, null);
     }
 
     public bool IsFunctionName(string functionName)
@@ -39,7 +39,7 @@ public class MockFunctionRegistry : IFunctionRegistry
         throw new NotImplementedException();
     }
 
-    public void RegisterFunction(string functionName, Delegate function, bool isIdempotent, bool isOverWritable)
+    public void RegisterFunction(string functionName, Delegate function, bool isIdempotent)
     {
         throw new NotImplementedException();
     }

@@ -24,16 +24,16 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
-        { 
-            new() { Value = '(', TokenType = TokenType.LeftBracket }, 
-            new() { Value = 42, TokenType = TokenType.Integer }, 
-            new() { Value = '+', TokenType = TokenType.Operation }, 
-            new() { Value = 8, TokenType = TokenType.Integer }, 
-            new() { Value = ')', TokenType = TokenType.RightBracket }, 
-            new() { Value = '*', TokenType = TokenType.Operation }, 
-            new() { Value = 2, TokenType = TokenType.Integer } 
+        {
+            new() { Value = '(', TokenType = TokenType.LeftBracket },
+            new() { Value = 42, TokenType = TokenType.Integer },
+            new() { Value = '+', TokenType = TokenType.Operation },
+            new() { Value = 8, TokenType = TokenType.Integer },
+            new() { Value = ')', TokenType = TokenType.RightBracket },
+            new() { Value = '*', TokenType = TokenType.Operation },
+            new() { Value = 2, TokenType = TokenType.Integer }
         });
 
         var multiplication = (Multiplication)operation;
@@ -49,14 +49,14 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
         {
-            new() { Value = 2, TokenType = TokenType.Integer }, 
-            new() { Value = '+', TokenType = TokenType.Operation }, 
-            new() { Value = 8, TokenType = TokenType.Integer }, 
-            new() { Value = '*', TokenType = TokenType.Operation }, 
-            new() { Value = 3, TokenType = TokenType.Integer } 
+            new() { Value = 2, TokenType = TokenType.Integer },
+            new() { Value = '+', TokenType = TokenType.Operation },
+            new() { Value = 8, TokenType = TokenType.Integer },
+            new() { Value = '*', TokenType = TokenType.Operation },
+            new() { Value = 3, TokenType = TokenType.Integer }
         });
 
         Addition addition = (Addition)operation;
@@ -72,13 +72,13 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
         {
-            new() { Value = 2, TokenType = TokenType.Integer }, 
-            new() { Value = '*', TokenType = TokenType.Operation }, 
-            new() { Value = 8, TokenType = TokenType.Integer }, 
-            new() { Value = '-', TokenType = TokenType.Operation }, 
+            new() { Value = 2, TokenType = TokenType.Integer },
+            new() { Value = '*', TokenType = TokenType.Operation },
+            new() { Value = 8, TokenType = TokenType.Integer },
+            new() { Value = '-', TokenType = TokenType.Operation },
             new() { Value = 3, TokenType = TokenType.Integer }
         });
 
@@ -95,11 +95,11 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
-        { 
-            new() { Value = 10, TokenType = TokenType.Integer }, 
-            new() { Value = '/', TokenType = TokenType.Operation }, 
+        {
+            new() { Value = 10, TokenType = TokenType.Integer },
+            new() { Value = '/', TokenType = TokenType.Operation },
             new() { Value = 2, TokenType = TokenType.Integer }
         });
 
@@ -116,11 +116,11 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
-        { 
-            new() { Value = 10, TokenType = TokenType.Integer }, 
-            new() { Value = '*', TokenType = TokenType.Operation }, 
+        {
+            new() { Value = 10, TokenType = TokenType.Integer },
+            new() { Value = '*', TokenType = TokenType.Operation },
             new() { Value = 2.0, TokenType = TokenType.FloatingPoint }
         });
 
@@ -135,11 +135,11 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
-        { 
-            new() { Value = 2, TokenType = TokenType.Integer }, 
-            new() { Value = '^', TokenType = TokenType.Operation }, 
+        {
+            new() { Value = 2, TokenType = TokenType.Integer },
+            new() { Value = '^', TokenType = TokenType.Operation },
             new() { Value = 3, TokenType = TokenType.Integer }
         });
 
@@ -154,11 +154,11 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
-        { 
-            new() { Value = 2.7, TokenType = TokenType.FloatingPoint }, 
-            new() { Value = '%', TokenType = TokenType.Operation }, 
+        {
+            new() { Value = 2.7, TokenType = TokenType.FloatingPoint },
+            new() { Value = '%', TokenType = TokenType.Operation },
             new() { Value = 3, TokenType = TokenType.Integer }
         });
 
@@ -173,11 +173,11 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
-        { 
-            new() { Value = 10, TokenType = TokenType.Integer }, 
-            new() { Value = '*', TokenType = TokenType.Operation }, 
+        {
+            new() { Value = 10, TokenType = TokenType.Integer },
+            new() { Value = '*', TokenType = TokenType.Operation },
             new() { Value = "var1", TokenType = TokenType.Text }
         });
 
@@ -192,16 +192,17 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
-        var operation = builder.Build(new List<Token>() { 
-            new() { Value = "var1", TokenType = TokenType.Text }, 
-            new() { Value = '+', TokenType = TokenType.Operation }, 
-            new() { Value = 2, TokenType = TokenType.Integer }, 
-            new() { Value = '*', TokenType = TokenType.Operation }, 
-            new() { Value = '(', TokenType = TokenType.LeftBracket }, 
-            new() { Value = 3, TokenType = TokenType.Integer }, 
-            new() { Value = '*', TokenType = TokenType.Operation }, 
-            new() { Value = "age", TokenType = TokenType.Text }, 
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
+        var operation = builder.Build(new List<Token>()
+        {
+            new() { Value = "var1", TokenType = TokenType.Text },
+            new() { Value = '+', TokenType = TokenType.Operation },
+            new() { Value = 2, TokenType = TokenType.Integer },
+            new() { Value = '*', TokenType = TokenType.Operation },
+            new() { Value = '(', TokenType = TokenType.LeftBracket },
+            new() { Value = 3, TokenType = TokenType.Integer },
+            new() { Value = '*', TokenType = TokenType.Operation },
+            new() { Value = "age", TokenType = TokenType.Text },
             new() { Value = ')', TokenType = TokenType.RightBracket }
         });
 
@@ -220,12 +221,12 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
-        { 
-            new() { Value = "sin", TokenType = TokenType.Text }, 
-            new() { Value = '(', TokenType = TokenType.LeftBracket }, 
-            new() { Value = 2, TokenType = TokenType.Integer }, 
+        {
+            new() { Value = "sin", TokenType = TokenType.Text },
+            new() { Value = '(', TokenType = TokenType.LeftBracket },
+            new() { Value = 2, TokenType = TokenType.Integer },
             new() { Value = ')', TokenType = TokenType.RightBracket }
         });
 
@@ -238,14 +239,14 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
-        { 
-            new() { Value = "sin", TokenType = TokenType.Text }, 
-            new() { Value = '(', TokenType = TokenType.LeftBracket }, 
-            new() { Value = 2, TokenType = TokenType.Integer }, 
-            new() { Value = '+', TokenType = TokenType.Operation }, 
-            new() { Value = 3, TokenType = TokenType.Integer }, 
+        {
+            new() { Value = "sin", TokenType = TokenType.Text },
+            new() { Value = '(', TokenType = TokenType.LeftBracket },
+            new() { Value = 2, TokenType = TokenType.Integer },
+            new() { Value = '+', TokenType = TokenType.Operation },
+            new() { Value = 3, TokenType = TokenType.Integer },
             new() { Value = ')', TokenType = TokenType.RightBracket }
         });
 
@@ -261,14 +262,14 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
-        { 
-            new() { Value = "sin", TokenType = TokenType.Text }, 
-            new() { Value = '(', TokenType = TokenType.LeftBracket }, 
-            new() { Value = 2, TokenType = TokenType.Integer }, 
-            new() { Value = '+', TokenType = TokenType.Operation }, 
-            new() { Value = 3, TokenType = TokenType.Integer }, 
+        {
+            new() { Value = "sin", TokenType = TokenType.Text },
+            new() { Value = '(', TokenType = TokenType.LeftBracket },
+            new() { Value = 2, TokenType = TokenType.Integer },
+            new() { Value = '+', TokenType = TokenType.Operation },
+            new() { Value = 3, TokenType = TokenType.Integer },
             new() { Value = ')', TokenType = TokenType.RightBracket },
             new() { Value = '*', TokenType = TokenType.Operation },
             new() { Value = 4.9, TokenType = TokenType.FloatingPoint }
@@ -290,17 +291,17 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
-        { 
-            new() { Value = 5.3, TokenType = TokenType.FloatingPoint }, 
-            new() { Value = '*', TokenType = TokenType.Operation}, 
-            new() { Value = '_', TokenType = TokenType.Operation }, 
-            new() { Value = '(', TokenType = TokenType.LeftBracket }, 
-            new() { Value = 5, TokenType = TokenType.Integer }, 
-            new() { Value = '+', TokenType = TokenType.Operation }, 
-            new() { Value = 42, TokenType = TokenType.Integer }, 
-            new() { Value = ')', TokenType = TokenType.RightBracket }, 
+        {
+            new() { Value = 5.3, TokenType = TokenType.FloatingPoint },
+            new() { Value = '*', TokenType = TokenType.Operation },
+            new() { Value = '_', TokenType = TokenType.Operation },
+            new() { Value = '(', TokenType = TokenType.LeftBracket },
+            new() { Value = 5, TokenType = TokenType.Integer },
+            new() { Value = '+', TokenType = TokenType.Operation },
+            new() { Value = 42, TokenType = TokenType.Integer },
+            new() { Value = ')', TokenType = TokenType.RightBracket },
         });
 
         var multiplication = (Multiplication)operation;
@@ -318,15 +319,15 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
-        { 
+        {
             new() { Value = '_', TokenType = TokenType.Operation },
             new() { Value = '(', TokenType = TokenType.LeftBracket },
             new() { Value = 1, TokenType = TokenType.Integer },
             new() { Value = ')', TokenType = TokenType.RightBracket },
-            new() { Value = '^', TokenType = TokenType.Operation }, 
-            new() { Value = 2, TokenType = TokenType.Integer }, 
+            new() { Value = '^', TokenType = TokenType.Operation },
+            new() { Value = 2, TokenType = TokenType.Integer },
         });
 
         var unaryMinus = (UnaryMinus)operation;
@@ -342,18 +343,18 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
 
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
             var operation = builder.Build(new List<Token>
-            { 
-                new() { Value = '(', TokenType = TokenType.LeftBracket, StartPosition = 0 }, 
-                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 1 }, 
-                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 3 }, 
-                new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 4 }, 
-                new() { Value = ')', TokenType = TokenType.RightBracket, StartPosition = 5 }, 
-                new() { Value = '*', TokenType = TokenType.Operation, StartPosition = 6 }, 
+            {
+                new() { Value = '(', TokenType = TokenType.LeftBracket, StartPosition = 0 },
+                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 1 },
+                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 3 },
+                new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 4 },
+                new() { Value = ')', TokenType = TokenType.RightBracket, StartPosition = 5 },
+                new() { Value = '*', TokenType = TokenType.Operation, StartPosition = 6 },
             });
         });
     }
@@ -363,18 +364,18 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
 
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
             var operation = builder.Build(new List<Token>
-            { 
-                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 0 }, 
-                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 2 }, 
-                new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 3 }, 
-                new() { Value = ')', TokenType = TokenType.RightBracket, StartPosition = 4 }, 
-                new() { Value = '*', TokenType = TokenType.Operation, StartPosition = 5 }, 
-                new() { Value = 2, TokenType = TokenType.Integer, StartPosition = 6 }, 
+            {
+                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 0 },
+                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 2 },
+                new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 3 },
+                new() { Value = ')', TokenType = TokenType.RightBracket, StartPosition = 4 },
+                new() { Value = '*', TokenType = TokenType.Operation, StartPosition = 5 },
+                new() { Value = 2, TokenType = TokenType.Integer, StartPosition = 6 },
             });
         });
     }
@@ -384,15 +385,15 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
 
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
             var operation = builder.Build(new List<Token>
-            { 
-                new() { Value = '(', TokenType = TokenType.LeftBracket, StartPosition = 0 }, 
-                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 1 }, 
-                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 3 }, 
+            {
+                new() { Value = '(', TokenType = TokenType.LeftBracket, StartPosition = 0 },
+                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 1 },
+                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 3 },
                 new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 4 }
             });
         });
@@ -403,15 +404,15 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
 
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
             var operation = builder.Build(new List<Token>
-            { 
-                new() { Value = 5, TokenType = TokenType.Integer, StartPosition = 0 }, 
-                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 1 }, 
-                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 3 }, 
+            {
+                new() { Value = 5, TokenType = TokenType.Integer, StartPosition = 0 },
+                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 1 },
+                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 3 },
                 new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 4 }
             });
         });
@@ -422,16 +423,16 @@ public class AstBuilderTests
     {
         IFunctionRegistry registry = new MockFunctionRegistry();
 
-        var builder = new AstBuilder(registry, false);
+        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
 
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
             var operation = builder.Build(new List<Token>
-            { 
-                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 0 }, 
-                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 2 }, 
+            {
+                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 0 },
+                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 2 },
                 new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 3 },
-                new() { Value = 5, TokenType = TokenType.Integer, StartPosition = 4 } 
+                new() { Value = 5, TokenType = TokenType.Integer, StartPosition = 4 }
             });
         });
     }

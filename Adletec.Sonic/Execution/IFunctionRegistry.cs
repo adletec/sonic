@@ -8,6 +8,6 @@ namespace Adletec.Sonic.Execution
         FunctionInfo GetFunctionInfo(string functionName);
         bool IsFunctionName(string functionName);
         void RegisterFunction(string functionName, Delegate function);
-        void RegisterFunction(string functionName, Delegate function, bool isIdempotent, bool isOverWritable);
+        void RegisterFunction(string functionName, Delegate function, bool isIdempotent);
     }
 }
