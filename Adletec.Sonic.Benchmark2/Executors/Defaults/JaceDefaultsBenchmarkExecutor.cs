@@ -1,11 +1,14 @@
-namespace Adletec.Sonic.Benchmark2;
+using Adletec.Sonic.Benchmark2.Expressions;
+using Adletec.Sonic.Benchmark2.Values;
 
-public class SonicDefaultsBenchmarkExecutor : IBenchmarkExecutor
+namespace Adletec.Sonic.Benchmark2.Executors.Defaults;
+
+public class JaceDefaultsBenchmarkExecutor : IBenchmarkExecutor
 {
     public void RunBenchmark(string expression, List<string> variableNames, long iterations, IValueProvider valueProvider)
     {
-        var engine = CalculationEngine.CreateWithDefaults();
-        var calculate = engine.CreateDelegate(expression);
+        var engine = new Jace.CalculationEngine();
+        var calculate = engine.Build(expression);
         var variables = new Dictionary<string, double>();
         for (var i = 0; i < iterations; i++)
         {
@@ -17,5 +20,7 @@ public class SonicDefaultsBenchmarkExecutor : IBenchmarkExecutor
         }
     }
     
-    public override string ToString() => "Sonic (Defaults)";
+    public ExpressionDialect Dialect => ExpressionDialect.Jace;
+    
+    public override string ToString() => "Jace (Defaults)";
 }

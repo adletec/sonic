@@ -1,10 +1,14 @@
-namespace Adletec.Sonic.Benchmark2;
+using Adletec.Sonic.Benchmark2.Expressions;
+using Adletec.Sonic.Benchmark2.Values;
+using Jace;
 
-public class JaceDefaultsBenchmarkExecutor : IBenchmarkExecutor
+namespace Adletec.Sonic.Benchmark2.Executors.CaseSensitive;
+
+public class JaceCaseSensitiveCompiledBenchmarkExecutor : IBenchmarkExecutor
 {
     public void RunBenchmark(string expression, List<string> variableNames, long iterations, IValueProvider valueProvider)
     {
-        var engine = new Jace.CalculationEngine();
+        var engine = new Jace.CalculationEngine(new JaceOptions {CaseSensitive = true});
         var calculate = engine.Build(expression);
         var variables = new Dictionary<string, double>();
         for (var i = 0; i < iterations; i++)
@@ -17,5 +21,7 @@ public class JaceDefaultsBenchmarkExecutor : IBenchmarkExecutor
         }
     }
     
-    public override string ToString() => "Jace (Defaults)";
+    public ExpressionDialect Dialect => ExpressionDialect.Jace;
+    
+    public override string ToString() => "Jace (CaseSensitive, Compiled)";
 }

@@ -1,4 +1,7 @@
-namespace Adletec.Sonic.Benchmark2;
+using Adletec.Sonic.Benchmark2.Expressions;
+using Adletec.Sonic.Benchmark2.Values;
+
+namespace Adletec.Sonic.Benchmark2.Executors.Defaults;
 
 public class NCalcDefaultsBenchmarkExecutor : IBenchmarkExecutor
 {
@@ -14,6 +17,7 @@ public class NCalcDefaultsBenchmarkExecutor : IBenchmarkExecutor
             nCalcExpression.Evaluate();
         }
     }
+    public ExpressionDialect Dialect => ExpressionDialect.NCalc;
     
     public override string ToString() => "NCalc (Defaults)";
 }
