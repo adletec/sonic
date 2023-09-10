@@ -3,6 +3,11 @@ using Adletec.Sonic.Benchmark2.Values;
 
 namespace Adletec.Sonic.Benchmark2.Executors.Defaults;
 
+/// <summary>
+/// Executes a benchmark using the Jace library with default settings.
+///
+/// Jace compiles expressions and evaluates them case-insensitively by default.
+/// </summary>
 public class JaceDefaultsBenchmarkExecutor : IBenchmarkExecutor
 {
     public void RunBenchmark(string expression, List<string> variableNames, long iterations, IValueProvider valueProvider)

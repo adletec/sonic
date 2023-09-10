@@ -3,6 +3,11 @@ using Adletec.Sonic.Benchmark2.Values;
 
 namespace Adletec.Sonic.Benchmark2.Executors.Defaults;
 
+/// <summary>
+/// Executes a benchmark using the sonic library with default settings.
+///
+/// Sonic compile expressions and evaluates them case-sensitively by default.
+/// </summary>
 public class SonicDefaultsBenchmarkExecutor : IBenchmarkExecutor
 {
     public void RunBenchmark(string expression, List<string> variableNames, long iterations, IValueProvider valueProvider)

@@ -2,7 +2,7 @@ using Adletec.Sonic.Benchmark2.Expressions;
 using Adletec.Sonic.Benchmark2.Values;
 using Adletec.Sonic.Execution;
 
-namespace Adletec.Sonic.Benchmark2.Executors.Defaults;
+namespace Adletec.Sonic.Benchmark2.Executors.Interpreted;
 
 public class SonicInterpretedBenchmarkExecutor : IBenchmarkExecutor
 {

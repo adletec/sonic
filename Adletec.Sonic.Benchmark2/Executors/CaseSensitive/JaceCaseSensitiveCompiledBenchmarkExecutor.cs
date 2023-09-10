@@ -4,6 +4,9 @@ using Jace;
 
 namespace Adletec.Sonic.Benchmark2.Executors.CaseSensitive;
 
+/// <summary>
+/// Executes a benchmark using the Jace library with case-sensitive settings.
+/// </summary>
 public class JaceCaseSensitiveCompiledBenchmarkExecutor : IBenchmarkExecutor
 {
     public void RunBenchmark(string expression, List<string> variableNames, long iterations, IValueProvider valueProvider)

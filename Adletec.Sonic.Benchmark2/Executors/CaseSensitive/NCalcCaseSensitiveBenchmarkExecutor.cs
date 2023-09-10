@@ -1,8 +1,12 @@
+using Adletec.Sonic.Benchmark2.Executors.Defaults;
 using Adletec.Sonic.Benchmark2.Expressions;
 using Adletec.Sonic.Benchmark2.Values;
 
-namespace Adletec.Sonic.Benchmark2.Executors.Defaults;
+namespace Adletec.Sonic.Benchmark2.Executors.CaseSensitive;
 
+/// <summary>
+/// Executes a benchmark using the NCalc library with (case-sensitive) default settings.
+/// </summary>
 public class NCalcCaseSensitiveBenchmarkExecutor : IBenchmarkExecutor
 {
     private readonly IBenchmarkExecutor executor = new NCalcDefaultsBenchmarkExecutor();

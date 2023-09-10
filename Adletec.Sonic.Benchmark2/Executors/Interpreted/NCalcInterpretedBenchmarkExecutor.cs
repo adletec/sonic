@@ -1,8 +1,13 @@
+using Adletec.Sonic.Benchmark2.Executors.Defaults;
 using Adletec.Sonic.Benchmark2.Expressions;
 using Adletec.Sonic.Benchmark2.Values;
 
-namespace Adletec.Sonic.Benchmark2.Executors.Defaults;
+namespace Adletec.Sonic.Benchmark2.Executors.Interpreted;
 
+/// <summary>
+/// Executes a benchmark using the NCalc library in interpreted mode. This is the default, since NCalc
+/// does not support compilation.
+/// </summary>
 public class NCalcInterpretedBenchmarkExecutor : IBenchmarkExecutor
 {
     private readonly IBenchmarkExecutor executor = new NCalcDefaultsBenchmarkExecutor();

@@ -1,5 +1,6 @@
 using Adletec.Sonic.Benchmark2.Executors;
 using Adletec.Sonic.Benchmark2.Executors.Defaults;
+using Adletec.Sonic.Benchmark2.Executors.Interpreted;
 using Adletec.Sonic.Benchmark2.Expressions;
 using Adletec.Sonic.Benchmark2.Expressions.Defaults;
 using Adletec.Sonic.Benchmark2.Values;
@@ -7,13 +8,16 @@ using BenchmarkDotNet.Attributes;
 
 namespace Adletec.Sonic.Benchmark2.Benchmarks;
 
+/// <summary>
+/// Compares the performance of the interpreted evaluation of expressions.
+/// </summary>
 public class CompareInterpretedBenchmark
 {
     [ParamsSource(nameof(ExpressionValues))]
-    public BenchmarkExpression Expression { get; set; }
+    public BenchmarkExpression Expression { get; set; } = null!;
 
     [ParamsSource(nameof(BenchmarkExecutors))]
-    public IBenchmarkExecutor Executor { get; set; }
+    public IBenchmarkExecutor Executor { get; set; } = null!;
 
     public long Iterations { get; set; } = 2000000L;
 

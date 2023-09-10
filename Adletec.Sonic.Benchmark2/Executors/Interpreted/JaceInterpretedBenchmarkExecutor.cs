@@ -3,8 +3,11 @@ using Adletec.Sonic.Benchmark2.Values;
 using Jace;
 using Jace.Execution;
 
-namespace Adletec.Sonic.Benchmark2.Executors.Defaults;
+namespace Adletec.Sonic.Benchmark2.Executors.Interpreted;
 
+/// <summary>
+/// Executes a benchmark using the Jace library in interpreted mode.
+/// </summary>
 public class JaceInterpretedBenchmarkExecutor : IBenchmarkExecutor
 {
     public void RunBenchmark(string expression, List<string> variableNames, long iterations,

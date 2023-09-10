@@ -8,13 +8,16 @@ using BenchmarkDotNet.Attributes;
 
 namespace Adletec.Sonic.Benchmark2.Benchmarks;
 
+/// <summary>
+/// Compares the performance of the case sensitive evaluation of expressions.
+/// </summary>
 public class CompareCaseSensitiveBenchmark
 {
     [ParamsSource(nameof(ExpressionValues))]
-    public BenchmarkExpression Expression { get; set; }
+    public BenchmarkExpression Expression { get; set; } = null!;
 
     [ParamsSource(nameof(BenchmarkExecutors))]
-    public IBenchmarkExecutor Executor { get; set; }
+    public IBenchmarkExecutor Executor { get; set; } = null!;
 
     public long Iterations { get; set; } = 2000000L;
 

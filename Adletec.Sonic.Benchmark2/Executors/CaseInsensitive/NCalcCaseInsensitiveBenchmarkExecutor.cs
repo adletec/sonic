@@ -2,8 +2,11 @@ using Adletec.Sonic.Benchmark2.Expressions;
 using Adletec.Sonic.Benchmark2.Values;
 using NCalc;
 
-namespace Adletec.Sonic.Benchmark2.Executors.Defaults;
+namespace Adletec.Sonic.Benchmark2.Executors.CaseInsensitive;
 
+/// <summary>
+/// Executes a benchmark using the NCalc library with case-insensitive evaluation.
+/// </summary>
 public class NCalcCaseInsensitiveBenchmarkExecutor : IBenchmarkExecutor
 {
     public void RunBenchmark(string expression, List<string> variableNames, long iterations, IValueProvider valueProvider)
