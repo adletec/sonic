@@ -1,18 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <OutputType>Exe</OutputType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AssemblyName>Adletec.Sonic.Benchmark</AssemblyName>
-    <RootNamespace>Adletec.Sonic.Benchmark</RootNamespace>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Adletec.Sonic\Adletec.Sonic.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.3" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Adletec.Sonic\Adletec.Sonic.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="BenchmarkDotNet" Version="0.13.8" />
+      <PackageReference Include="Jace" Version="1.0.0" />
+      <PackageReference Include="NCalcSync" Version="3.8.0" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Adletec.Sonic.Benchmark</RootNamespace>
+    </PropertyGroup>
+
 </Project>

@@ -6,15 +6,17 @@ using Adletec.Sonic.Util;
 
 namespace Adletec.Sonic.Execution
 {
-    public class Interpreter : IExecutor
+    public class Interpreter : AbstractExecutor, IExecutor
     {
         private readonly bool caseSensitive;
+        private readonly bool guardedMode;
 
-        public Interpreter(): this(false) { }
+        public Interpreter(): this(false, false) { }
 
-        public Interpreter(bool caseSensitive)
+        public Interpreter(bool caseSensitive, bool guardedMode)
         {
             this.caseSensitive = caseSensitive;
+            this.guardedMode = guardedMode;
         }
         public Func<IDictionary<string, double>, double> BuildFormula(Operation operation, 
             IFunctionRegistry functionRegistry,
@@ -36,7 +38,15 @@ namespace Adletec.Sonic.Execution
 
         public double Execute(Operation operation,
             IFunctionRegistry functionRegistry,
-            IConstantRegistry constantRegistry, 
+            IConstantRegistry constantRegistry,
+            IDictionary<string, double> variables)
+        {
+            if (guardedMode) VerifyVariableNames(variables, constantRegistry, functionRegistry);
+            return ExecuteInternal(operation, functionRegistry, variables);
+        }
+
+        private double ExecuteInternal(Operation operation,
+            IFunctionRegistry functionRegistry,
             IDictionary<string, double> variables)
         {
             if (operation == null)
@@ -63,58 +73,55 @@ namespace Adletec.Sonic.Execution
                 if (variableFound)
                     return value;
                 
-                if (constantRegistry.IsConstantName(variable.Name))
-                    return constantRegistry.GetConstantInfo(variable.Name).Value;
-
                 throw new VariableNotDefinedException($"The variable \"{variable.Name}\" used is not defined.");
             }
             if (operation.GetType() == typeof(Multiplication))
             {
                 var multiplication = (Multiplication)operation;
-                return Execute(multiplication.Argument1, functionRegistry, constantRegistry,  variables) * Execute(multiplication.Argument2, functionRegistry, constantRegistry,  variables);
+                return ExecuteInternal(multiplication.Argument1, functionRegistry,  variables) * ExecuteInternal(multiplication.Argument2, functionRegistry,  variables);
             }
 
             if (operation.GetType() == typeof(Addition))
             {
                 var addition = (Addition)operation;
-                return Execute(addition.Argument1, functionRegistry, constantRegistry,  variables) + Execute(addition.Argument2, functionRegistry, constantRegistry,  variables);
+                return ExecuteInternal(addition.Argument1, functionRegistry,  variables) + ExecuteInternal(addition.Argument2, functionRegistry,  variables);
             }
 
             if (operation.GetType() == typeof(Subtraction))
             {
                 var addition = (Subtraction)operation;
-                return Execute(addition.Argument1, functionRegistry, constantRegistry,  variables) - Execute(addition.Argument2, functionRegistry, constantRegistry,  variables);
+                return ExecuteInternal(addition.Argument1, functionRegistry,  variables) - ExecuteInternal(addition.Argument2, functionRegistry,  variables);
             }
 
             if (operation.GetType() == typeof(Division))
             {
                 var division = (Division)operation;
-                return Execute(division.Dividend, functionRegistry, constantRegistry,  variables) / Execute(division.Divisor, functionRegistry, constantRegistry,  variables);
+                return ExecuteInternal(division.Dividend, functionRegistry,  variables) / ExecuteInternal(division.Divisor, functionRegistry,  variables);
             }
 
             if (operation.GetType() == typeof(Modulo))
             {
                 var division = (Modulo)operation;
-                return Execute(division.Dividend, functionRegistry, constantRegistry,  variables) % Execute(division.Divisor, functionRegistry, constantRegistry,  variables);
+                return ExecuteInternal(division.Dividend, functionRegistry,  variables) % ExecuteInternal(division.Divisor, functionRegistry,  variables);
             }
 
             if (operation.GetType() == typeof(Exponentiation))
             {
                 var exponentiation = (Exponentiation)operation;
-                return Math.Pow(Execute(exponentiation.Base, functionRegistry, constantRegistry,  variables), Execute(exponentiation.Exponent, functionRegistry, constantRegistry,  variables));
+                return Math.Pow(ExecuteInternal(exponentiation.Base, functionRegistry,  variables), ExecuteInternal(exponentiation.Exponent, functionRegistry,  variables));
             }
 
             if (operation.GetType() == typeof(UnaryMinus))
             {
                 var unaryMinus = (UnaryMinus)operation;
-                return -Execute(unaryMinus.Argument, functionRegistry, constantRegistry,  variables);
+                return -ExecuteInternal(unaryMinus.Argument, functionRegistry,  variables);
             }
 
             if (operation.GetType() == typeof(And))
             {
                 var and = (And)operation;
-                var operation1 = Execute(and.Argument1, functionRegistry, constantRegistry,  variables) != 0;
-                var operation2 = Execute(and.Argument2, functionRegistry, constantRegistry,  variables) != 0;
+                var operation1 = ExecuteInternal(and.Argument1, functionRegistry,  variables) != 0;
+                var operation2 = ExecuteInternal(and.Argument2, functionRegistry,  variables) != 0;
 
                 return operation1 && operation2 ? 1.0 : 0.0;
             }
@@ -122,8 +129,8 @@ namespace Adletec.Sonic.Execution
             if (operation.GetType() == typeof(Or))
             {
                 var or = (Or)operation;
-                var operation1 = Execute(or.Argument1, functionRegistry, constantRegistry,  variables) != 0;
-                var operation2 = Execute(or.Argument2, functionRegistry, constantRegistry,  variables) != 0;
+                var operation1 = ExecuteInternal(or.Argument1, functionRegistry,  variables) != 0;
+                var operation2 = ExecuteInternal(or.Argument2, functionRegistry,  variables) != 0;
 
                 return operation1 || operation2 ? 1.0 : 0.0;
             }
@@ -131,37 +138,37 @@ namespace Adletec.Sonic.Execution
             if(operation.GetType() == typeof(LessThan))
             {
                 var lessThan = (LessThan)operation;
-                return Execute(lessThan.Argument1, functionRegistry, constantRegistry,  variables) < Execute(lessThan.Argument2, functionRegistry, constantRegistry,  variables) ? 1.0 : 0.0;
+                return ExecuteInternal(lessThan.Argument1, functionRegistry,  variables) < ExecuteInternal(lessThan.Argument2, functionRegistry,  variables) ? 1.0 : 0.0;
             }
 
             if (operation.GetType() == typeof(LessOrEqualThan))
             {
                 var lessOrEqualThan = (LessOrEqualThan)operation;
-                return Execute(lessOrEqualThan.Argument1, functionRegistry, constantRegistry,  variables) <= Execute(lessOrEqualThan.Argument2, functionRegistry, constantRegistry,  variables) ? 1.0 : 0.0;
+                return ExecuteInternal(lessOrEqualThan.Argument1, functionRegistry,  variables) <= ExecuteInternal(lessOrEqualThan.Argument2, functionRegistry,  variables) ? 1.0 : 0.0;
             }
 
             if (operation.GetType() == typeof(GreaterThan))
             {
                 var greaterThan = (GreaterThan)operation;
-                return Execute(greaterThan.Argument1, functionRegistry, constantRegistry,  variables) > Execute(greaterThan.Argument2, functionRegistry, constantRegistry,  variables) ? 1.0 : 0.0;
+                return ExecuteInternal(greaterThan.Argument1, functionRegistry,  variables) > ExecuteInternal(greaterThan.Argument2, functionRegistry,  variables) ? 1.0 : 0.0;
             }
 
             if (operation.GetType() == typeof(GreaterOrEqualThan))
             {
                 var greaterOrEqualThan = (GreaterOrEqualThan)operation;
-                return Execute(greaterOrEqualThan.Argument1, functionRegistry, constantRegistry,  variables) >= Execute(greaterOrEqualThan.Argument2, functionRegistry, constantRegistry,  variables) ? 1.0 : 0.0;
+                return ExecuteInternal(greaterOrEqualThan.Argument1, functionRegistry,  variables) >= ExecuteInternal(greaterOrEqualThan.Argument2, functionRegistry,  variables) ? 1.0 : 0.0;
             }
 
             if (operation.GetType() == typeof(Equal))
             {
                 var equal = (Equal)operation;
-                return Execute(equal.Argument1, functionRegistry, constantRegistry,  variables) == Execute(equal.Argument2, functionRegistry, constantRegistry,  variables) ? 1.0 : 0.0;
+                return ExecuteInternal(equal.Argument1, functionRegistry,  variables) == ExecuteInternal(equal.Argument2, functionRegistry,  variables) ? 1.0 : 0.0;
             }
 
             if (operation.GetType() == typeof(NotEqual))
             {
                 var notEqual = (NotEqual)operation;
-                return Execute(notEqual.Argument1, functionRegistry, constantRegistry,  variables) != Execute(notEqual.Argument2, functionRegistry, constantRegistry,  variables) ? 1.0 : 0.0;
+                return ExecuteInternal(notEqual.Argument1, functionRegistry,  variables) != ExecuteInternal(notEqual.Argument2, functionRegistry,  variables) ? 1.0 : 0.0;
             }
 
             if (operation.GetType() == typeof(Function))
@@ -172,7 +179,7 @@ namespace Adletec.Sonic.Execution
 
                 var arguments = new double[functionInfo.IsDynamicFunc ? function.Arguments.Count : functionInfo.NumberOfParameters];
                 for (var i = 0; i < arguments.Length; i++)
-                    arguments[i] = Execute(function.Arguments[i], functionRegistry, constantRegistry,  variables);
+                    arguments[i] = ExecuteInternal(function.Arguments[i], functionRegistry,  variables);
 
                 return Invoke(functionInfo.Function, arguments);
             }

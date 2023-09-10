@@ -7,12 +7,14 @@ namespace Adletec.Sonic.Execution
     public class ConstantRegistry : IConstantRegistry
     {
         private readonly Dictionary<string, ConstantInfo> constants;
+        private readonly bool guardedMode;
 
-        public ConstantRegistry(bool caseSensitive)
+        public ConstantRegistry(bool caseSensitive, bool guardedMode)
         {
             constants = caseSensitive
                 ? new Dictionary<string, ConstantInfo>()
                 : new Dictionary<string, ConstantInfo>(StringComparer.OrdinalIgnoreCase);
+            this.guardedMode = guardedMode;
         }
 
         public IEnumerator<ConstantInfo> GetEnumerator()
@@ -43,20 +45,15 @@ namespace Adletec.Sonic.Execution
 
         public void RegisterConstant(string constantName, double value)
         {
-            RegisterConstant(constantName, value, true);
-        }
-
-        public void RegisterConstant(string constantName, double value, bool isOverWritable)
-        {
             if(string.IsNullOrEmpty(constantName))
                 throw new ArgumentNullException(nameof(constantName));
 
-            if (constants.ContainsKey(constantName) && !constants[constantName].IsOverWritable)
+            if (guardedMode && constants.ContainsKey(constantName))
             {
-                throw new Exception($"The constant \"{constantName}\" cannot be overwritten.");
+                throw new ArgumentException($"The constant \"{constantName}\" cannot be overwritten.");
             }
 
-            var constantInfo = new ConstantInfo(constantName, value, isOverWritable);
+            var constantInfo = new ConstantInfo(constantName, value);
 
             constants[constantName] = constantInfo;
         }

@@ -7,6 +7,5 @@ namespace Adletec.Sonic.Execution
         ConstantInfo GetConstantInfo(string constantName);
         bool IsConstantName(string constantName);
         void RegisterConstant(string constantName, double value);
-        void RegisterConstant(string constantName, double value, bool isOverWritable);
     }
 }
