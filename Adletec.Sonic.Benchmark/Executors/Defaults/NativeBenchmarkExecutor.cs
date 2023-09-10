@@ -66,6 +66,6 @@ namespace Adletec.Sonic.Benchmark.Executors.Defaults
 
         public ExpressionDialect Dialect => ExpressionDialect.Generic;
 
-        public override string ToString() => "Native";
+        public override string ToString() => "Native C# Code";
     }
 }
