@@ -1,6 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using BenchmarkDotNet.Running;
 
-using Adletec.Sonic.Benchmark2.Benchmarks;
-using BenchmarkDotNet.Running;
-
-BenchmarkRunner.Run<CompareDefaultsBenchmark>();
+// This shows a list of all the benchmarks in the project and lets the user select which ones to run.
+BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);

@@ -1,4 +1,5 @@
 using Adletec.Sonic.Benchmark2.Executors;
+using Adletec.Sonic.Benchmark2.Executors.CaseSensitive;
 using Adletec.Sonic.Benchmark2.Executors.Defaults;
 using Adletec.Sonic.Benchmark2.Expressions;
 using Adletec.Sonic.Benchmark2.Expressions.Defaults;
@@ -7,7 +8,7 @@ using BenchmarkDotNet.Attributes;
 
 namespace Adletec.Sonic.Benchmark2.Benchmarks;
 
-public class CompareDefaultsBenchmark
+public class CompareCaseInsensitiveBenchmark
 {
     [ParamsSource(nameof(ExpressionValues))]
     public BenchmarkExpression Expression { get; set; }
@@ -22,9 +23,9 @@ public class CompareDefaultsBenchmark
     /// </summary>
     public IEnumerable<IBenchmarkExecutor> BenchmarkExecutors => new List<IBenchmarkExecutor>
     {
-        new JaceDefaultsBenchmarkExecutor(),
-        new SonicDefaultsBenchmarkExecutor(),
-        new NCalcDefaultsBenchmarkExecutor()
+        new JaceCaseInsensitiveBenchmarkExecutor(),
+        new SonicCaseInsensitiveBenchmarkExecutor(),
+        new NCalcCaseInsensitiveBenchmarkExecutor()
     };
 
 

@@ -7,7 +7,7 @@ using BenchmarkDotNet.Attributes;
 
 namespace Adletec.Sonic.Benchmark2.Benchmarks;
 
-public class CompareDefaultsBenchmark
+public class CompareInterpretedBenchmark
 {
     [ParamsSource(nameof(ExpressionValues))]
     public BenchmarkExpression Expression { get; set; }
@@ -22,9 +22,9 @@ public class CompareDefaultsBenchmark
     /// </summary>
     public IEnumerable<IBenchmarkExecutor> BenchmarkExecutors => new List<IBenchmarkExecutor>
     {
-        new JaceDefaultsBenchmarkExecutor(),
-        new SonicDefaultsBenchmarkExecutor(),
-        new NCalcDefaultsBenchmarkExecutor()
+        new JaceInterpretedBenchmarkExecutor(),
+        new SonicInterpretedBenchmarkExecutor(),
+        new NCalcInterpretedBenchmarkExecutor()
     };
 
 
