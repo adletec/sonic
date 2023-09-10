@@ -10,6 +10,7 @@ namespace Adletec.Sonic.Benchmark.Benchmarks;
 /// <summary>
 /// Compares the performance of the evaluation of expressions using each engines default settings.
 /// </summary>
+[MedianColumn]
 public class CompareDefaultsBenchmark
 {
     [ParamsSource(nameof(ExpressionValues))]
@@ -18,17 +19,17 @@ public class CompareDefaultsBenchmark
     [ParamsSource(nameof(BenchmarkExecutors))]
     public IBenchmarkExecutor Executor { get; set; } = null!;
 
-    public long Iterations { get; set; } = 2000000L;
+    public long Iterations { get; set; } = 200000L;
 
     /// <summary>
     /// All benchmark executors to run the benchmark with.
     /// </summary>
     public IEnumerable<IBenchmarkExecutor> BenchmarkExecutors => new List<IBenchmarkExecutor>
     {
-        new JaceDefaultsBenchmarkExecutor(),
+        new NativeBenchmarkExecutor(),
         new SonicDefaultsBenchmarkExecutor(),
-        new NCalcDefaultsBenchmarkExecutor(),
-        new NativeBenchmarkExecutor()
+        new JaceDefaultsBenchmarkExecutor(),
+        new NCalcDefaultsBenchmarkExecutor()
     };
 
 
