@@ -9,7 +9,7 @@ namespace Adletec.Sonic.Benchmark.Executors.Defaults
     /// </summary>
     public class NativeBenchmarkExecutor : IBenchmarkExecutor
     {
-        private readonly Dictionary<string, Func<IValueProvider, double>?> expressionMethods =
+        private readonly Dictionary<string, Func<IValueProvider, double>> expressionMethods =
             new()
             {
                 { DefaultExpressionProvider.ExpressionA, Calculate_Expression_A },
@@ -20,7 +20,7 @@ namespace Adletec.Sonic.Benchmark.Executors.Defaults
         public void RunBenchmark(string expression, List<string> variableNames, long iterations,
             IValueProvider valueProvider)
         {
-            if (expressionMethods.TryGetValue(expression, out Func<IValueProvider, double>? func))
+            if (expressionMethods.TryGetValue(expression, out var func))
             {
                 RepeatEvaluation(func, iterations, valueProvider);
             }
@@ -30,7 +30,7 @@ namespace Adletec.Sonic.Benchmark.Executors.Defaults
             }
         }
 
-        private double RepeatEvaluation(Func<IValueProvider, double>? func, long iterations, IValueProvider valueProvider)
+        private double RepeatEvaluation(Func<IValueProvider, double> func, long iterations, IValueProvider valueProvider)
         {
             double result = 0;
             for (var i = 0; i < iterations; i++)
