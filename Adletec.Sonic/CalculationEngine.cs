@@ -129,13 +129,8 @@ namespace Adletec.Sonic
             if (variables == null)
                 throw new ArgumentNullException(nameof(variables));
 
-            // We're writing to that dictionary so let's create a copy.
-            variables = !caseSensitive ? EngineUtil.ConvertVariableNamesToLowerCase(variables) : new Dictionary<string, double>(variables);
+            variables = !caseSensitive ? EngineUtil.ConvertVariableNamesToLowerCase(variables) : variables;
             
-            // Add the reserved variables to the dictionary
-            foreach (ConstantInfo constant in ConstantRegistry)
-                variables.Add(constant.ConstantName, constant.Value);
-
             if (IsInFormulaCache(expression, out var function))
             {
                 return function(variables);

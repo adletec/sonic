@@ -555,13 +555,17 @@ public class CalculationEngineTests
     }
 
     [TestMethod]
-    public void TestReservedVariableName()
+    public void TestReservedVariableNameCaseInsensitiveGuarded()
     {
         AssertExtensions.ThrowsException<ArgumentException>(() =>
         {
             var variables = new Dictionary<string, double> { { "pi", 2.0 } };
 
-            var engine = CalculationEngine.CreateWithDefaults();
+            var engine = CalculationEngine.Create()
+                .DisableCaseSensitivity()
+                .EnableGuardedMode()
+                .Build();
+            
             double result = engine.Evaluate("2 * pI", variables);
         });
     }
@@ -1255,11 +1259,23 @@ public class CalculationEngineTests
     }
 
     [TestMethod]
-    public void TestConflictingConstantAndVariableCompiled()
+    public void TestConflictingConstantAndVariableUnguardedCompiled()
+    {
+            var engine = SonicBuilders.Compiled()
+                .AddConstant("a", 1)
+                .Build();
+
+            var result = engine.Evaluate("a+a", new Dictionary<string, double> { { "a", 2 } });
+            Assert.AreEqual(2.0, result);
+    }
+    
+    [TestMethod]
+    public void TestConflictingConstantAndVariableGuardedCompiled()
     {
         AssertExtensions.ThrowsException<ArgumentException>(() =>
         {
             var engine = SonicBuilders.Compiled()
+                .EnableGuardedMode()
                 .AddConstant("a", 1)
                 .Build();
 
@@ -1331,11 +1347,23 @@ public class CalculationEngineTests
     }
 
     [TestMethod]
-    public void TestConflictingConstantAndVariableInterpreted()
+    public void TestConflictingConstantAndVariableUnguardedInterpreted()
+    {
+            var engine = SonicBuilders.Interpreted()
+                .AddConstant("a", 1)
+                .Build();
+
+            var result = engine.Evaluate("a+a", new Dictionary<string, double> { { "a", 2 } });
+            Assert.AreEqual(2.0, result);
+    }
+
+    [TestMethod]
+    public void TestConflictingConstantAndVariableGuardedInterpreted()
     {
         AssertExtensions.ThrowsException<ArgumentException>(() =>
         {
             var engine = SonicBuilders.Interpreted()
+                .EnableGuardedMode()
                 .AddConstant("a", 1)
                 .Build();
 
