@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Adletec.Sonic.Execution
 {
-    public abstract class AbstractExecutor 
+    public abstract class VariableVerifier
     {
         /// <summary>
         /// Verify a collection of variables to ensure that all the variable names are valid.
@@ -12,7 +12,7 @@ namespace Adletec.Sonic.Execution
         /// If an invalid variable is detected an exception is thrown.
         /// </summary>
         /// <param name="variables">The collection of variables that must be verified.</param>
-        protected void VerifyVariableNames(IDictionary<string, double> variables, IConstantRegistry constantRegistry, IFunctionRegistry functionRegistry)
+        public static void VerifyVariableNames(IDictionary<string, double> variables, IConstantRegistry constantRegistry, IFunctionRegistry functionRegistry)
         {
             var variableNames = variables.Keys.ToArray();
             foreach (var variableName in variableNames)
@@ -26,7 +26,6 @@ namespace Adletec.Sonic.Execution
                         $"The name \"{variableName}\" is a function name. Parameters cannot have this name.", nameof(variables));
             }
         }
-
         
     }
 }

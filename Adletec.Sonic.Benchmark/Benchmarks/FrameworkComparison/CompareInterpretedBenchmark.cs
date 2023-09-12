@@ -1,17 +1,17 @@
 using Adletec.Sonic.Benchmark.Executors;
-using Adletec.Sonic.Benchmark.Executors.CaseInsensitive;
+using Adletec.Sonic.Benchmark.Executors.Interpreted;
 using Adletec.Sonic.Benchmark.Expressions;
 using Adletec.Sonic.Benchmark.Expressions.Defaults;
 using Adletec.Sonic.Benchmark.Values;
 using BenchmarkDotNet.Attributes;
 
-namespace Adletec.Sonic.Benchmark.Benchmarks;
+namespace Adletec.Sonic.Benchmark.Benchmarks.FrameworkComparison;
 
 /// <summary>
-/// Compares the performance of the case insensitive evaluation of expressions.
+/// Compares the performance of the interpreted evaluation of expressions.
 /// </summary>
 [MedianColumn]
-public class CompareCaseInsensitiveBenchmark
+public class CompareInterpretedBenchmark
 {
     [ParamsSource(nameof(ExpressionValues))]
     public BenchmarkExpression Expression { get; set; } = null!;
@@ -26,9 +26,9 @@ public class CompareCaseInsensitiveBenchmark
     /// </summary>
     public IEnumerable<IBenchmarkExecutor> BenchmarkExecutors => new List<IBenchmarkExecutor>
     {
-        new SonicCaseInsensitiveBenchmarkExecutor(),
-        new JaceCaseInsensitiveBenchmarkExecutor(),
-        new NCalcCaseInsensitiveBenchmarkExecutor()
+        new SonicInterpretedBenchmarkExecutor(),
+        new JaceInterpretedBenchmarkExecutor(),
+        new NCalcInterpretedBenchmarkExecutor()
     };
 
 

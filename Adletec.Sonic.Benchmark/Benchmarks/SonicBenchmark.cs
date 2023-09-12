@@ -1,5 +1,8 @@
 using Adletec.Sonic.Benchmark.Executors;
-using Adletec.Sonic.Benchmark.Executors.CaseSensitive;
+using Adletec.Sonic.Benchmark.Executors.CaseInsensitive;
+using Adletec.Sonic.Benchmark.Executors.Defaults;
+using Adletec.Sonic.Benchmark.Executors.GuardedMode;
+using Adletec.Sonic.Benchmark.Executors.Interpreted;
 using Adletec.Sonic.Benchmark.Expressions;
 using Adletec.Sonic.Benchmark.Expressions.Defaults;
 using Adletec.Sonic.Benchmark.Values;
@@ -8,10 +11,10 @@ using BenchmarkDotNet.Attributes;
 namespace Adletec.Sonic.Benchmark.Benchmarks;
 
 /// <summary>
-/// Compares the performance of the case sensitive evaluation of expressions.
+/// Compares the performance of the evaluation of expressions using each engines default settings.
 /// </summary>
 [MedianColumn]
-public class CompareCaseSensitiveBenchmark
+public class SonicBenchmark
 {
     [ParamsSource(nameof(ExpressionValues))]
     public BenchmarkExpression Expression { get; set; } = null!;
@@ -26,9 +29,10 @@ public class CompareCaseSensitiveBenchmark
     /// </summary>
     public IEnumerable<IBenchmarkExecutor> BenchmarkExecutors => new List<IBenchmarkExecutor>
     {
-        new SonicCaseSensitiveBenchmarkExecutor(),
-        new JaceCaseSensitiveCompiledBenchmarkExecutor(),
-        new NCalcCaseSensitiveBenchmarkExecutor()
+        new SonicDefaultsBenchmarkExecutor(),
+        new SonicGuardedModeBenchmarkExecutor(),
+        new SonicCaseInsensitiveBenchmarkExecutor(),
+        new SonicInterpretedBenchmarkExecutor(),
     };
 
 

@@ -44,11 +44,13 @@ namespace Adletec.Sonic
         {
             return new CalculationEngineBuilder();
         }
-        
+
         internal CalculationEngine(CalculationEngineBuilder options)
         {
             this.caseSensitive = options.CaseSensitive;
-            this.executionFormulaCache = new MemoryCache<string, Func<IDictionary<string, double>, double>>(options.CacheMaximumSize, options.CacheReductionSize);
+            this.executionFormulaCache =
+                new MemoryCache<string, Func<IDictionary<string, double>, double>>(options.CacheMaximumSize,
+                    options.CacheReductionSize);
             this.FunctionRegistry = new FunctionRegistry(caseSensitive, options.GuardedMode);
             this.ConstantRegistry = new ConstantRegistry(caseSensitive, options.GuardedMode);
             this.cultureInfo = options.CultureInfo;
@@ -80,7 +82,7 @@ namespace Adletec.Sonic
             // Register the default functions of sonic into the function registry
             if (options.DefaultFunctions)
                 RegisterDefaultFunctions();
-            
+
             // Register the user defined constants
             if (options.Constants != null)
             {
@@ -90,10 +92,11 @@ namespace Adletec.Sonic
                     {
                         throw new ArgumentException("The constant name cannot be the same as a function name.");
                     }
+
                     ConstantRegistry.RegisterConstant(constant.Name, constant.Value);
                 }
             }
-            
+
             // Register the user defined functions
             if (options.Functions != null)
             {
@@ -103,6 +106,7 @@ namespace Adletec.Sonic
                     {
                         throw new ArgumentException("The function name cannot be the same as a constant name.");
                     }
+
                     FunctionRegistry.RegisterFunction(function.Name, function.Function, function.IsIdempotent);
                 }
             }
@@ -123,19 +127,7 @@ namespace Adletec.Sonic
 
         public double Evaluate(string expression, IDictionary<string, double> variables)
         {
-            if (string.IsNullOrEmpty(expression))
-                throw new ArgumentNullException(nameof(expression));
-
-            if (variables == null)
-                throw new ArgumentNullException(nameof(variables));
-
-            if (IsInFormulaCache(expression, out var function))
-            {
-                return function(variables);
-            }
-
-            Operation operation = BuildAbstractSyntaxTree(expression, ConstantRegistry);
-            function = BuildFormula(expression, operation);
+            var function = CreateDelegate(expression);
             return function(variables);
         }
 
@@ -150,7 +142,7 @@ namespace Adletec.Sonic
             }
 
             Operation operation = BuildAbstractSyntaxTree(expression, ConstantRegistry);
-            return BuildFormula(expression, operation);
+            return BuildEvaluator(expression, operation);
         }
 
         private void RegisterDefaultFunctions()
@@ -170,17 +162,21 @@ namespace Adletec.Sonic
             FunctionRegistry.RegisterFunction("logn", (Func<double, double, double>)Math.Log, true);
             FunctionRegistry.RegisterFunction("sqrt", (Func<double, double>)Math.Sqrt, true);
             FunctionRegistry.RegisterFunction("abs", (Func<double, double>)Math.Abs, true);
-            FunctionRegistry.RegisterFunction("if", (Func<double, double, double, double>)((a, b, c) => a != 0.0 ? b : c), true);
-            FunctionRegistry.RegisterFunction("ifless", (Func<double, double, double, double, double>)((a, b, c, d) => a < b ? c : d), true);
-            FunctionRegistry.RegisterFunction("ifmore", (Func<double, double, double, double, double>)((a, b, c, d) => a > b ? c : d), true);
-            FunctionRegistry.RegisterFunction("ifequal", (Func<double, double, double, double, double>)((a, b, c, d) => a == b ? c : d), true);
+            FunctionRegistry.RegisterFunction("if",
+                (Func<double, double, double, double>)((a, b, c) => a != 0.0 ? b : c), true);
+            FunctionRegistry.RegisterFunction("ifless",
+                (Func<double, double, double, double, double>)((a, b, c, d) => a < b ? c : d), true);
+            FunctionRegistry.RegisterFunction("ifmore",
+                (Func<double, double, double, double, double>)((a, b, c, d) => a > b ? c : d), true);
+            FunctionRegistry.RegisterFunction("ifequal",
+                (Func<double, double, double, double, double>)((a, b, c, d) => a == b ? c : d), true);
             FunctionRegistry.RegisterFunction("ceiling", (Func<double, double>)Math.Ceiling, true);
             FunctionRegistry.RegisterFunction("floor", (Func<double, double>)Math.Floor, true);
             FunctionRegistry.RegisterFunction("truncate", (Func<double, double>)Math.Truncate, true);
             FunctionRegistry.RegisterFunction("round", (Func<double, double>)Math.Round, true);
 
             // Dynamic based arguments Functions
-            FunctionRegistry.RegisterFunction("max",  (DynamicFunc<double, double>)(a => a.Max()), true);
+            FunctionRegistry.RegisterFunction("max", (DynamicFunc<double, double>)(a => a.Max()), true);
             FunctionRegistry.RegisterFunction("min", (DynamicFunc<double, double>)(a => a.Min()), true);
             FunctionRegistry.RegisterFunction("avg", (DynamicFunc<double, double>)(a => a.Average()), true);
             FunctionRegistry.RegisterFunction("median", (DynamicFunc<double, double>)(a => a.Median()), true);
@@ -208,16 +204,34 @@ namespace Adletec.Sonic
         {
             var tokenReader = new TokenReader(cultureInfo);
             List<Token> tokens = tokenReader.Read(formulaText);
-            
+
             var astBuilder = new AstBuilder(FunctionRegistry, compiledConstants);
             Operation operation = astBuilder.Build(tokens);
 
-            return optimizerEnabled ? optimizer.Optimize(operation, this.FunctionRegistry, this.ConstantRegistry) : operation;
+            return optimizerEnabled
+                ? optimizer.Optimize(operation, this.FunctionRegistry, this.ConstantRegistry)
+                : operation;
         }
 
-        private Func<IDictionary<string, double>, double> BuildFormula(string formulaText, Operation operation)
+        private Func<IDictionary<string, double>, double> BuildEvaluator(string formulaText, Operation operation)
         {
-            return executionFormulaCache.GetOrAdd(formulaText, v => executor.BuildFormula(operation, this.FunctionRegistry, this.ConstantRegistry));
+            return executionFormulaCache.GetOrAdd(formulaText, v =>
+            {
+                // If the operation is a constant, we can just return the constant value
+                if (operation is Constant<double> constant)
+                {
+                    if (guardedMode)
+                    {
+                        return values =>
+                        {
+                            VariableVerifier.VerifyVariableNames(values, ConstantRegistry, FunctionRegistry);
+                            return constant.Value;
+                        };
+                    }
+                    return _ => constant.Value;
+                }
+                return executor.BuildFormula(operation, this.FunctionRegistry, this.ConstantRegistry);
+            });
         }
 
         private bool IsInFormulaCache(string formulaText, out Func<IDictionary<string, double>, double> function)
@@ -225,6 +239,5 @@ namespace Adletec.Sonic
             function = null;
             return cacheEnabled && executionFormulaCache.TryGetValue(formulaText, out function);
         }
-
     }
 }

@@ -1,18 +1,17 @@
 using Adletec.Sonic.Benchmark.Executors;
 using Adletec.Sonic.Benchmark.Executors.Defaults;
-using Adletec.Sonic.Benchmark.Executors.GuardedMode;
 using Adletec.Sonic.Benchmark.Expressions;
 using Adletec.Sonic.Benchmark.Expressions.Defaults;
 using Adletec.Sonic.Benchmark.Values;
 using BenchmarkDotNet.Attributes;
 
-namespace Adletec.Sonic.Benchmark.Benchmarks;
+namespace Adletec.Sonic.Benchmark.Benchmarks.FrameworkComparison;
 
 /// <summary>
 /// Compares the performance of the evaluation of expressions using each engines default settings.
 /// </summary>
 [MedianColumn]
-public class GuardedModeBenchmark
+public class CompareDefaultsBenchmark
 {
     [ParamsSource(nameof(ExpressionValues))]
     public BenchmarkExpression Expression { get; set; } = null!;
@@ -27,8 +26,10 @@ public class GuardedModeBenchmark
     /// </summary>
     public IEnumerable<IBenchmarkExecutor> BenchmarkExecutors => new List<IBenchmarkExecutor>
     {
+        new NativeBenchmarkExecutor(),
         new SonicDefaultsBenchmarkExecutor(),
-        new SonicGuardedModeBenchmarkExecutor()
+        new JaceDefaultsBenchmarkExecutor(),
+        new NCalcDefaultsBenchmarkExecutor()
     };
 
 

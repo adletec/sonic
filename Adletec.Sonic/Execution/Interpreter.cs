@@ -6,7 +6,7 @@ using Adletec.Sonic.Util;
 
 namespace Adletec.Sonic.Execution
 {
-    public class Interpreter : AbstractExecutor, IExecutor
+    public class Interpreter : IExecutor
     {
         private readonly bool caseSensitive;
         private readonly bool guardedMode;
@@ -41,7 +41,7 @@ namespace Adletec.Sonic.Execution
             IConstantRegistry constantRegistry,
             IDictionary<string, double> variables)
         {
-            if (guardedMode) VerifyVariableNames(variables, constantRegistry, functionRegistry);
+            if (guardedMode) VariableVerifier.VerifyVariableNames(variables, constantRegistry, functionRegistry);
             return ExecuteInternal(operation, functionRegistry, variables);
         }
 
