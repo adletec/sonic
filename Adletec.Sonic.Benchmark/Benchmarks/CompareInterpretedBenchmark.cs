@@ -19,7 +19,7 @@ public class CompareInterpretedBenchmark
     [ParamsSource(nameof(BenchmarkExecutors))]
     public IBenchmarkExecutor Executor { get; set; } = null!;
 
-    public long Iterations { get; set; } = 20000000L;
+    public long Iterations { get; set; } = 2000000L;
 
     /// <summary>
     /// All benchmark executors to run the benchmark with.

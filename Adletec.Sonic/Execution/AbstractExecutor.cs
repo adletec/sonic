@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Adletec.Sonic.Execution
 {
@@ -13,7 +14,8 @@ namespace Adletec.Sonic.Execution
         /// <param name="variables">The collection of variables that must be verified.</param>
         protected void VerifyVariableNames(IDictionary<string, double> variables, IConstantRegistry constantRegistry, IFunctionRegistry functionRegistry)
         {
-            foreach (var variableName in variables.Keys)
+            var variableNames = variables.Keys.ToArray();
+            foreach (var variableName in variableNames)
             {
                 if(constantRegistry.IsConstantName(variableName))
                     throw new ArgumentException(
