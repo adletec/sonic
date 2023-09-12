@@ -129,8 +129,6 @@ namespace Adletec.Sonic
             if (variables == null)
                 throw new ArgumentNullException(nameof(variables));
 
-            variables = !caseSensitive ? EngineUtil.ConvertVariableNamesToLowerCase(variables) : variables;
-            
             if (IsInFormulaCache(expression, out var function))
             {
                 return function(variables);
