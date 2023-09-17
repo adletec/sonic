@@ -1,9 +1,10 @@
-﻿using BenchmarkDotNet.Running;
+﻿using Adletec.Sonic.Benchmark.Benchmarks.Sonic;
+using BenchmarkDotNet.Running;
 
 // Add your own benchmark or framework
 // -----------------------------------
-// To add a new framework to the benchmark, create a new implementation of IBenchmarkExecutor and add it to the
-// BenchmarkExecutors list in the desired benchmark class, e.g. Benchmarks/CompareDefaultBenchmark.cs.
+// To add a new framework to the benchmark, create a new implementation of IBenchmarkExecutor and add it as [Benchmark]
+// to the desired class, e.g. Benchmarks/CrossFramework/FrameworkDefaultsMultiPassBenchmark.cs.
 //
 // You can also create a new benchmark class by copying an existing one and modifying it to your needs. As long as
 // it contains the [Benchmark] attribute, it will be picked up by the BenchmarkSwitcher.
