@@ -15,6 +15,12 @@ public class JaceCaseInsensitiveBenchmarkExecutor : IBenchmarkExecutor
     {
         executor.RunBenchmark(expression, variableNames, iterations, valueProvider);
     }
+
+    public void RunBenchmark(IEnumerable<BenchmarkExpression> expressions, IValueProvider valueProvider, long iterations)
+    {
+        executor.RunBenchmark(expressions, valueProvider, iterations);
+    }
+
     public ExpressionDialect Dialect => ExpressionDialect.Sonic;
     
     public override string ToString() => "Jace (C/I)";

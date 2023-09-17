@@ -1,14 +1,13 @@
 using Adletec.Sonic.Benchmark.Expressions;
 using Adletec.Sonic.Benchmark.Values;
-using Adletec.Sonic.Execution;
 
-namespace Adletec.Sonic.Benchmark.Executors.Interpreted;
+namespace Adletec.Sonic.Benchmark.Executors.NoCache;
 
-public class SonicInterpretedBenchmarkExecutor : IBenchmarkExecutor
+public class SonicNoCacheBenchmarkExecutor : IBenchmarkExecutor
 {
     public void RunBenchmark(string expression, List<string> variableNames, long iterations, IValueProvider valueProvider)
     {
-        var engine = CalculationEngine.Create().UseExecutionMode(ExecutionMode.Interpreted).Build();
+        var engine = CalculationEngine.Create().DisableCache().Build();
         var calculate = engine.CreateDelegate(expression);
         var variables = new Dictionary<string, double>();
         for (var i = 0; i < iterations; i++)
@@ -23,7 +22,7 @@ public class SonicInterpretedBenchmarkExecutor : IBenchmarkExecutor
 
     public void RunBenchmark(IEnumerable<BenchmarkExpression> expressions, IValueProvider valueProvider, long iterations)
     {
-       var engine = CalculationEngine.Create().UseExecutionMode(ExecutionMode.Interpreted).Build();
+        var engine = CalculationEngine.Create().DisableCache().Build();
         foreach (var benchmarkExpression in expressions)
         {
             var calculate = engine.CreateDelegate(benchmarkExpression.GetExpression(ExpressionDialect.Sonic));
@@ -36,10 +35,10 @@ public class SonicInterpretedBenchmarkExecutor : IBenchmarkExecutor
                 }
                 calculate(variables);
             }
-        } 
+        }
     }
 
     public ExpressionDialect Dialect => ExpressionDialect.Sonic;
 
-    public override string ToString() => "Sonic (C/S Interpreted)";
+    public override string ToString() => "Sonic (No Cache)";
 }

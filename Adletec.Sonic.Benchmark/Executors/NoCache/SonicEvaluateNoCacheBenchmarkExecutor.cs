@@ -1,15 +1,19 @@
 using Adletec.Sonic.Benchmark.Expressions;
 using Adletec.Sonic.Benchmark.Values;
-using Adletec.Sonic.Execution;
 
-namespace Adletec.Sonic.Benchmark.Executors.Interpreted;
+namespace Adletec.Sonic.Benchmark.Executors.NoCache;
 
-public class SonicInterpretedBenchmarkExecutor : IBenchmarkExecutor
+/// <summary>
+/// Executes a benchmark using the sonic library with default settings using the engine evaluator.
+/// The evaluator is a simple API but slower than using a delegate directly.
+///
+/// Sonic compile expressions and evaluates them case-sensitively by default.
+/// </summary>
+public class SonicEvaluateNoCacheBenchmarkExecutor : IBenchmarkExecutor
 {
     public void RunBenchmark(string expression, List<string> variableNames, long iterations, IValueProvider valueProvider)
     {
-        var engine = CalculationEngine.Create().UseExecutionMode(ExecutionMode.Interpreted).Build();
-        var calculate = engine.CreateDelegate(expression);
+        var engine = CalculationEngine.Create().DisableCache().Build();
         var variables = new Dictionary<string, double>();
         for (var i = 0; i < iterations; i++)
         {
@@ -17,16 +21,15 @@ public class SonicInterpretedBenchmarkExecutor : IBenchmarkExecutor
             {
                 variables[variableName] = valueProvider.GetNextValue();
             }
-            calculate(variables);
+            engine.Evaluate(expression, variables);
         }
     }
 
     public void RunBenchmark(IEnumerable<BenchmarkExpression> expressions, IValueProvider valueProvider, long iterations)
     {
-       var engine = CalculationEngine.Create().UseExecutionMode(ExecutionMode.Interpreted).Build();
+        var engine = CalculationEngine.Create().DisableCache().Build();
         foreach (var benchmarkExpression in expressions)
         {
-            var calculate = engine.CreateDelegate(benchmarkExpression.GetExpression(ExpressionDialect.Sonic));
             var variables = new Dictionary<string, double>();
             for (var i = 0; i < iterations; i++)
             {
@@ -34,12 +37,12 @@ public class SonicInterpretedBenchmarkExecutor : IBenchmarkExecutor
                 {
                     variables[variableName] = valueProvider.GetNextValue();
                 }
-                calculate(variables);
+                engine.Evaluate(benchmarkExpression.GetExpression(ExpressionDialect.Sonic), variables);
             }
-        } 
+        }
     }
 
     public ExpressionDialect Dialect => ExpressionDialect.Sonic;
 
-    public override string ToString() => "Sonic (C/S Interpreted)";
+    public override string ToString() => "Sonic (Evaluate w/o Cache)";
 }

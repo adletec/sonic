@@ -15,6 +15,12 @@ public class NCalcInterpretedBenchmarkExecutor : IBenchmarkExecutor
     {
         executor.RunBenchmark(expression, variableNames, iterations, valueProvider);
     }
+
+    public void RunBenchmark(IEnumerable<BenchmarkExpression> expressions, IValueProvider valueProvider, long iterations)
+    {
+        executor.RunBenchmark(expressions, valueProvider, iterations);
+    }
+
     public ExpressionDialect Dialect => ExpressionDialect.NCalc;
     
     public override string ToString() => "NCalc (C/S Interpreted)";

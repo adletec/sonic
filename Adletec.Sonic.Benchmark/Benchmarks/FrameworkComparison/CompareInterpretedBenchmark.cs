@@ -1,7 +1,7 @@
 using Adletec.Sonic.Benchmark.Executors;
 using Adletec.Sonic.Benchmark.Executors.Interpreted;
 using Adletec.Sonic.Benchmark.Expressions;
-using Adletec.Sonic.Benchmark.Expressions.Defaults;
+using Adletec.Sonic.Benchmark.Expressions.Fixed;
 using Adletec.Sonic.Benchmark.Values;
 using BenchmarkDotNet.Attributes;
 
@@ -35,7 +35,7 @@ public class CompareInterpretedBenchmark
     /// <summary>
     /// All expressions to run the benchmark with.
     /// </summary>
-    public IEnumerable<BenchmarkExpression> ExpressionValues => new DefaultExpressionProvider().GetExpressions();
+    public IEnumerable<BenchmarkExpression> ExpressionValues => new DefaultFixedExpressionProvider().GetExpressions();
 
     [Benchmark]
     public void CompareDefaults() =>

@@ -23,7 +23,25 @@ public class JaceCaseSensitiveCompiledBenchmarkExecutor : IBenchmarkExecutor
             calculate(variables);
         }
     }
-    
+
+    public void RunBenchmark(IEnumerable<BenchmarkExpression> expressions, IValueProvider valueProvider, long iterations)
+    {
+        var engine = new Jace.CalculationEngine(new JaceOptions {CaseSensitive = true});
+        foreach (var benchmarkExpression in expressions)
+        {
+            var calculate = engine.Build(benchmarkExpression.GetExpression(ExpressionDialect.Jace));
+            var variables = new Dictionary<string, double>();
+            for (var i = 0; i < iterations; i++)
+            {
+                foreach (var variableName in benchmarkExpression.VariableNames)
+                {
+                    variables[variableName] = valueProvider.GetNextValue();
+                }
+                calculate(variables);
+            }
+        }
+    }
+
     public ExpressionDialect Dialect => ExpressionDialect.Jace;
     
     public override string ToString() => "Jace (C/S)";

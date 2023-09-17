@@ -1,5 +1,5 @@
 using Adletec.Sonic.Benchmark.Expressions;
-using Adletec.Sonic.Benchmark.Expressions.Defaults;
+using Adletec.Sonic.Benchmark.Expressions.Fixed;
 using Adletec.Sonic.Benchmark.Values;
 
 namespace Adletec.Sonic.Benchmark.Executors.Defaults
@@ -12,9 +12,9 @@ namespace Adletec.Sonic.Benchmark.Executors.Defaults
         private readonly Dictionary<string, Func<IValueProvider, double>> expressionMethods =
             new()
             {
-                { DefaultExpressionProvider.ExpressionA, Calculate_Expression_A },
-                { DefaultExpressionProvider.ExpressionB, Calculate_Expression_B },
-                { DefaultExpressionProvider.ExpressionC, Calculate_Expression_C },
+                { DefaultFixedExpressionProvider.ExpressionA, Calculate_Expression_A },
+                { DefaultFixedExpressionProvider.ExpressionB, Calculate_Expression_B },
+                { DefaultFixedExpressionProvider.ExpressionC, Calculate_Expression_C },
             };
 
         public void RunBenchmark(string expression, List<string> variableNames, long iterations,
@@ -27,6 +27,21 @@ namespace Adletec.Sonic.Benchmark.Executors.Defaults
             else
             {
                 throw new NotImplementedException("Expression not implemented.");
+            }
+        }
+
+        public void RunBenchmark(IEnumerable<BenchmarkExpression> expressions, IValueProvider valueProvider, long iterations)
+        {
+            foreach (var benchmarkExpression in expressions)
+            {
+                if (expressionMethods.TryGetValue(benchmarkExpression.GetExpression(ExpressionDialect.Generic), out var func))
+                {
+                    RepeatEvaluation(func, iterations, valueProvider);
+                }
+                else
+                {
+                    throw new NotImplementedException("Expression not implemented.");
+                }
             }
         }
 

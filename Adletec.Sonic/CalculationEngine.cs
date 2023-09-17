@@ -212,10 +212,13 @@ namespace Adletec.Sonic
                 ? optimizer.Optimize(operation, this.FunctionRegistry, this.ConstantRegistry)
                 : operation;
         }
-
+        
         private Func<IDictionary<string, double>, double> BuildEvaluator(string formulaText, Operation operation)
         {
-            return executionFormulaCache.GetOrAdd(formulaText, v =>
+            return cacheEnabled ? executionFormulaCache.GetOrAdd(formulaText, Evaluator) : Evaluator(formulaText);
+
+            // can be external function
+            Func<IDictionary<string, double>, double> Evaluator(string s)
             {
                 // If the operation is a constant, we can just return the constant value
                 if (operation is Constant<double> constant)
@@ -228,10 +231,12 @@ namespace Adletec.Sonic
                             return constant.Value;
                         };
                     }
+
                     return _ => constant.Value;
                 }
+
                 return executor.BuildFormula(operation, this.FunctionRegistry, this.ConstantRegistry);
-            });
+            }
         }
 
         private bool IsInFormulaCache(string formulaText, out Func<IDictionary<string, double>, double> function)

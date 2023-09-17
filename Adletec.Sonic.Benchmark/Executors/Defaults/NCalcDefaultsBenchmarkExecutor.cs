@@ -23,6 +23,23 @@ public class NCalcDefaultsBenchmarkExecutor : IBenchmarkExecutor
             nCalcExpression.Evaluate();
         }
     }
+
+    public void RunBenchmark(IEnumerable<BenchmarkExpression> expressions, IValueProvider valueProvider, long iterations)
+    {
+        foreach (var benchmarkExpression in expressions)
+        {
+            var nCalcExpression = new Expression(benchmarkExpression.GetExpression(ExpressionDialect.NCalc));
+            for (var i = 0; i < iterations; i++)
+            {
+                foreach (var variableName in benchmarkExpression.VariableNames)
+                {
+                    nCalcExpression.Parameters[variableName] = valueProvider.GetNextValue();
+                }
+                nCalcExpression.Evaluate();
+            }
+        }
+    }
+
     public ExpressionDialect Dialect => ExpressionDialect.NCalc;
     
     public override string ToString() => "NCalc (Defaults)";

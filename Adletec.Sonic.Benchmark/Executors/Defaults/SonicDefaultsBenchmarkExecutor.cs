@@ -25,6 +25,24 @@ public class SonicDefaultsBenchmarkExecutor : IBenchmarkExecutor
         }
     }
 
+    public void RunBenchmark(IEnumerable<BenchmarkExpression> expressions, IValueProvider valueProvider, long iterations)
+    {
+        var engine = CalculationEngine.CreateWithDefaults();
+        foreach (var benchmarkExpression in expressions)
+        {
+            var calculate = engine.CreateDelegate(benchmarkExpression.GetExpression(ExpressionDialect.Sonic));
+            var variables = new Dictionary<string, double>();
+            for (var i = 0; i < iterations; i++)
+            {
+                foreach (var variableName in benchmarkExpression.VariableNames)
+                {
+                    variables[variableName] = valueProvider.GetNextValue();
+                }
+                calculate(variables);
+            }
+        }
+    }
+
     public ExpressionDialect Dialect => ExpressionDialect.Sonic;
 
     public override string ToString() => "Sonic (Defaults)";
