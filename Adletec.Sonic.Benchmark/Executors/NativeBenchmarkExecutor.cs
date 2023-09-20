@@ -1,32 +1,47 @@
 using Adletec.Sonic.Benchmark.Expressions;
-using Adletec.Sonic.Benchmark.Expressions.Defaults;
+using Adletec.Sonic.Benchmark.Expressions.Fixed;
 using Adletec.Sonic.Benchmark.Values;
 
-namespace Adletec.Sonic.Benchmark.Executors.Defaults
+namespace Adletec.Sonic.Benchmark.Executors
 {
     /// <summary>
-    /// A reference executor which calculates the expressions using hard-coded C#.
+    /// A reference executor which calculates the default expressions using hard-coded C#.
     /// </summary>
     public class NativeBenchmarkExecutor : IBenchmarkExecutor
     {
         private readonly Dictionary<string, Func<IValueProvider, double>> expressionMethods =
             new()
             {
-                { DefaultExpressionProvider.ExpressionA, Calculate_Expression_A },
-                { DefaultExpressionProvider.ExpressionB, Calculate_Expression_B },
-                { DefaultExpressionProvider.ExpressionC, Calculate_Expression_C },
+                { DefaultFixedExpressionProvider.ExpressionA, Calculate_Expression_A },
+                { DefaultFixedExpressionProvider.ExpressionB, Calculate_Expression_B },
+                { DefaultFixedExpressionProvider.ExpressionC, Calculate_Expression_C },
             };
 
-        public void RunBenchmark(string expression, List<string> variableNames, long iterations,
-            IValueProvider valueProvider)
+        public void RunBenchmark(BenchmarkExpression expression,
+            IValueProvider valueProvider, long iterations)
         {
-            if (expressionMethods.TryGetValue(expression, out var func))
+            if (expressionMethods.TryGetValue(expression.GetExpression(Dialect), out var func))
             {
                 RepeatEvaluation(func, iterations, valueProvider);
             }
             else
             {
                 throw new NotImplementedException("Expression not implemented.");
+            }
+        }
+
+        public void RunBenchmark(IEnumerable<BenchmarkExpression> expressions, IValueProvider valueProvider, long iterations)
+        {
+            foreach (var benchmarkExpression in expressions)
+            {
+                if (expressionMethods.TryGetValue(benchmarkExpression.GetExpression(ExpressionDialect.Generic), out var func))
+                {
+                    RepeatEvaluation(func, iterations, valueProvider);
+                }
+                else
+                {
+                    throw new NotImplementedException("Expression not implemented.");
+                }
             }
         }
 
