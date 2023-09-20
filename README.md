@@ -56,7 +56,7 @@ Additionally, for specific use-cases (e.g. Unity with IL2CPP) dynamic code gener
 _sonic_ is available via [nuget](https://www.nuget.org/packages/Adletec.Sonic):
 
 ```bash
-dotnet add package Adletec.Sonic --version 1.1.0
+dotnet add package Adletec.Sonic --version 1.2.0
 ```
 
 ## Usage
