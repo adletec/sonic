@@ -50,9 +50,9 @@ public partial class MainWindow : Window
 
             ShowTokens(tokens);
 
-            IFunctionRegistry functionRegistry = new FunctionRegistry(false);
+            IFunctionRegistry functionRegistry = new FunctionRegistry(false,true );
                 
-            var astBuilder = new AstBuilder(functionRegistry, false);
+            var astBuilder = new AstBuilder(functionRegistry, new ConstantRegistry(false, true));
             var operation = astBuilder.Build(tokens);
 
             ShowAbstractSyntaxTree(operation);

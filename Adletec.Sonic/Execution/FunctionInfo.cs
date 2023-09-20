@@ -4,12 +4,11 @@ namespace Adletec.Sonic.Execution
 {
     public class FunctionInfo
     {
-        public FunctionInfo(string functionName, int numberOfParameters, bool isIdempotent, bool isOverWritable, bool isDynamicFunc, Delegate function)
+        public FunctionInfo(string functionName, int numberOfParameters, bool isIdempotent, bool isDynamicFunc, Delegate function)
         {
             this.FunctionName = functionName;
             this.NumberOfParameters = numberOfParameters;
             this.IsIdempotent = isIdempotent;
-            this.IsOverWritable = isOverWritable;
             this.IsDynamicFunc = isDynamicFunc;
             this.Function = function;
         }
@@ -18,7 +17,6 @@ namespace Adletec.Sonic.Execution
         
         public int NumberOfParameters { get; }
 
-        public bool IsOverWritable { get; }
 
         public bool IsIdempotent { get; }
 
