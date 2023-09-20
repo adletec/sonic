@@ -53,10 +53,10 @@ As a rule of thumb, you should use **dynamic compilation mode** if you are evalu
 Additionally, for specific use-cases (e.g. Unity with IL2CPP) dynamic code generation can be limited. In those cases, you can use the **interpreted mode** as a fallback.
 
 ## Installation
-_sonic_ is available via [nuget](https://www.nuget.org/packages/adletec-sonic):
+_sonic_ is available via [nuget](https://www.nuget.org/packages/Adletec.Sonic):
 
 ```bash
-dotnet add package adletec-sonic --version 1.1.0
+dotnet add package Adletec.Sonic --version 1.1.0
 ```
 
 ## Usage
