@@ -10,7 +10,7 @@ namespace Adletec.Sonic
     /// 
     /// It can be configured to run in a number of modes based on the constructor parameters chosen.
     /// </summary>
-    public interface ICalculationEngine
+    public interface IEvaluator
     {
         /// <summary>
         /// All functions registered with the engine.

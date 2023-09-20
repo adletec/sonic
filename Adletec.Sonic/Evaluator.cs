@@ -12,7 +12,7 @@ namespace Adletec.Sonic
     public delegate TResult DynamicFunc<T, TResult>(params T[] values);
 
     /// <inheritdoc/>
-    public class CalculationEngine : ICalculationEngine
+    public class Evaluator : IEvaluator
     {
         private readonly IExecutor executor;
         private readonly Optimizer optimizer;
@@ -26,26 +26,26 @@ namespace Adletec.Sonic
         private readonly Random random;
 
         /// <summary>
-        /// Create a new instance of the calculation engine with default settings.
-        /// For more control over the calculation engine use the Create() method.
+        /// Create a new instance of the evaluator with default settings.
+        /// For more control over the evaluator use the Create() method.
         /// </summary>
         /// <returns></returns>
-        public static CalculationEngine CreateWithDefaults()
+        public static Evaluator CreateWithDefaults()
         {
-            return new CalculationEngine(new CalculationEngineBuilder());
+            return new Evaluator(new EvaluatorBuilder());
         }
 
         /// <summary>
-        /// Create a new builder instance for the calculation engine. The builder can be
-        /// used to configure the calculation engine, and add custom functions and constants.
+        /// Create a new builder instance for the evaluator. The builder can be
+        /// used to configure the evaluator, and add custom functions and constants.
         /// </summary>
         /// <returns></returns>
-        public static CalculationEngineBuilder Create()
+        public static EvaluatorBuilder Create()
         {
-            return new CalculationEngineBuilder();
+            return new EvaluatorBuilder();
         }
 
-        internal CalculationEngine(CalculationEngineBuilder options)
+        internal Evaluator(EvaluatorBuilder options)
         {
             this.caseSensitive = options.CaseSensitive;
             this.executionFormulaCache =

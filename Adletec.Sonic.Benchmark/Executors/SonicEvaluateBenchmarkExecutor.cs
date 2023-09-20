@@ -9,16 +9,16 @@ namespace Adletec.Sonic.Benchmark.Executors;
 /// </summary>
 public class SonicEvaluateBenchmarkExecutor : IBenchmarkExecutor
 {
-    private readonly CalculationEngine engine;
+    private readonly Evaluator engine;
 
     public SonicEvaluateBenchmarkExecutor()
     {
-        engine = CalculationEngine.CreateWithDefaults();
+        engine = Evaluator.CreateWithDefaults();
     }
 
     public SonicEvaluateBenchmarkExecutor(bool caseSensitive, bool interpreted, bool cached, bool optimize = true, bool guardedMode = false)
     {
-        var engineBuilder = CalculationEngine.Create();
+        var engineBuilder = Evaluator.Create();
         engineBuilder = caseSensitive ? engineBuilder.EnableCaseSensitivity() : engineBuilder.DisableCaseSensitivity();
         engineBuilder = interpreted ? engineBuilder.UseExecutionMode(ExecutionMode.Interpreted) : engineBuilder.UseExecutionMode(ExecutionMode.Compiled);
         engineBuilder = cached ? engineBuilder.EnableCache() : engineBuilder.DisableCache();
