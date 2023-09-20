@@ -19,6 +19,7 @@ public class SonicDelegateBenchmarkExecutor : IBenchmarkExecutor
     public SonicDelegateBenchmarkExecutor(bool caseSensitive, bool interpreted, bool cached, bool optimize = true, bool guardedMode = false)
     {
         var engineBuilder = Evaluator.Create();
+
         engineBuilder = caseSensitive ? engineBuilder.EnableCaseSensitivity() : engineBuilder.DisableCaseSensitivity();
         engineBuilder = interpreted ? engineBuilder.UseExecutionMode(ExecutionMode.Interpreted) : engineBuilder.UseExecutionMode(ExecutionMode.Compiled);
         engineBuilder = cached ? engineBuilder.EnableCache() : engineBuilder.DisableCache();
