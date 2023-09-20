@@ -11,7 +11,7 @@ The guiding principles for _sonic_ are (in that order):
 
 _sonic_ originally started as a fork of [_Jace.NET_ by Pieter De Rycke](https://github.com/pieterderycke/Jace), which is no longer actively maintained. It is not a drop-in replacement for _Jace.NET_, but you should be able to switch to _sonic_ with minimal effort.
 
-_sonic_ is **considerably faster** (up to 3.5 times) than _Jace.NET_. It contains numerous **bugfixes** and a lot of **maintenance work** over the latest _Jace.NET_ release (1.0.0). Many of them were originally suggested and developed by the community for _Jace.NET_, but never merged due to the dormant state of the project. See the changelog for details and a complete list.
+_sonic_ is **considerably faster** than _Jace.NET_ (see benchmarks below). It contains numerous **bugfixes** and a lot of **maintenance work** over the latest _Jace.NET_ release (1.0.0). Many of them were originally suggested and developed by the community for _Jace.NET_, but never merged due to the dormant state of the project. See the changelog for details and a complete list.
 
 ## Build Status
 | branch | status |
