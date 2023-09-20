@@ -9,12 +9,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Adletec.Sonic.Tests;
 
 [TestClass]
-public class CalculationEngineTests
+public class EvaluatorTests
 {
     [TestMethod]
     public void TestCalculationFormula1FloatingPointCompiled()
     {
-        var engine = CalculationEngine.Create()
+        var engine = Sonic.Evaluator.Create()
             .UseCulture(CultureInfo.InvariantCulture)
             .UseExecutionMode(ExecutionMode.Compiled)
             .Build();
@@ -27,7 +27,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculationFormula1IntegersCompiled()
     {
-        var engine = CalculationEngine.Create()
+        var engine = Sonic.Evaluator.Create()
             .UseCulture(CultureInfo.InvariantCulture)
             .UseExecutionMode(ExecutionMode.Compiled)
             .Build();
@@ -40,7 +40,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestCalculateFormula1()
     {
-        var engine = CalculationEngine.CreateWithDefaults();
+        var engine = Sonic.Evaluator.CreateWithDefaults();
         double result = engine.Evaluate("2+3");
 
         Assert.AreEqual(5.0, result);
@@ -89,7 +89,7 @@ public class CalculationEngineTests
         variables.Add("var1", 2.5);
         variables.Add("var2", 3.4);
 
-        var engine = CalculationEngine.CreateWithDefaults();
+        var engine = Sonic.Evaluator.CreateWithDefaults();
         double result = engine.Evaluate("var1*var2", variables);
 
         Assert.AreEqual(8.5, result);
@@ -119,7 +119,7 @@ public class CalculationEngineTests
             { "var2", 1 }
         };
 
-        var engine = CalculationEngine.Create()
+        var engine = Sonic.Evaluator.Create()
             .EnableCaseSensitivity()
             .Build();
 
@@ -353,7 +353,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestBuild()
     {
-        var engine = CalculationEngine.CreateWithDefaults();
+        var engine = Sonic.Evaluator.CreateWithDefaults();
         Func<Dictionary<string, double>, double> function = engine.CreateDelegate("var1+2*(3*age)");
 
         Dictionary<string, double> variables = new Dictionary<string, double>();
@@ -413,7 +413,7 @@ public class CalculationEngineTests
     {
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
-            var engine = CalculationEngine.Create()
+            var engine = Sonic.Evaluator.Create()
                 .Build();
             engine.Evaluate("sin+2", new Dictionary<string, double> { { "sin", 2.0 } });
         });
@@ -425,7 +425,7 @@ public class CalculationEngineTests
     {
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
-            var engine = CalculationEngine.Create()
+            var engine = Sonic.Evaluator.Create()
                 .EnableGuardedMode()
                 .Build();
             engine.Evaluate("sin+2", new Dictionary<string, double> { { "sin", 2.0 } });
@@ -437,7 +437,7 @@ public class CalculationEngineTests
     {
         AssertExtensions.ThrowsException<ArgumentException>(() =>
         {
-            var engine = CalculationEngine.Create()
+            var engine = Sonic.Evaluator.Create()
                 .EnableGuardedMode()
                 .AddConstant("a", 1.0)
                 .Build();
@@ -450,7 +450,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestVariableNameCollidesWithConstantNameUnguardedInCompiledDelegate()
     {
-            var engine = CalculationEngine.Create()
+            var engine = Sonic.Evaluator.Create()
                 .AddConstant("a", 1.0)
                 .Build();
 
@@ -464,7 +464,7 @@ public class CalculationEngineTests
     {
         AssertExtensions.ThrowsException<ArgumentException>(() =>
         {
-            var engine = CalculationEngine.Create()
+            var engine = Sonic.Evaluator.Create()
                 .UseExecutionMode(ExecutionMode.Interpreted)
                 .EnableGuardedMode()
                 .AddConstant("a", 1.0)
@@ -478,7 +478,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestVariableNameCollidesWithConstantNameUnguardedInInterpretedDelegate()
     {
-            var engine = CalculationEngine.Create()
+            var engine = Sonic.Evaluator.Create()
                 .UseExecutionMode(ExecutionMode.Interpreted)
                 .AddConstant("a", 1.0)
                 .Build();
@@ -494,7 +494,7 @@ public class CalculationEngineTests
     {
         AssertExtensions.ThrowsException<ArgumentException>(() =>
         {
-            var engine = CalculationEngine.Create()
+            var engine = Sonic.Evaluator.Create()
                 .EnableGuardedMode()
                 .AddFunction("a", x => x)
                 .Build();
@@ -507,7 +507,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestVariableNameCollidesWithFunctionNameUnguardedInCompiledDelegate()
     {
-            var engine = CalculationEngine.Create()
+            var engine = Sonic.Evaluator.Create()
                 .AddFunction("a", x => x)
                 .Build();
 
@@ -521,7 +521,7 @@ public class CalculationEngineTests
     {
         AssertExtensions.ThrowsException<ArgumentException>(() =>
         {
-            var engine = CalculationEngine.Create()
+            var engine = Sonic.Evaluator.Create()
                 .UseExecutionMode(ExecutionMode.Interpreted)
                 .EnableGuardedMode()
                 .AddFunction("a", x => x)
@@ -535,7 +535,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestVariableNameCollidesWithFunctionNameUnguardedInInterpretedDelegate()
     {
-            var engine = CalculationEngine.Create()
+            var engine = Sonic.Evaluator.Create()
                 .UseExecutionMode(ExecutionMode.Interpreted)
                 .AddFunction("a", x => x)
                 .Build();
@@ -561,7 +561,7 @@ public class CalculationEngineTests
         {
             var variables = new Dictionary<string, double> { { "pi", 2.0 } };
 
-            var engine = CalculationEngine.Create()
+            var engine = Sonic.Evaluator.Create()
                 .DisableCaseSensitivity()
                 .EnableGuardedMode()
                 .Build();
@@ -640,7 +640,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestComplicatedPrecedence1()
     {
-        var engine = CalculationEngine.CreateWithDefaults();
+        var engine = Sonic.Evaluator.CreateWithDefaults();
 
         double result = engine.Evaluate("1+2-3*4/5+6-7*8/9+0");
         Assert.AreEqual(0.378, Math.Round(result, 3));
@@ -649,7 +649,7 @@ public class CalculationEngineTests
     [TestMethod]
     public void TestComplicatedPrecedence2()
     {
-        var engine = CalculationEngine.CreateWithDefaults();
+        var engine = Sonic.Evaluator.CreateWithDefaults();
 
         double result = engine.Evaluate("1+2-3*4/sqrt(25)+6-7*8/9+0");
         Assert.AreEqual(0.378, Math.Round(result, 3));
@@ -1496,7 +1496,7 @@ public class CalculationEngineTests
 
 internal static class SonicEngines
 {
-    public static CalculationEngine CompiledNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+    public static Sonic.Evaluator CompiledNoOptimizerCaseInsensitive() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Compiled)
         .EnableCache()
@@ -1504,7 +1504,7 @@ internal static class SonicEngines
         .DisableCaseSensitivity()
         .Build();
 
-    public static CalculationEngine CompiledCaseInsensitive() => CalculationEngine.Create()
+    public static Sonic.Evaluator CompiledCaseInsensitive() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Compiled)
         .EnableCache()
@@ -1512,7 +1512,7 @@ internal static class SonicEngines
         .DisableCaseSensitivity()
         .Build();
 
-    public static CalculationEngine CompiledNoCacheNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+    public static Sonic.Evaluator CompiledNoCacheNoOptimizerCaseInsensitive() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Compiled)
         .DisableCache()
@@ -1520,7 +1520,7 @@ internal static class SonicEngines
         .DisableCaseSensitivity()
         .Build();
 
-    public static CalculationEngine CompiledNoCacheNoOptimizer() => CalculationEngine.Create()
+    public static Sonic.Evaluator CompiledNoCacheNoOptimizer() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Compiled)
         .DisableCache()
@@ -1528,7 +1528,7 @@ internal static class SonicEngines
         .EnableCaseSensitivity()
         .Build();
 
-    public static CalculationEngine Compiled() => CalculationEngine.Create()
+    public static Sonic.Evaluator Compiled() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Compiled)
         .EnableCache()
@@ -1536,7 +1536,7 @@ internal static class SonicEngines
         .EnableCaseSensitivity()
         .Build();
 
-    public static CalculationEngine InterpretedNoCacheNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+    public static Sonic.Evaluator InterpretedNoCacheNoOptimizerCaseInsensitive() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Interpreted)
         .DisableCache()
@@ -1544,7 +1544,7 @@ internal static class SonicEngines
         .DisableCaseSensitivity()
         .Build();
 
-    public static CalculationEngine InterpretedNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+    public static Sonic.Evaluator InterpretedNoOptimizerCaseInsensitive() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Interpreted)
         .EnableCache()
@@ -1552,7 +1552,7 @@ internal static class SonicEngines
         .DisableCaseSensitivity()
         .Build();
 
-    public static CalculationEngine InterpretedNoCacheNoOptimizer() => CalculationEngine.Create()
+    public static Sonic.Evaluator InterpretedNoCacheNoOptimizer() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Interpreted)
         .DisableCache()
@@ -1560,7 +1560,7 @@ internal static class SonicEngines
         .EnableCaseSensitivity()
         .Build();
 
-    public static CalculationEngine InterpretedCaseInsensitive() => CalculationEngine.Create()
+    public static Sonic.Evaluator InterpretedCaseInsensitive() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Interpreted)
         .EnableCache()
@@ -1568,7 +1568,7 @@ internal static class SonicEngines
         .DisableCaseSensitivity()
         .Build();
 
-    public static CalculationEngine Interpreted() => CalculationEngine.Create()
+    public static Sonic.Evaluator Interpreted() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Interpreted)
         .EnableCache()
@@ -1579,56 +1579,56 @@ internal static class SonicEngines
 
 internal static class SonicBuilders
 {
-    public static CalculationEngineBuilder CompiledNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+    public static EvaluatorBuilder CompiledNoOptimizerCaseInsensitive() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Compiled)
         .EnableCache()
         .DisableOptimizer()
         .DisableCaseSensitivity();
 
-    public static CalculationEngineBuilder CompiledNoCacheNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+    public static EvaluatorBuilder CompiledNoCacheNoOptimizerCaseInsensitive() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Compiled)
         .DisableCache()
         .DisableOptimizer()
         .DisableCaseSensitivity();
 
-    public static CalculationEngineBuilder CompiledNoCacheNoOptimizer() => CalculationEngine.Create()
+    public static EvaluatorBuilder CompiledNoCacheNoOptimizer() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Compiled)
         .DisableCache()
         .DisableOptimizer()
         .EnableCaseSensitivity();
 
-    public static CalculationEngineBuilder Compiled() => CalculationEngine.Create()
+    public static EvaluatorBuilder Compiled() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Compiled)
         .EnableCache()
         .EnableOptimizer()
         .EnableCaseSensitivity();
 
-    public static CalculationEngineBuilder InterpretedNoCacheNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+    public static EvaluatorBuilder InterpretedNoCacheNoOptimizerCaseInsensitive() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Interpreted)
         .DisableCache()
         .DisableOptimizer()
         .DisableCaseSensitivity();
 
-    public static CalculationEngineBuilder InterpretedNoOptimizerCaseInsensitive() => CalculationEngine.Create()
+    public static EvaluatorBuilder InterpretedNoOptimizerCaseInsensitive() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Interpreted)
         .EnableCache()
         .DisableOptimizer()
         .DisableCaseSensitivity();
 
-    public static CalculationEngineBuilder InterpretedNoCacheNoOptimizer() => CalculationEngine.Create()
+    public static EvaluatorBuilder InterpretedNoCacheNoOptimizer() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Interpreted)
         .DisableCache()
         .DisableOptimizer()
         .EnableCaseSensitivity();
 
-    public static CalculationEngineBuilder Interpreted() => CalculationEngine.Create()
+    public static EvaluatorBuilder Interpreted() => Sonic.Evaluator.Create()
         .UseCulture(CultureInfo.InvariantCulture)
         .UseExecutionMode(ExecutionMode.Interpreted)
         .EnableCache()

@@ -7,9 +7,9 @@ using Adletec.Sonic.Execution;
 namespace Adletec.Sonic
 {
     /// <summary>
-    /// A builder for the <see cref="CalculationEngine"/> class.
+    /// A builder for the <see cref="Evaluator"/> class.
     /// </summary>
-    public class CalculationEngineBuilder
+    public class EvaluatorBuilder
     {
         private const int DefaultCacheMaximumSize = 500;
         private const int DefaultCacheReductionSize = 50;
@@ -40,7 +40,7 @@ namespace Adletec.Sonic
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public CalculationEngineBuilder()
+        public EvaluatorBuilder()
         {
             Functions = new List<FunctionDraft>();
             Constants = new List<ConstantDraft>();
@@ -49,22 +49,22 @@ namespace Adletec.Sonic
         /// <summary>
         /// Copy constructor.
         /// </summary>
-        /// <param name="calculationEngineBuilder">The builder to copy from.</param>
-        public CalculationEngineBuilder(CalculationEngineBuilder calculationEngineBuilder)
+        /// <param name="evaluatorBuilder">The builder to copy from.</param>
+        public EvaluatorBuilder(EvaluatorBuilder evaluatorBuilder)
         {
-            CultureInfo = calculationEngineBuilder.CultureInfo;
-            ExecutionMode = calculationEngineBuilder.ExecutionMode;
-            CacheEnabled = calculationEngineBuilder.CacheEnabled;
-            OptimizerEnabled = calculationEngineBuilder.OptimizerEnabled;
-            CaseSensitive = calculationEngineBuilder.CaseSensitive;
-            DefaultConstants = calculationEngineBuilder.DefaultConstants;
-            DefaultFunctions = calculationEngineBuilder.DefaultFunctions;
-            CacheMaximumSize = calculationEngineBuilder.CacheMaximumSize;
-            CacheReductionSize = calculationEngineBuilder.CacheReductionSize;
+            CultureInfo = evaluatorBuilder.CultureInfo;
+            ExecutionMode = evaluatorBuilder.ExecutionMode;
+            CacheEnabled = evaluatorBuilder.CacheEnabled;
+            OptimizerEnabled = evaluatorBuilder.OptimizerEnabled;
+            CaseSensitive = evaluatorBuilder.CaseSensitive;
+            DefaultConstants = evaluatorBuilder.DefaultConstants;
+            DefaultFunctions = evaluatorBuilder.DefaultFunctions;
+            CacheMaximumSize = evaluatorBuilder.CacheMaximumSize;
+            CacheReductionSize = evaluatorBuilder.CacheReductionSize;
 
             // Functions and Constants are immutable, so we can just copy the references.
-            Functions = new List<FunctionDraft>(calculationEngineBuilder.Functions);
-            Constants = new List<ConstantDraft>(calculationEngineBuilder.Constants);
+            Functions = new List<FunctionDraft>(evaluatorBuilder.Functions);
+            Constants = new List<ConstantDraft>(evaluatorBuilder.Constants);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Adletec.Sonic
         /// </summary>
         /// <param name="cultureInfo"></param>
         /// <returns></returns>
-        public CalculationEngineBuilder UseCulture(CultureInfo cultureInfo)
+        public EvaluatorBuilder UseCulture(CultureInfo cultureInfo)
         {
             CultureInfo = cultureInfo;
             return this;
@@ -85,7 +85,7 @@ namespace Adletec.Sonic
         /// </summary>
         /// <param name="executionMode"></param>
         /// <returns></returns>
-        public CalculationEngineBuilder UseExecutionMode(ExecutionMode executionMode)
+        public EvaluatorBuilder UseExecutionMode(ExecutionMode executionMode)
         {
             ExecutionMode = executionMode;
             return this;
@@ -96,7 +96,7 @@ namespace Adletec.Sonic
         /// Default: cache enabled.
         /// </summary>
         /// <returns></returns>
-        public CalculationEngineBuilder EnableCache()
+        public EvaluatorBuilder EnableCache()
         {
             CacheEnabled = true;
             return this;
@@ -108,7 +108,7 @@ namespace Adletec.Sonic
         /// Default: cache enabled.
         /// </summary>
         /// <returns></returns>
-        public CalculationEngineBuilder DisableCache()
+        public EvaluatorBuilder DisableCache()
         {
             CacheEnabled = false;
             return this;
@@ -120,7 +120,7 @@ namespace Adletec.Sonic
         /// Default: optimization enabled.
         /// </summary>
         /// <returns></returns>
-        public CalculationEngineBuilder EnableOptimizer()
+        public EvaluatorBuilder EnableOptimizer()
         {
             OptimizerEnabled = true;
             return this;
@@ -132,7 +132,7 @@ namespace Adletec.Sonic
         /// Default: optimization enabled.
         /// </summary>
         /// <returns></returns>
-        public CalculationEngineBuilder DisableOptimizer()
+        public EvaluatorBuilder DisableOptimizer()
         {
             OptimizerEnabled = false;
             return this;
@@ -143,7 +143,7 @@ namespace Adletec.Sonic
         /// Default: case sensitivity enabled.
         /// </summary>
         /// <returns></returns>
-        public CalculationEngineBuilder EnableCaseSensitivity()
+        public EvaluatorBuilder EnableCaseSensitivity()
         {
             CaseSensitive = true;
             return this;
@@ -154,7 +154,7 @@ namespace Adletec.Sonic
         /// Default: case sensitivity enabled.
         /// </summary>
         /// <returns></returns>
-        public CalculationEngineBuilder DisableCaseSensitivity()
+        public EvaluatorBuilder DisableCaseSensitivity()
         {
             CaseSensitive = false;
             return this;
@@ -165,7 +165,7 @@ namespace Adletec.Sonic
         /// Default: default functions enabled.
         /// </summary>
         /// <returns></returns>
-        public CalculationEngineBuilder EnableDefaultFunctions()
+        public EvaluatorBuilder EnableDefaultFunctions()
         {
             DefaultFunctions = true;
             return this;
@@ -176,7 +176,7 @@ namespace Adletec.Sonic
         /// Default: default functions enabled.
         /// </summary>
         /// <returns></returns>
-        public CalculationEngineBuilder DisableDefaultFunctions()
+        public EvaluatorBuilder DisableDefaultFunctions()
         {
             DefaultFunctions = false;
             return this;
@@ -187,7 +187,7 @@ namespace Adletec.Sonic
         /// Default: default constants enabled.
         /// </summary>
         /// <returns></returns>
-        public CalculationEngineBuilder EnableDefaultConstants()
+        public EvaluatorBuilder EnableDefaultConstants()
         {
             DefaultConstants = true;
             return this;
@@ -198,7 +198,7 @@ namespace Adletec.Sonic
         /// Default: default constants enabled.
         /// </summary>
         /// <returns></returns>
-        public CalculationEngineBuilder DisableDefaultConstants()
+        public EvaluatorBuilder DisableDefaultConstants()
         {
             DefaultConstants = false;
             return this;
@@ -216,7 +216,7 @@ namespace Adletec.Sonic
         /// Default: guarded mode disabled.
         /// </summary>
         /// <returns></returns>
-        public CalculationEngineBuilder EnableGuardedMode()
+        public EvaluatorBuilder EnableGuardedMode()
         {
             GuardedMode = true;
             return this;
@@ -234,7 +234,7 @@ namespace Adletec.Sonic
         /// Default: guarded mode disabled.
         /// </summary>
         /// <returns></returns>
-        public CalculationEngineBuilder DisableGuardedMode()
+        public EvaluatorBuilder DisableGuardedMode()
         {
             GuardedMode = false;
             return this;
@@ -248,7 +248,7 @@ namespace Adletec.Sonic
         /// </summary>
         /// <param name="cacheMaximumSize">the number of expressions to cache</param>
         /// <returns></returns>
-        public CalculationEngineBuilder UseCacheMaximumSize(int cacheMaximumSize)
+        public EvaluatorBuilder UseCacheMaximumSize(int cacheMaximumSize)
         {
             CacheMaximumSize = cacheMaximumSize;
             return this;
@@ -261,20 +261,20 @@ namespace Adletec.Sonic
         /// </summary>
         /// <param name="cacheReductionSize"></param>
         /// <returns></returns>
-        public CalculationEngineBuilder UseCacheReductionSize(int cacheReductionSize)
+        public EvaluatorBuilder UseCacheReductionSize(int cacheReductionSize)
         {
             CacheReductionSize = cacheReductionSize;
             return this;
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName, Func<double> function,
+        public EvaluatorBuilder AddFunction(string functionName, Func<double> function,
             bool isIdempotent = true)
         {
             Functions.Add(new FunctionDraft(functionName, isIdempotent, function));
@@ -282,13 +282,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName, Func<double, double> function,
+        public EvaluatorBuilder AddFunction(string functionName, Func<double, double> function,
             bool isIdempotent = true)
         {
             Functions.Add(new FunctionDraft(functionName, isIdempotent, function));
@@ -296,13 +296,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName, Func<double, double, double> function,
+        public EvaluatorBuilder AddFunction(string functionName, Func<double, double, double> function,
             bool isIdempotent = true)
         {
             Functions.Add(new FunctionDraft(functionName, isIdempotent, function));
@@ -310,13 +310,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName, Func<double, double, double, double> function,
+        public EvaluatorBuilder AddFunction(string functionName, Func<double, double, double, double> function,
             bool isIdempotent = true)
         {
             Functions.Add(new FunctionDraft(functionName, isIdempotent, function));
@@ -324,13 +324,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName,
+        public EvaluatorBuilder AddFunction(string functionName,
             Func<double, double, double, double, double> function, bool isIdempotent = true)
         {
             Functions.Add(new FunctionDraft(functionName, isIdempotent, function));
@@ -338,13 +338,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName,
+        public EvaluatorBuilder AddFunction(string functionName,
             Func<double, double, double, double, double, double> function, bool isIdempotent = true)
         {
             Functions.Add(new FunctionDraft(functionName, isIdempotent, function));
@@ -352,13 +352,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName,
+        public EvaluatorBuilder AddFunction(string functionName,
             Func<double, double, double, double, double, double, double> function, bool isIdempotent = true)
         {
             Functions.Add(new FunctionDraft(functionName, isIdempotent, function));
@@ -366,13 +366,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName,
+        public EvaluatorBuilder AddFunction(string functionName,
             Func<double, double, double, double, double, double, double, double> function, bool isIdempotent = true)
         {
             Functions.Add(new FunctionDraft(functionName, isIdempotent, function));
@@ -380,13 +380,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName,
+        public EvaluatorBuilder AddFunction(string functionName,
             Func<double, double, double, double, double, double, double, double, double> function,
             bool isIdempotent = true)
         {
@@ -395,13 +395,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName,
+        public EvaluatorBuilder AddFunction(string functionName,
             Func<double, double, double, double, double, double, double, double, double, double> function,
             bool isIdempotent = true)
         {
@@ -410,13 +410,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName,
+        public EvaluatorBuilder AddFunction(string functionName,
             Func<double, double, double, double, double, double, double, double, double, double, double> function,
             bool isIdempotent = true)
         {
@@ -425,13 +425,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName,
+        public EvaluatorBuilder AddFunction(string functionName,
             Func<double, double, double, double, double, double, double, double, double, double, double, double>
                 function, bool isIdempotent = true)
         {
@@ -440,13 +440,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName,
+        public EvaluatorBuilder AddFunction(string functionName,
             Func<double, double, double, double, double, double, double, double, double, double, double, double, double>
                 function, bool isIdempotent = true)
         {
@@ -455,13 +455,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName,
+        public EvaluatorBuilder AddFunction(string functionName,
             Func<double, double, double, double, double, double, double, double, double, double, double, double, double,
                 double> function, bool isIdempotent = true)
         {
@@ -470,13 +470,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName,
+        public EvaluatorBuilder AddFunction(string functionName,
             Func<double, double, double, double, double, double, double, double, double, double, double, double, double,
                 double, double> function, bool isIdempotent = true)
         {
@@ -485,13 +485,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName,
+        public EvaluatorBuilder AddFunction(string functionName,
             Func<double, double, double, double, double, double, double, double, double, double, double, double, double,
                 double, double, double> function, bool isIdempotent = true)
         {
@@ -500,13 +500,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="function">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName,
+        public EvaluatorBuilder AddFunction(string functionName,
             Func<double, double, double, double, double, double, double, double, double, double, double, double, double,
                 double, double, double, double> function, bool isIdempotent = true)
         {
@@ -515,13 +515,13 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new function to the calculation engine. The function must be a .NET func (but can be defined as lambda).
+        /// Add a new function to the evaluator. The function must be a .NET func (but can be defined as lambda).
         /// </summary>
         /// <param name="functionName">The name of the function. This is how the function will be called in the expression (e.g. 'a' if the function should be called by 'a(x)').</param>
         /// <param name="functionDelegate">The .NET func which is to be executed.</param>
         /// <param name="isIdempotent">Whether the function is idempotent, i.e. always returns the same result if called with the same parameters.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddFunction(string functionName, DynamicFunc<double, double> functionDelegate,
+        public EvaluatorBuilder AddFunction(string functionName, DynamicFunc<double, double> functionDelegate,
             bool isIdempotent = true)
         {
             Functions.Add(new FunctionDraft(functionName, isIdempotent, functionDelegate));
@@ -529,27 +529,27 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Add a new constant to the calculation engine. If the optimization is enabled, the constant will be replaced its value during parsing in every expression processed by this engine.
+        /// Add a new constant to the evaluator. If the optimization is enabled, the constant will be replaced its value during parsing in every expression processed by this engine.
         /// </summary>
         /// <param name="constantName">The constant name.</param>
         /// <param name="value">The value of the constant.</param>
         /// <returns></returns>
-        public CalculationEngineBuilder AddConstant(string constantName, double value)
+        public EvaluatorBuilder AddConstant(string constantName, double value)
         {
             Constants.Add(new ConstantDraft(constantName, value));
             return this;
         }
 
         /// <summary>
-        /// Create an instance of the <see cref="CalculationEngine"/> class with the current configuration.
+        /// Create an instance of the <see cref="Evaluator"/> class with the current configuration.
         /// </summary>
         /// <returns></returns>
-        public CalculationEngine Build()
+        public Evaluator Build()
         {
-            return new CalculationEngine(this);
+            return new Evaluator(this);
         }
 
-        protected bool Equals(CalculationEngineBuilder other)
+        protected bool Equals(EvaluatorBuilder other)
         {
             return Equals(CultureInfo, other.CultureInfo) && ExecutionMode == other.ExecutionMode &&
                    CacheEnabled == other.CacheEnabled && OptimizerEnabled == other.OptimizerEnabled &&
@@ -564,7 +564,7 @@ namespace Adletec.Sonic
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((CalculationEngineBuilder)obj);
+            return Equals((EvaluatorBuilder)obj);
         }
 
         public override int GetHashCode()
@@ -589,7 +589,7 @@ namespace Adletec.Sonic
 
 
     /// <summary>
-    /// A small helper class to store function information during the configuration of the <see cref="CalculationEngine"/>.
+    /// A small helper class to store function information during the configuration of the <see cref="Evaluator"/>.
     /// </summary>
     internal class FunctionDraft
     {
@@ -632,7 +632,7 @@ namespace Adletec.Sonic
     }
 
     /// <summary>
-    /// A small helper class to store constant information during the configuration of the <see cref="CalculationEngine"/>.
+    /// A small helper class to store constant information during the configuration of the <see cref="Evaluator"/>.
     /// </summary>
     internal class ConstantDraft
     {
