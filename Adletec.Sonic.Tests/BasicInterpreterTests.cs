@@ -18,7 +18,7 @@ namespace Adletec.Sonic.Tests;
 public class BasicInterpreterTests
 {
     [TestMethod]
-    public void TestBasicInterpreterSubstraction()
+    public void TestBasicInterpreterSubtraction()
     {
         IFunctionRegistry functionRegistry = new MockFunctionRegistry();
         IConstantRegistry constantRegistry = new MockConstantRegistry();
