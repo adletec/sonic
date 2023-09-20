@@ -4,7 +4,6 @@ using System.Linq;
 using Adletec.Sonic.Execution;
 using Adletec.Sonic.Operations;
 using Adletec.Sonic.Tokenizer;
-using Adletec.Sonic.Util;
 
 namespace Adletec.Sonic
 {

@@ -1,5 +1,8 @@
 namespace Adletec.Sonic.Benchmark.Values;
 
+/// <summary>
+/// Primitive value provider that returns an incrementing value with every call.
+/// </summary>
 public class IncrementingValueProvider : IValueProvider
 {
     private double value = 0;

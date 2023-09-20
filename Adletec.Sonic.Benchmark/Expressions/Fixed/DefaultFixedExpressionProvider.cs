@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Adletec.Sonic.Benchmark.Expressions.Defaults;
+namespace Adletec.Sonic.Benchmark.Expressions.Fixed;
 
 /// <summary>
 /// Provides three default expressions to be evaluated.
@@ -9,7 +9,7 @@ namespace Adletec.Sonic.Benchmark.Expressions.Defaults;
 /// Expression B: A balanced expression using functions and constants
 /// Expression C: An expression which can be folded (simplified) to a single constant
 /// </summary>
-class DefaultExpressionProvider : IExpressionProvider
+class DefaultFixedExpressionProvider : IFixedExpressionProvider
 {
     
     public const string ExpressionA = "var1 + var2 * var3 / 2";
@@ -44,5 +44,11 @@ class DefaultExpressionProvider : IExpressionProvider
             ).WithDialect(ExpressionDialect.NCalc,
                 "(var1 + var2 * var3 / 2) * 0 + 0 / (var1 + var2 * var3 / 2) + Pow(var1 + var2 * var3 / 2,0)"),
         };
+    }
+
+    public IEnumerable<BenchmarkExpression> GetExpressions(int count)
+    {
+        // not relevant for this kind of provider
+        throw new NotImplementedException();
     }
 }

@@ -8,7 +8,7 @@ using Adletec.Sonic.Util;
 
 namespace Adletec.Sonic.Execution
 {
-    public class DynamicCompiler : AbstractExecutor, IExecutor
+    public class DynamicCompiler : IExecutor
     {
         private readonly string funcAssemblyQualifiedName;
         private readonly bool caseSensitive;
@@ -55,7 +55,7 @@ namespace Adletec.Sonic.Execution
                 {
                     return variables =>
                     {
-                        VerifyVariableNames(variables,constantRegistry, functionRegistry);
+                        VariableVerifier.VerifyVariableNames(variables,constantRegistry, functionRegistry);
                         var context = new FormulaContext(variables, functionRegistry, constantRegistry);
                         return func(context);
                     };
@@ -73,7 +73,7 @@ namespace Adletec.Sonic.Execution
                 return variables =>
                 {
                     variables = EngineUtil.ConvertVariableNamesToLowerCase(variables);
-                    VerifyVariableNames(variables, constantRegistry, functionRegistry);
+                    VariableVerifier.VerifyVariableNames(variables, constantRegistry, functionRegistry);
                     var context = new FormulaContext(variables, functionRegistry, constantRegistry);
                     return func(context);
                 };
