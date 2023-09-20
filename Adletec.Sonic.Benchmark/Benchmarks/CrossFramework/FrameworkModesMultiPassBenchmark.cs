@@ -46,7 +46,7 @@ public class FrameworkModesMultiPassBenchmark
     // Disabling the cache _and_ using Evaluate in Sonic or Calculate in Jace will take a lot of time.
     
     [Benchmark(Description = "Sonic [using CreateDelegate]", Baseline = true)]
-    public void SonicCaseInsensitive() => RunBenchmark(new SonicEvaluateBenchmarkExecutor(CaseSensitive, Interpreted, Cached, Optimize));
+    public void SonicCaseInsensitive() => RunBenchmark(new SonicDelegateBenchmarkExecutor(CaseSensitive, Interpreted, Cached, Optimize));
 
     [Benchmark(Description = "Jace [using Build]")]
     public void JaceCaseInsensitive() => RunBenchmark(new JaceDelegateBenchmarkExecutor(CaseSensitive, Interpreted, Cached, Optimize));
