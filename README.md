@@ -252,3 +252,36 @@ The following table shows the time in seconds it takes the benchmark to complete
 | NCalc | 33.579 ms | 51.400 ms| 127.165 ms |
 
 Keep in mind that this is a very specific benchmark and not entirely fair. The frameworks are using different default settings which might not be optimal for the given benchmark. You can get a better understanding of the performance of each library by running the benchmark yourself and adjusting the expressions to your needs.
+
+## Project Origin
+When we originally forked _Jace.NET_, the idea was to give it a new home. At the time of writing, the upstream repository still has 11 unmerged pull requests (which are mostly merged into _sonic_ now). It takes time and effort to maintain an open source library, and we're very thankful for the fantastic foundation which is _Jace.NET_. Pieter De Rycke's original code is still a very large part of _sonic_, and so is the work of all who have contributed to _Jace.NET_ over the years.
+
+However, as a company, using a software component which seems to be in a dormant state introduces a significant risk. Our decision to create a maintained fork of _Jace.NET_ was mainly driven by the necessity to mitigate this risk, while still using the best expression evaluator available for .NET.
+
+While _Jace.NET_ is still the origin of this project, _sonic_ has diverged from its ancestor in quite some way, including major changes to the API. These changes were - in part - necessary to fix some architectural problems we encountered in the code base. Being able to add functions and constants after parsing and folding steps are completed introduced a lot of headaches and complexity in the usage of _Jace.NET_ while adding almost no real world benefit over doing the same steps before any evaluation has taken place.
+
+It also showed that the _Jace.NET_ API evolved to its current state rather than following a clear design, which makes it harder to understand: which of the three ways to evaluate an expression is the right one for a specific use case? How do they differ at all?
+
+After putting many hours of work into our _Jace.NET_ fork, we decided that it no longer made sense to maintain API compatibility, and this was the birth hour of _sonic_.
+
+When compared to _Jace.NET_, _sonic_ shows to be at least as fast as _Jace.NET_. Often, _sonic_ outperforms _Jace.NET_ by a factor. The notable exception being re-evaluation with disabled cache. This is due to a still existing bug in _Jace.NET_ which prevents the user from _actually_ disabling the cache.
+
+We're using _sonic_ in our commercial products and it's stress tested many thousand hours per year. We fixed a lot of bugs, we're constantly benchmarking and testing new kinds of expressions to make sure that we don't overfit to a specific kind of test.
+
+The success of our products would not have been possible without the great work of Pieter De Rycke and the _Jace.NET_ community. Open sourcing _sonic_ and offering a new home to the _Jace.NET_ community is our way of giving back and to say _Thank You_..
+
+## Contributing
+Your contributions are welcome. To streamline the process, take note of the following best practices:
+
+* Always discuss your goal and solution in an issue before implementing a solution or even opening a pull request. This potentially saves a lot of time and rework compared to having the same conversation after you open your pull request.
+* Do one thing (feature, bugfix, change,...) per pull request. If you need one thing to do another, break them up in seperate requests.
+* Please keep pull requests to a manageable size, so we can clearly understand the changes and intent.
+* Add tests to prove your code is doing what it says and make sure there are no broken tests.
+* Run the benchmark suite and make sure that your change didn't (negatively) impact performance. If so, clearly state why this is necessary.
+
+## FAQ
+**Q:** Why is the main project still on .NET Standard 1.6?
+**A:** While upgrading the project to .NET 7.0 would get us access to a couple of nice language features, there is no real benefit for the user of the library. But if we'd upgrade, we'd also force everyone who's currently on .NET < 7.0 to upgrade, too - which might break their use-case. This might change in the future, if there is a significant performance or even maintainability benefit from a newer target framework. At the moment, this is not the case.
+
+**Q:** What is the purpose of demo application in the solution?
+**A:** The original _Jace.NET_ contained a demo application just like this. It shows how an expression is parsed and illustrates the AST derived from it. This is a cross-platform version of the same demo, built using Avalonia UI.  It's a nice little thing if you want to get a better understanding of what _sonic_ does internally. It's not a good example of how to use _sonic_, though. If you want to see a lot of usage examples, take a look at the tests.
