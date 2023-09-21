@@ -281,7 +281,10 @@ Your contributions are welcome. To streamline the process, take note of the foll
 
 ## FAQ
 **Q:** Why is the main project still on .NET Standard 1.6?
+
 **A:** While upgrading the project to .NET 7.0 would get us access to a couple of nice language features, there is no real benefit for the user of the library. But if we'd upgrade, we'd also force everyone who's currently on .NET < 7.0 to upgrade, too - which might break their use-case. This might change in the future, if there is a significant performance or even maintainability benefit from a newer target framework. At the moment, this is not the case.
 
+
 **Q:** What is the purpose of demo application in the solution?
+
 **A:** The original _Jace.NET_ contained a demo application just like this. It shows how an expression is parsed and illustrates the AST derived from it. This is a cross-platform version of the same demo, built using Avalonia UI.  It's a nice little thing if you want to get a better understanding of what _sonic_ does internally. It's not a good example of how to use _sonic_, though. If you want to see a lot of usage examples, take a look at the tests.
