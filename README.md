@@ -215,7 +215,7 @@ However, all of those cases might be potential sources of error, so for some use
 In that case, you can enable _Guarded Mode_ by calling `.EnableGuardedMode()` when building your `Evaluator` instance:
 
 ```csharp
-var evaluator = Evaluator.Create()
+var engine = Evaluator.Create()
     .EnableGuardedMode()
     .Build();
 ```
