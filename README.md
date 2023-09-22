@@ -46,7 +46,7 @@ double result = engine.Evaluate("ft2m(30)"); // 9.144
 
 You can find more examples below.
 
-_sonic_ can execute formulas in two modes: **dynamic compilation mode** and **interpreted mode**. If **dynamic compilation mode** is used, _sonic_ will create a dynamic method at runtime and will generate the necessary MSIL opcodes for native execution of the formula. If a formula is re-executed with other variables, _sonic_ will take the dynamically generated method from its cache. Dynamic compilation mode is a lot faster when evaluating an expression, but has a higher overhead when building the formula.
+_sonic_ can execute formulas in two modes: **dynamic compilation mode** and **interpreted mode**. If **dynamic compilation mode** is used, _sonic_ will create a dynamic method at runtime and will generate the MSIL opcodes necessary for the native execution of the evaluation. If a formula is re-evaluated with other variables, _sonic_ will take the dynamically generated method from its cache (if enabled, which it is by default). Dynamic compilation mode is a lot faster when evaluating an expression, but has a higher overhead when building the evaluator.
 
 As a rule of thumb, you should use **dynamic compilation mode** if you are evaluating the same expressions multiple times with different variables, and **interpreted mode** if you are evaluating many different expressions only once.
 
@@ -189,6 +189,43 @@ double result = engine.Evaluate("g*2"); // 19.6133
 ```
 
 Custom constants will also be taken into account during the optimization phase of the compilation process.
+
+#### Guarded Mode
+There are some cases in which _sonic_ can get ambiguous inputs. If there is no sane way to continue, _sonic_ will throw an Exception:
+
+* A constant name collides with a function name
+* A function name collides with a variable name
+
+Both cases are easy to find during AST creation, since a text token can't be unambiguously resolved.
+
+Other ambiguous inputs are a little more subtle which makes them harder to find:
+
+* The given variables include a variable name which is also a constant name
+* A constant is defined multiple times with different values
+* A function is defined multiple times with different implementations
+
+_sonic_ doesn't automatically recognize those cases, since it's explicitly designed to have a sane default which doesn't require additional checks:
+
+* Constants always have precedence over variables
+* Of two different constant definitions, the latter wins
+* Of two different function definitions, the latter wins
+
+However, all of those cases might be potential sources of error, so for some use-cases, it might not be the desired behavior to silently ignore the ambiguous input.
+
+In that case, you can enable _Guarded Mode_ by calling `.EnableGuardedMode()` when building your `Evaluator` instance:
+
+```c-sharp
+var evaluator = Evaluator.Create()
+    .EnableGuardedMode()
+    .Build();
+```
+
+_sonic_ will then actively check if it encounters any of the above cases and throw an `ArgumentException` if it does.
+These checks are pretty expensive, so _Guarded Mode_ is disabled by default. It is recommended to only use _Guarded Mode_ if performance is not of importance
+or at least less important than the additional checks.
+
+Still, _Guarded Mode_ can help you to find problems in your code which might otherwise be hard to track down. It can be beneficial to use it while developing an
+application (e.g. in a _Debug_ configuration) and disable it in your production code (_Release_ configuration).
 
 ## Configuration
 The `Evaluator`-builder also allows you to configure the evaluator. The following options are available:
