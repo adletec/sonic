@@ -12,7 +12,7 @@ Instead, we're trying to find the right level of abstraction here and only list 
 - Take case-sensitivity into account in function and constant registry (fix by @aavita in #1)
 - Implement a faster case-insensitive mode using `StringComparer.OrdinalIgnoreCase`.
 - Vastly improve constant folding (add new folding logic, completely fold constants, return constant instead of evaluator if the only operation is a constant, add support for integer constant folding, update idempotency if arguments of idempotent functions can be folded etc.)
-- Remove unnecessary operations
+- Remove unnecessary operations. In some cases, there were duplications of logic or checks. Those duplications (or plainly operations with no effect towards the evaluation) were probably artifacts of changes made to Jace over the years, when a new logic was set to replace the old one, but the old logic wasn't entirely removed. This became apparent when consolidating the behavior and architecture, and sometimes even while profiling the library to identify bottlenecks.
 - Introduce sane default behavior in case of ambiguous situations (e.g. variable and constant of the same name defaults to constant use) and move additional, expensive checks to explicit guard mode.
 - Completely disable use of cache if the Evaluator is set to do so. This improves performance if expressions are evaluated once (single pass), which is the prime use-case of disabling the cache.
 - Move logic from evaluation to build time wherever possible. This makes no difference for expressions which are evaluated exactly once, but improves performance on every subsequent evaluation.
