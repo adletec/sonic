@@ -46,3 +46,4 @@ Instead, we're trying to find the right level of abstraction here and only list 
 - Fixes an issue with the precedence of powers of negative numbers (fix by @FabianNitsche in #8)
 - Prevent evaluation from mutating the given variable dictionary
 - Fix indempotency of function tokens if they depend on constants
+- Fix missing checks when building a delegate. Previously, this omitted all consistency checks. Now, if guard mode is enabled, it will also be active in delegates. If it is disabled (default) the same sane defaults will prevent errors in case of ambiguous input.
