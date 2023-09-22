@@ -26,7 +26,7 @@ Instead, we're trying to find the right level of abstraction here and only list 
 - Add interface to Evaluator to improve test- and mockability
 
 ### Changes
-- Replace benchmark with a completely new BenchmarkDotNet-based implementation.
+- Replace benchmark with a completely new BenchmarkDotNet-based implementation. The new benchmark also adds comparisons with other frameworks, like the original_Jac.net_. This allows users to compare specific use cases in a reliable benchmarking environment.
 - Replace manual release process with automated build, test, and release jobs.
 - Replace WPF demo application with cross-platform Avalonia UI demo application.
 - Update framewok dependencies in all projects which aren't part of the NuGet package.
