@@ -141,8 +141,13 @@ namespace Adletec.Sonic
                 return result;
             }
 
-            Operation operation = BuildAbstractSyntaxTree(expression, ConstantRegistry);
+            Operation operation = BuildAbstractSyntaxTree(expression, ConstantRegistry, optimizerEnabled);
             return BuildEvaluator(expression, operation);
+        }
+
+        public void Validate(string expression)
+        {
+            BuildAbstractSyntaxTree(expression, ConstantRegistry, false);
         }
 
         private void RegisterDefaultFunctions()
@@ -199,8 +204,9 @@ namespace Adletec.Sonic
         /// <param name="formulaText">A string containing the mathematical formula that must be converted 
         /// into an abstract syntax tree.</param>
         /// <param name="compiledConstants">The constants which are to be available in the given formula.</param>
+        /// <param name="optimize">If the abstract syntax tree should be optimized.</param>
         /// <returns>The abstract syntax tree of the formula.</returns>
-        private Operation BuildAbstractSyntaxTree(string formulaText, IConstantRegistry compiledConstants)
+        private Operation BuildAbstractSyntaxTree(string formulaText, IConstantRegistry compiledConstants, bool optimize)
         {
             var tokenReader = new TokenReader(cultureInfo);
             List<Token> tokens = tokenReader.Read(formulaText);
@@ -208,7 +214,7 @@ namespace Adletec.Sonic
             var astBuilder = new AstBuilder(FunctionRegistry, compiledConstants);
             Operation operation = astBuilder.Build(tokens);
 
-            return optimizerEnabled
+            return optimize
                 ? optimizer.Optimize(operation, this.FunctionRegistry, this.ConstantRegistry)
                 : operation;
         }
@@ -244,5 +250,18 @@ namespace Adletec.Sonic
             function = null;
             return cacheEnabled && executionFormulaCache.TryGetValue(formulaText, out function);
         }
+    }
+
+    public class ValidationResult
+    {
+        public ValidationResult(bool isValid, string errorMessage)
+        {
+            IsValid = isValid;
+            ErrorMessage = errorMessage;
+        }
+
+        public bool IsValid { get; }
+
+        public string ErrorMessage { get; }
     }
 }

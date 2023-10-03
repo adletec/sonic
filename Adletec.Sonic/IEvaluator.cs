@@ -43,6 +43,13 @@ namespace Adletec.Sonic
         /// <param name="expression">The expression string for which a delegate should be created.</param>
         /// <returns>A delegate which takes an <see cref="IDictionary{TKey,TValue}"/> with variable values and evaluates the expression using those values.</returns>
         Func<IDictionary<string, double>, double> CreateDelegate(string expression);
+        
+        
+        /// <summary>
+        /// Validates a given expression. If the expression is invalid, the matching subtype of <see cref="ParseException"/> is thrown.
+        /// </summary>
+        /// <param name="expression">The expression to be validated.</param>
+        void Validate(string expression);
 
     }
 }

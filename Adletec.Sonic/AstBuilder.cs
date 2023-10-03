@@ -39,22 +39,27 @@ namespace Adletec.Sonic
             operationPrecedence.Add('^', 6);
         }
 
-        public Operation Build(IEnumerable<Token> tokens)
+        public Operation Build(IList<Token> tokens)
         {
             resultStack.Clear();
             operatorStack.Clear();
 
             parameterCount.Clear();
+            var tokenReferences = new List<TokenReference>(tokens.Count);
 
             foreach (var token in tokens)
             {
                 switch (token.TokenType)
                 {
                     case TokenType.Integer:
-                        resultStack.Push(new IntegerConstant((int)token.Value));
+                        var integerConstant = new IntegerConstant((int)token.Value);
+                        tokenReferences.Add(new TokenReference(token, integerConstant));
+                        resultStack.Push(integerConstant);
                         break;
                     case TokenType.FloatingPoint:
-                        resultStack.Push(new FloatingPointConstant((double)token.Value));
+                        var floatingPointConstant = new FloatingPointConstant((double)token.Value);
+                        tokenReferences.Add(new TokenReference(token, floatingPointConstant));
+                        resultStack.Push(floatingPointConstant);
                         break;
                     case TokenType.Text:
                         if (functionRegistry.IsFunctionName((string)token.Value))
@@ -67,13 +72,19 @@ namespace Adletec.Sonic
                             var tokenValue = (string)token.Value;
                             if (constantRegistry.IsConstantName(tokenValue))
                             {
-                                resultStack.Push(new FloatingPointConstant(constantRegistry.GetConstantInfo(tokenValue).Value));
+                                var registeredConstant =
+                                    new FloatingPointConstant(constantRegistry.GetConstantInfo(tokenValue).Value);
+                                tokenReferences.Add(new TokenReference(token, registeredConstant));
+                                resultStack.Push(registeredConstant);
                             }
                             else
                             {
-                                resultStack.Push(new Variable(tokenValue));
+                                var variable = new Variable(tokenValue);
+                                tokenReferences.Add(new TokenReference(token, variable));
+                                resultStack.Push(variable);
                             }
                         }
+
                         break;
                     case TokenType.LeftBracket:
                         operatorStack.Push(token);
@@ -89,7 +100,7 @@ namespace Adletec.Sonic
                         var operation1 = (char)token.Value;
 
                         while (operatorStack.Count > 0 && (operatorStack.Peek().TokenType == TokenType.Operation ||
-                            operatorStack.Peek().TokenType == TokenType.Text))
+                                                           operatorStack.Peek().TokenType == TokenType.Text))
                         {
                             Token operation2Token = operatorStack.Peek();
                             var isFunctionOnTopOfStack = operation2Token.TokenType == TokenType.Text;
@@ -99,7 +110,7 @@ namespace Adletec.Sonic
                                 var operation2 = (char)operation2Token.Value;
 
                                 if ((IsLeftAssociativeOperation(operation1) &&
-                                        operationPrecedence[operation1] <= operationPrecedence[operation2]) ||
+                                     operationPrecedence[operation1] <= operationPrecedence[operation2]) ||
                                     operationPrecedence[operation1] < operationPrecedence[operation2])
                                 {
                                     operatorStack.Pop();
@@ -120,13 +131,14 @@ namespace Adletec.Sonic
                         operatorStack.Push(token);
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(token), $"Unexpected value \"{token}\" for {nameof(token)}.");
+                        throw new ArgumentOutOfRangeException(nameof(token),
+                            $"Unexpected value \"{token}\" for {nameof(token)}.");
                 }
             }
 
             PopOperations(false, null);
 
-            VerifyResultStack();
+            VerifyResultStack(tokenReferences);
 
             return resultStack.First();
         }
@@ -134,8 +146,9 @@ namespace Adletec.Sonic
         private void PopOperations(bool untilLeftBracket, Token? currentToken)
         {
             if (untilLeftBracket && !currentToken.HasValue)
-                throw new ArgumentNullException(nameof(currentToken), $"If the parameter \"{nameof(untilLeftBracket)}\" is set to true, " +
-                                                                      $"the parameter \"${nameof(currentToken)}\" cannot be null.");
+                throw new ArgumentNullException(nameof(currentToken),
+                    $"If the parameter \"{nameof(untilLeftBracket)}\" is set to true, " +
+                    $"the parameter \"${nameof(currentToken)}\" cannot be null.");
 
             while (operatorStack.Count > 0 && operatorStack.Peek().TokenType != TokenType.LeftBracket)
             {
@@ -157,15 +170,18 @@ namespace Adletec.Sonic
                 if (operatorStack.Count > 0 && operatorStack.Peek().TokenType == TokenType.LeftBracket)
                     operatorStack.Pop();
                 else
-                    throw new ParseException("No matching left bracket found for the right " +
-                                             $"bracket at position {currentToken.Value.StartPosition}.");
+                    throw new MissingLeftBracketParserException("No matching left bracket found for the right " +
+                                                                $"bracket at position {currentToken.Value.StartPosition}.",
+                        currentToken.Value.StartPosition);
             }
             else
             {
-                if (operatorStack.Count > 0 && operatorStack.Peek().TokenType == TokenType.LeftBracket 
-                    && !(currentToken.HasValue && currentToken.Value.TokenType == TokenType.ArgumentSeparator))
-                    throw new ParseException("No matching right bracket found for the left " +
-                                             $"bracket at position {operatorStack.Peek().StartPosition}.");
+                if (operatorStack.Count > 0 && operatorStack.Peek().TokenType == TokenType.LeftBracket
+                                            && !(currentToken.HasValue && currentToken.Value.TokenType ==
+                                                TokenType.ArgumentSeparator))
+                    throw new MissingRightBracketParserException("No matching right bracket found for the left " +
+                                                                 $"bracket at position {operatorStack.Peek().StartPosition}.",
+                        operatorStack.Peek().StartPosition);
             }
         }
 
@@ -274,9 +290,10 @@ namespace Adletec.Sonic
             {
                 // If we encounter a Stack empty issue this means there is a syntax issue in 
                 // the mathematical formula
-                throw new ParseException(
+                throw new InvalidNumberOfOperationArgumentsParserException(
                     $"There is a syntax issue for the operation \"{operationToken.Value}\" at position {operationToken.StartPosition}. " +
-                    "The number of arguments does not match with what is expected.");
+                    "The number of arguments does not match with what is expected.", operationToken.StartPosition,
+                    operationToken.Value.ToString());
             }
         }
 
@@ -284,6 +301,7 @@ namespace Adletec.Sonic
         {
             try
             {
+                // todo: is the tolowerinvariant really needed?
                 var functionName = ((string)functionToken.Value).ToLowerInvariant();
 
                 if (functionRegistry.IsFunctionName(functionName))
@@ -292,14 +310,16 @@ namespace Adletec.Sonic
 
                     int numberOfParameters;
 
-                    if (functionInfo.IsDynamicFunc) {
+                    if (functionInfo.IsDynamicFunc)
+                    {
                         numberOfParameters = parameterCount.Pop();
                     }
-                    else {
+                    else
+                    {
                         parameterCount.Pop();
                         numberOfParameters = functionInfo.NumberOfParameters;
                     }
-                    
+
                     var operations = new List<Operation>();
                     for (var i = 0; i < numberOfParameters; i++)
                         operations.Add(resultStack.Pop());
@@ -307,27 +327,27 @@ namespace Adletec.Sonic
 
                     return new Function(DataType.FloatingPoint, functionName, operations, functionInfo.IsIdempotent);
                 }
-                else
-                {
-                    throw new ArgumentException($"Unknown function \"{functionToken.Value}\".", nameof(functionToken.Value));
-                }
+
+                throw new ArgumentException($"Unknown function \"{functionToken.Value}\".",
+                    nameof(functionToken.Value));
             }
             catch (InvalidOperationException)
             {
                 // If we encounter a Stack empty issue this means there is a syntax issue in 
                 // the mathematical formula
-                throw new ParseException(
+                throw new InvalidNumberOfFunctionArgumentsParserException(
                     $"There is a syntax issue for the function \"{functionToken.Value}\" at position {functionToken.StartPosition}. " +
                     "The number of arguments does not match with what is expected. " +
-                    "This can also happen if the expression contains a variable with the same name as a function. " + 
-                    "In that case please rename either the variable or the function.");
+                    "This can also happen if the expression contains a variable with the same name as a function. " +
+                    "In that case please rename either the variable or the function.", functionToken.StartPosition,
+                    functionToken.Length, (string)functionToken.Value);
             }
         }
 
-        private void VerifyResultStack()
+        private void VerifyResultStack(IList<TokenReference> tokenReferences)
         {
             if (resultStack.Count <= 1) return;
-            
+
             Operation[] operations = resultStack.ToArray();
 
             for (var i = 1; i < operations.Length; i++)
@@ -337,13 +357,20 @@ namespace Adletec.Sonic
                 if (operation.GetType() == typeof(IntegerConstant))
                 {
                     var constant = (IntegerConstant)operation;
-                    throw new ParseException($"Unexpected integer constant \"{constant.Value}\" found.");
+                    var tokenReference = tokenReferences.First(t => ReferenceEquals(t.Operation, constant));
+                    throw new UnexpectedIntegerConstantParserException(
+                        $"Unexpected integer constant \"{constant.Value}\" found.", tokenReference.Token.StartPosition,
+                        tokenReference.Token.Length, tokenReference.Token.Value.ToString());
                 }
 
                 if (operation.GetType() == typeof(FloatingPointConstant))
                 {
                     var constant = (FloatingPointConstant)operation;
-                    throw new ParseException($"Unexpected floating point constant \"{constant.Value}\" found."); 
+                    var tokenReference = tokenReferences.First(t => ReferenceEquals(t.Operation, constant));
+                    throw new UnexpectedFloatingPointConstantParserException(
+                        $"Unexpected floating point constant \"{constant.Value}\" found.",
+                        tokenReference.Token.StartPosition, tokenReference.Token.Length,
+                        (string)tokenReference.Token.Value);
                 }
             }
 
@@ -357,7 +384,21 @@ namespace Adletec.Sonic
 
         private DataType RequiredDataType(Operation argument1, Operation argument2)
         {
-            return argument1.DataType == DataType.FloatingPoint || argument2.DataType == DataType.FloatingPoint ? DataType.FloatingPoint : DataType.Integer;
+            return argument1.DataType == DataType.FloatingPoint || argument2.DataType == DataType.FloatingPoint
+                ? DataType.FloatingPoint
+                : DataType.Integer;
+        }
+
+        private class TokenReference
+        {
+            public TokenReference(Token token, Operation operation)
+            {
+                Token = token;
+                Operation = operation;
+            }
+
+            public Operation Operation { get; }
+            public Token Token { get; }
         }
     }
 }
