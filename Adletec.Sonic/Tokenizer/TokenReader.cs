@@ -151,7 +151,6 @@ namespace Adletec.Sonic.Tokenizer
                         case ' ':
                             continue;
                         case '+':
-                        case '-':
                         case '*':
                         case '/':
                         case '^':
@@ -159,6 +158,10 @@ namespace Adletec.Sonic.Tokenizer
                         case '≤':
                         case '≥':
                         case '≠':
+                            tokens.Add(new Token { TokenType = TokenType.Operation, Value = characters[i], StartPosition = i, Length = 1 });                            
+                            isFormulaSubPart = true;
+                            break;
+                        case '-':
                             if (IsUnaryMinus(characters[i], tokens))
                             {
                                 // We use the token '_' for a unary minus in the AST builder
