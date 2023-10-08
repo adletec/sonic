@@ -63,6 +63,12 @@ namespace Adletec.Sonic.Tokenizer
             {
                 if (IsPartOfNumeric(characters[i], true, false, isFormulaSubPart))
                 {
+                    if (characters[i] == '-')
+                    {
+                        tokens.Add(new Token { TokenType = TokenType.Operation, Value = '_', StartPosition = i, Length = 1 });
+                        continue;
+                    }
+                    
                     var buffer = new StringBuilder();
                     buffer.Append(characters[i]);
                     var startPosition = i;
@@ -94,12 +100,7 @@ namespace Adletec.Sonic.Tokenizer
                     }
                     else
                     {
-                        if (buffer.ToString() == "-")
-                        {
-                            // Verify if we have a unary minus, we use the token '_' for a unary minus in the AST builder
-                            tokens.Add(new Token { TokenType = TokenType.Operation, Value = '_', StartPosition = startPosition, Length = 1 });
-                        }
-                        else if (double.TryParse(buffer.ToString(), NumberStyles.Float | NumberStyles.AllowThousands,
+                        if (double.TryParse(buffer.ToString(), NumberStyles.Float | NumberStyles.AllowThousands,
                             cultureInfo, out var doubleValue))
                         {
                             tokens.Add(new Token { TokenType = TokenType.FloatingPoint, Value = doubleValue, StartPosition = startPosition, Length = i - startPosition });

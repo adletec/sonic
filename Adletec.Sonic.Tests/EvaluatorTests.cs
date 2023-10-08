@@ -349,6 +349,107 @@ public class EvaluatorTests
 
         Assert.AreEqual(-4.0, result);
     }
+    
+    [TestMethod]
+    public void TestUnaryMinus7Compiled()
+    {
+        var engine = SonicEngines.CompiledNoCacheNoOptimizer();
+        var result = engine.Evaluate("-1.0^2");
+        Assert.AreEqual(-1.0, result);
+    }
+    
+    [TestMethod]
+    public void TestUnaryMinus7Interpreted()
+    {
+        var engine = SonicEngines.InterpretedNoCacheNoOptimizer();
+        var result = engine.Evaluate("-1.0^2");
+        Assert.AreEqual(-1.0, result);
+    }
+    
+    
+    [TestMethod]
+    public void TestUnaryMinus8Compiled()
+    {
+        var engine = SonicEngines.CompiledNoCacheNoOptimizer();
+        var result = engine.Evaluate("-(1.0)^2");
+        Assert.AreEqual(-1.0, result);
+    }
+    
+    [TestMethod]
+    public void TestUnaryMinus8Interpreted()
+    {
+        var engine = SonicEngines.InterpretedNoCacheNoOptimizer();
+        var result = engine.Evaluate("-(1.0)^2");
+        Assert.AreEqual(-1.0, result);
+    }
+    
+    
+    [TestMethod]
+    public void TestUnaryMinus9Compiled()
+    {
+        var engine = SonicEngines.CompiledNoCacheNoOptimizer();
+        var result = engine.Evaluate("1--1");
+        Assert.AreEqual(2.0, result);
+    }
+    
+    [TestMethod]
+    public void TestUnaryMinus9Interpreted()
+    {
+        var engine = SonicEngines.InterpretedNoCacheNoOptimizer();
+        var result = engine.Evaluate("1--1");
+        Assert.AreEqual(2.0, result);
+    }
+    
+    
+    [TestMethod]
+    public void TestUnaryMinus10Compiled()
+    {
+        var engine = SonicEngines.CompiledNoCacheNoOptimizer();
+        var result = engine.Evaluate("1.0-1.0");
+        Assert.AreEqual(0.0, result);
+    }
+    
+    [TestMethod]
+    public void TestUnaryMinus10Interpreted()
+    {
+        var engine = SonicEngines.InterpretedNoCacheNoOptimizer();
+        var result = engine.Evaluate("1.0-1.0");
+        Assert.AreEqual(0.0, result);
+    }
+    
+    
+    [TestMethod]
+    public void TestUnaryMinus11Compiled()
+    {
+        var engine = SonicEngines.CompiledNoCacheNoOptimizer();
+        var result = engine.Evaluate("5*-2");
+        Assert.AreEqual(-10.0, result);
+    }
+    
+    [TestMethod]
+    public void TestUnaryMinus11Interpreted()
+    {
+        var engine = SonicEngines.InterpretedNoCacheNoOptimizer();
+        var result = engine.Evaluate("5*-2");
+        Assert.AreEqual(-10.0, result);
+    }
+    
+    [TestMethod]
+    public void TestUnaryMinus12Compiled()
+    {
+        var engine = SonicEngines.CompiledNoCacheNoOptimizer();
+        var result = engine.Evaluate("(-3)^2");
+        Assert.AreEqual(9, result);
+    }
+    
+    [TestMethod]
+    public void TestUnaryMinus12Interpreted()
+    {
+        var engine = SonicEngines.InterpretedNoCacheNoOptimizer();
+        var result = engine.Evaluate("(-3)^2");
+        Assert.AreEqual(9, result);
+    }
+
 
     [TestMethod]
     public void TestBuild()
@@ -1492,7 +1593,9 @@ public class EvaluatorTests
         var result = engine.Evaluate("b(a)");
         Assert.AreEqual(2.0, result);
     }
+
 }
+
 
 internal static class SonicEngines
 {

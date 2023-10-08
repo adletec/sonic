@@ -278,11 +278,15 @@ public class TokenReaderTests
         TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("-2.1");
 
-        Assert.AreEqual(1, tokens.Count);
+        Assert.AreEqual(2, tokens.Count);
 
-        Assert.AreEqual(-2.1, tokens[0].Value);
+        Assert.AreEqual('_', tokens[0].Value);
         Assert.AreEqual(0, tokens[0].StartPosition);
-        Assert.AreEqual(4, tokens[0].Length);
+        Assert.AreEqual(1, tokens[0].Length);
+        
+        Assert.AreEqual(2.1, tokens[1].Value);
+        Assert.AreEqual(1, tokens[1].StartPosition);
+        Assert.AreEqual(3, tokens[1].Length);
     }
 
     [TestMethod]
@@ -312,7 +316,7 @@ public class TokenReaderTests
         TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("5*-2");
 
-        Assert.AreEqual(3, tokens.Count);
+        Assert.AreEqual(4, tokens.Count);
 
         Assert.AreEqual(5, tokens[0].Value);
         Assert.AreEqual(0, tokens[0].StartPosition);
@@ -321,10 +325,14 @@ public class TokenReaderTests
         Assert.AreEqual('*', tokens[1].Value);
         Assert.AreEqual(1, tokens[1].StartPosition);
         Assert.AreEqual(1, tokens[1].Length);
-
-        Assert.AreEqual(-2, tokens[2].Value);
+        
+        Assert.AreEqual('_', tokens[2].Value);
         Assert.AreEqual(2, tokens[2].StartPosition);
-        Assert.AreEqual(2, tokens[2].Length);
+        Assert.AreEqual(1, tokens[2].Length);
+
+        Assert.AreEqual(2, tokens[3].Value);
+        Assert.AreEqual(3, tokens[3].StartPosition);
+        Assert.AreEqual(1, tokens[3].Length);
     }
 
     [TestMethod]
@@ -333,7 +341,7 @@ public class TokenReaderTests
         TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("5*(-2)");
 
-        Assert.AreEqual(5, tokens.Count);
+        Assert.AreEqual(6, tokens.Count);
 
         Assert.AreEqual(5, tokens[0].Value);
         Assert.AreEqual(0, tokens[0].StartPosition);
@@ -347,13 +355,17 @@ public class TokenReaderTests
         Assert.AreEqual(2, tokens[2].StartPosition);
         Assert.AreEqual(1, tokens[2].Length);
 
-        Assert.AreEqual(-2, tokens[3].Value);
+        Assert.AreEqual('_', tokens[3].Value);
         Assert.AreEqual(3, tokens[3].StartPosition);
-        Assert.AreEqual(2, tokens[3].Length);
-
-        Assert.AreEqual(')', tokens[4].Value);
-        Assert.AreEqual(5, tokens[4].StartPosition);
+        Assert.AreEqual(1, tokens[3].Length);
+        
+        Assert.AreEqual(2, tokens[4].Value);
+        Assert.AreEqual(4, tokens[4].StartPosition);
         Assert.AreEqual(1, tokens[4].Length);
+
+        Assert.AreEqual(')', tokens[5].Value);
+        Assert.AreEqual(5, tokens[5].StartPosition);
+        Assert.AreEqual(1, tokens[5].Length);
     }
 
     [TestMethod]
