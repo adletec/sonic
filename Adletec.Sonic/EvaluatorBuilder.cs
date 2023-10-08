@@ -13,8 +13,11 @@ namespace Adletec.Sonic
     {
         private const int DefaultCacheMaximumSize = 500;
         private const int DefaultCacheReductionSize = 50;
+        private static readonly List<char> IllegalArgumentSeparators = new List<char> {' ','+', '-', '*', '/', '^', '(', ')', '_', '%', '>', '<', '=', '&', '|', '≠', '≤', '≥'};
 
-        internal CultureInfo CultureInfo { get; private set; } = CultureInfo.CurrentCulture;
+        // todo adjust tests
+        internal CultureInfo CultureInfo { get; private set; } = CultureInfo.InvariantCulture;
+        
         internal ExecutionMode ExecutionMode { get; private set; } = ExecutionMode.Compiled;
 
         internal bool CacheEnabled { get; private set; } = true;
@@ -32,6 +35,10 @@ namespace Adletec.Sonic
         internal int CacheReductionSize { get; private set; } = DefaultCacheReductionSize;
         
         internal bool GuardedMode { get; private set; } = false;
+        
+        internal char ArgumentSeparator { get; private set; } = ',';
+
+        private char? OverrideArgumentSeparator { get; set; } = null;
 
         internal List<FunctionDraft> Functions { get; }
 
@@ -61,6 +68,8 @@ namespace Adletec.Sonic
             DefaultFunctions = evaluatorBuilder.DefaultFunctions;
             CacheMaximumSize = evaluatorBuilder.CacheMaximumSize;
             CacheReductionSize = evaluatorBuilder.CacheReductionSize;
+            ArgumentSeparator = evaluatorBuilder.ArgumentSeparator;
+            OverrideArgumentSeparator = evaluatorBuilder.OverrideArgumentSeparator;
 
             // Functions and Constants are immutable, so we can just copy the references.
             Functions = new List<FunctionDraft>(evaluatorBuilder.Functions);
@@ -69,13 +78,32 @@ namespace Adletec.Sonic
 
         /// <summary>
         /// Use the provided <see cref="CultureInfo"/> for correctly reading floating point numbers.
-        /// Default: <see cref="CultureInfo.CurrentCulture"/>.
+        /// Default: <see cref="CultureInfo.InvariantCulture"/>.
         /// </summary>
         /// <param name="cultureInfo"></param>
         /// <returns></returns>
         public EvaluatorBuilder UseCulture(CultureInfo cultureInfo)
         {
             CultureInfo = cultureInfo;
+            return this;
+        }
+        
+        /// <summary>
+        /// Override the argument separator for functions evaluated by this evaluator, e.g. `ifless(1,2,3,4)` with argument separator `;` would be `ifless(1;2;3;4)`.
+        /// By default, the list separator is `,` except for cultures where the decimal separator is `,`, in which case the list separator is `;`.
+        ///
+        /// Be aware that this method will throw an exception if the provided list separator is a letter, a digit, or an operator.
+        /// Also, the <see cref="Build"/>-method instantiation of the Evaluator will fail if the list separator is the same as the decimal separator.
+        /// </summary>
+        /// <param name="argumentSeparator">A valid character, i.e. a special character which is no operator, no digit, no letter and not the same as the decimal separator in the culture of the <see cref="Evaluator"/>.</param>
+        /// <returns></returns>
+        public EvaluatorBuilder UseArgumentSeparator(char argumentSeparator)
+        {
+            if (char.IsLetter(argumentSeparator) || char.IsDigit(argumentSeparator) || IllegalArgumentSeparators.Contains(argumentSeparator))
+            {
+                throw new ArgumentException("Illegal argument separator \"\". Character must be a symbol and must not be ", nameof(argumentSeparator));
+            }
+            OverrideArgumentSeparator = argumentSeparator;
             return this;
         }
 
@@ -546,17 +574,32 @@ namespace Adletec.Sonic
         /// <returns></returns>
         public Evaluator Build()
         {
+            if (OverrideArgumentSeparator == null)
+            {
+                ArgumentSeparator = CultureInfo.NumberFormat.NumberDecimalSeparator[0] == ',' ? ';' : ',';
+            }
+            else
+            {
+                if (OverrideArgumentSeparator == CultureInfo.NumberFormat.NumberDecimalSeparator[0])
+                {
+                    throw new ArgumentException(
+                        $"The list separator \"{ArgumentSeparator}\" is the same as the decimal separator \"{CultureInfo.NumberFormat.NumberDecimalSeparator}\". This is not allowed.",
+                        nameof(ArgumentSeparator));
+                }
+                ArgumentSeparator = OverrideArgumentSeparator.Value;
+            }
             return new Evaluator(this);
         }
 
         protected bool Equals(EvaluatorBuilder other)
         {
-            return Equals(CultureInfo, other.CultureInfo) && ExecutionMode == other.ExecutionMode &&
+            return Equals(CultureInfo, other.CultureInfo) && ArgumentSeparator == other.ArgumentSeparator && 
+                   OverrideArgumentSeparator == other.OverrideArgumentSeparator && ExecutionMode == other.ExecutionMode &&
                    CacheEnabled == other.CacheEnabled && OptimizerEnabled == other.OptimizerEnabled &&
                    CaseSensitive == other.CaseSensitive && DefaultFunctions == other.DefaultFunctions &&
                    DefaultConstants == other.DefaultConstants && CacheMaximumSize == other.CacheMaximumSize &&
                    CacheReductionSize == other.CacheReductionSize && Functions.SequenceEqual(other.Functions) &&
-                   Constants.SequenceEqual(other.Constants);
+                   Constants.SequenceEqual(other.Constants) && GuardedMode == other.GuardedMode;
         }
 
         public override bool Equals(object obj)
@@ -572,6 +615,8 @@ namespace Adletec.Sonic
             unchecked
             {
                 var hashCode = (CultureInfo != null ? CultureInfo.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ ArgumentSeparator.GetHashCode();
+                hashCode = (hashCode * 397) ^ OverrideArgumentSeparator.GetHashCode();
                 hashCode = (hashCode * 397) ^ (int)ExecutionMode;
                 hashCode = (hashCode * 397) ^ CacheEnabled.GetHashCode();
                 hashCode = (hashCode * 397) ^ OptimizerEnabled.GetHashCode();
@@ -580,6 +625,7 @@ namespace Adletec.Sonic
                 hashCode = (hashCode * 397) ^ DefaultConstants.GetHashCode();
                 hashCode = (hashCode * 397) ^ CacheMaximumSize;
                 hashCode = (hashCode * 397) ^ CacheReductionSize;
+                hashCode = (hashCode * 397) ^ GuardedMode.GetHashCode();
                 hashCode = (hashCode * 397) ^ (Functions != null ? Functions.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Constants != null ? Constants.GetHashCode() : 0);
                 return hashCode;

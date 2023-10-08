@@ -14,13 +14,13 @@ namespace Adletec.Sonic
     /// <inheritdoc/>
     public class Evaluator : IEvaluator
     {
-        private readonly IExecutor executor;
+        private readonly TokenReader tokenReader;
         private readonly Optimizer optimizer;
-        private readonly CultureInfo cultureInfo;
+        private readonly IExecutor executor;
+        
         private readonly MemoryCache<string, Func<IDictionary<string, double>, double>> executionFormulaCache;
         private readonly bool cacheEnabled;
         private readonly bool optimizerEnabled;
-        private readonly bool caseSensitive;
         private readonly bool guardedMode;
 
         private readonly Random random;
@@ -47,18 +47,23 @@ namespace Adletec.Sonic
 
         internal Evaluator(EvaluatorBuilder options)
         {
-            this.caseSensitive = options.CaseSensitive;
+            var caseSensitive = options.CaseSensitive;
             this.executionFormulaCache =
                 new MemoryCache<string, Func<IDictionary<string, double>, double>>(options.CacheMaximumSize,
                     options.CacheReductionSize);
             this.FunctionRegistry = new FunctionRegistry(caseSensitive, options.GuardedMode);
             this.ConstantRegistry = new ConstantRegistry(caseSensitive, options.GuardedMode);
-            this.cultureInfo = options.CultureInfo;
+            
+            var cultureInfo = options.CultureInfo;
+            var argumentSeparator = options.ArgumentSeparator;
+            tokenReader = new TokenReader(cultureInfo, argumentSeparator);
+            
             this.cacheEnabled = options.CacheEnabled;
             this.optimizerEnabled = options.OptimizerEnabled;
             this.guardedMode = options.GuardedMode;
 
             this.random = new Random();
+
 
             switch (options.ExecutionMode)
             {
@@ -208,9 +213,8 @@ namespace Adletec.Sonic
         /// <returns>The abstract syntax tree of the formula.</returns>
         private Operation BuildAbstractSyntaxTree(string formulaText, IConstantRegistry compiledConstants, bool optimize)
         {
-            var tokenReader = new TokenReader(cultureInfo);
             List<Token> tokens = tokenReader.Read(formulaText);
-
+            
             var astBuilder = new AstBuilder(FunctionRegistry, compiledConstants);
             Operation operation = astBuilder.Build(tokens);
 

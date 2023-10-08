@@ -14,16 +14,31 @@ namespace Adletec.Sonic.Tokenizer
         private readonly char decimalSeparator;
         private readonly char argumentSeparator;
 
+        /// <summary>
+        /// Default constructor. Uses the InvariantCulture and ',' as argument separator.
+        /// </summary>
         public TokenReader() 
-            : this(CultureInfo.CurrentCulture)
+            : this(CultureInfo.InvariantCulture, ',')
         {
         }
 
-        public TokenReader(CultureInfo cultureInfo)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="cultureInfo">The culture info to use for parsing the floating point numbers.</param>
+        /// <param name="argumentSeparator">The argument separator to use for functions.</param>
+        /// <exception cref="ArgumentException">Thrown when the argument separator is the same as the decimal separator.</exception>
+        public TokenReader(CultureInfo cultureInfo, char argumentSeparator)
         {
             this.cultureInfo = cultureInfo;
             this.decimalSeparator = cultureInfo.NumberFormat.NumberDecimalSeparator[0];
-            this.argumentSeparator = cultureInfo.TextInfo.ListSeparator[0];
+            this.argumentSeparator = argumentSeparator;
+            
+            if (cultureInfo.NumberFormat.NumberDecimalSeparator.ToCharArray(0, 1)[0] == argumentSeparator)
+            {
+                throw new ArgumentException(nameof(argumentSeparator) + " cannot be the same as " +
+                                            nameof(cultureInfo.NumberFormat.NumberDecimalSeparator), nameof(argumentSeparator));
+            }
         }
 
         /// <summary>

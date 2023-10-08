@@ -7,6 +7,7 @@ using TestMethod = NUnit.Framework.TestAttribute;
 #else
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 #endif
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Adletec.Sonic.Tokenizer;
@@ -69,7 +70,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader3()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("(42+31.0");
 
         Assert.AreEqual(4, tokens.Count);
@@ -131,7 +132,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader5()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("(42.87+31.0");
 
         Assert.AreEqual(4, tokens.Count);
@@ -156,7 +157,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader6()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("(var+31.0");
 
         Assert.AreEqual(4, tokens.Count);
@@ -181,7 +182,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader7()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("varb");
 
         Assert.AreEqual(1, tokens.Count);
@@ -194,7 +195,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader8()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("varb(");
 
         Assert.AreEqual(2, tokens.Count);
@@ -211,7 +212,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader9()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("+varb(");
 
         Assert.AreEqual(3, tokens.Count);
@@ -232,7 +233,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader10()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("var1+2");
 
         Assert.AreEqual(3, tokens.Count);
@@ -253,7 +254,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader11()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("5.1%2");
 
         Assert.AreEqual(3, tokens.Count);
@@ -274,7 +275,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader12()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("-2.1");
 
         Assert.AreEqual(1, tokens.Count);
@@ -287,7 +288,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader13()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("5-2");
 
         Assert.AreEqual(3, tokens.Count);
@@ -308,7 +309,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader14()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("5*-2");
 
         Assert.AreEqual(3, tokens.Count);
@@ -329,7 +330,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader15()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("5*(-2)");
 
         Assert.AreEqual(5, tokens.Count);
@@ -358,7 +359,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader16()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("5*-(2+43)");
 
         Assert.AreEqual(8, tokens.Count);
@@ -399,7 +400,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader17()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("logn(2,5)");
 
         Assert.AreEqual(6, tokens.Count);
@@ -435,7 +436,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader18()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("var_1+2");
 
         Assert.AreEqual(3, tokens.Count);
@@ -458,7 +459,7 @@ public class TokenReaderTests
     {
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
-            TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+            TokenReader reader = new TokenReader();
             List<Token> tokens = reader.Read("$1+$2+$3");
         });
     }
@@ -466,7 +467,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader20()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("2.11E-3");
 
         Assert.AreEqual(1, tokens.Count);
@@ -479,7 +480,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader21()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("var_1+2.11E-3");
 
         Assert.AreEqual(3, tokens.Count);
@@ -502,7 +503,7 @@ public class TokenReaderTests
     {
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
-            TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+            TokenReader reader = new TokenReader();
             List<Token> tokens = reader.Read("2.11E-E3");
         });
     }
@@ -510,7 +511,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader23()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("2.11e3");
 
         Assert.AreEqual(1, tokens.Count);
@@ -523,7 +524,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader24()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("1 * e");
 
         Assert.AreEqual(3, tokens.Count);
@@ -544,7 +545,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader25()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("e");
 
         Assert.AreEqual(1, tokens.Count);
@@ -557,7 +558,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader26()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("2.11e3+1.23E4");
 
         Assert.AreEqual(3, tokens.Count);
@@ -576,7 +577,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader27()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("-(1)^2");
 
         Assert.AreEqual(6, tokens.Count);
@@ -614,7 +615,7 @@ public class TokenReaderTests
     {
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
-            TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+            TokenReader reader = new TokenReader();
             List<Token> tokens = reader.Read(".");
         });
     }
@@ -624,7 +625,7 @@ public class TokenReaderTests
     {
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
-            TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+            TokenReader reader = new TokenReader();
             List<Token> tokens = reader.Read("..");
         });
     }
@@ -634,7 +635,7 @@ public class TokenReaderTests
     {
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
-            TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+            TokenReader reader = new TokenReader();
             List<Token> tokens = reader.Read("..1");
         });
     }
@@ -644,7 +645,7 @@ public class TokenReaderTests
     {
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
-            TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+            TokenReader reader = new TokenReader();
             List<Token> tokens = reader.Read("0..1");
         });
     }
@@ -652,7 +653,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader32()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("-e");
 
         Assert.AreEqual(2, tokens.Count);
@@ -669,7 +670,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader33()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("1-e");
 
         Assert.AreEqual(3, tokens.Count);
@@ -690,7 +691,7 @@ public class TokenReaderTests
     [TestMethod]
     public void TestTokenReader34()
     {
-        TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader reader = new TokenReader();
         List<Token> tokens = reader.Read("1+e");
 
         Assert.AreEqual(3, tokens.Count);
@@ -713,7 +714,7 @@ public class TokenReaderTests
     {
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
-            TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+            TokenReader reader = new TokenReader();
             List<Token> tokens = reader.Read("2.11E-e3");
         });
     }
@@ -723,7 +724,7 @@ public class TokenReaderTests
     {
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
-            TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+            TokenReader reader = new TokenReader();
             List<Token> tokens = reader.Read("2.11E-e");
         });
     }
@@ -733,8 +734,18 @@ public class TokenReaderTests
     {
         AssertExtensions.ThrowsException<ParseException>(() =>
         {
-            TokenReader reader = new TokenReader(CultureInfo.InvariantCulture);
+            TokenReader reader = new TokenReader();
             List<Token> tokens = reader.Read("3e");
         });
     }
+    
+    [TestMethod]
+    public void TestArgumentSeparatorCollidesWithDecimalSeparator()
+    {
+        AssertExtensions.ThrowsException<ArgumentException>(() =>
+        {
+            var _ = new TokenReader(CultureInfo.GetCultureInfo("de-DE"), ',');
+        });
+    }
+    
 }

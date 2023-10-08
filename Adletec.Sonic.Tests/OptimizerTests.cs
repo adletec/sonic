@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Adletec.Sonic.Execution;
 using Adletec.Sonic.Operations;
 using Adletec.Sonic.Tokenizer;
@@ -16,7 +15,7 @@ public class OptimizerTests
     {
         Optimizer optimizer = new Optimizer(new Interpreter());
 
-        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader tokenReader = new TokenReader();
         IList<Token> tokens = tokenReader.Read("test(var1, (2+3) * 500)");
 
         IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
@@ -35,7 +34,7 @@ public class OptimizerTests
     {
         Optimizer optimizer = new Optimizer(new Interpreter());
 
-        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader tokenReader = new TokenReader();
         IList<Token> tokens = tokenReader.Read("test(500)");
 
         IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
@@ -55,7 +54,7 @@ public class OptimizerTests
     {
         Optimizer optimizer = new Optimizer(new Interpreter());
 
-        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader tokenReader = new TokenReader();
         IList<Token> tokens = tokenReader.Read("var1 * 0.0");
 
         IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
@@ -75,7 +74,7 @@ public class OptimizerTests
     {
         Optimizer optimizer = new Optimizer(new Interpreter());
 
-        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader tokenReader = new TokenReader();
         IList<Token> tokens = tokenReader.Read("0 / var1");
 
         IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
@@ -94,7 +93,7 @@ public class OptimizerTests
     {
         Optimizer optimizer = new Optimizer(new Interpreter());
 
-        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader tokenReader = new TokenReader();
         IList<Token> tokens =
             tokenReader.Read(
                 "(var1 + var2 * var3 / 2) * 0 + 0 / (var1 + var2 * var3 / 2) + (var1 + var2 * var3 / 2)^0");
@@ -115,7 +114,7 @@ public class OptimizerTests
     {
         Optimizer optimizer = new Optimizer(new Interpreter());
 
-        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader tokenReader = new TokenReader();
         IList<Token> tokens = tokenReader.Read("0 ^ 2");
 
         IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
@@ -134,7 +133,7 @@ public class OptimizerTests
     {
         Optimizer optimizer = new Optimizer(new Interpreter());
 
-        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader tokenReader = new TokenReader();
         IList<Token> tokens = tokenReader.Read("0 ^ 0");
 
         IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
@@ -153,7 +152,7 @@ public class OptimizerTests
     {
         Optimizer optimizer = new Optimizer(new Interpreter());
 
-        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader tokenReader = new TokenReader();
         IList<Token> tokens = tokenReader.Read("sin(0 * var1)");
 
         IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);
@@ -172,7 +171,7 @@ public class OptimizerTests
     public void TestOptimizerConstants()
     {
         var optimizer = new Optimizer(new Interpreter());
-        TokenReader tokenReader = new TokenReader(CultureInfo.InvariantCulture);
+        TokenReader tokenReader = new TokenReader();
         IList<Token> tokens = tokenReader.Read("ident(a) + ident(a * b) + ident((a + b) * c) + c");
         
         IFunctionRegistry functionRegistry = new FunctionRegistry(true, false);

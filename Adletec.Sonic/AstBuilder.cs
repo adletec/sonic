@@ -12,6 +12,8 @@ namespace Adletec.Sonic
         private readonly IFunctionRegistry functionRegistry;
         private readonly IConstantRegistry constantRegistry;
         private readonly Dictionary<char, int> operationPrecedence = new Dictionary<char, int>();
+        
+        // todo: using class-member stacks prevents this from being thread safe and forces us to create a new instance of this class for each thread
         private readonly Stack<Operation> resultStack = new Stack<Operation>();
         private readonly Stack<Token> operatorStack = new Stack<Token>();
         private readonly Stack<int> parameterCount = new Stack<int>();
@@ -41,6 +43,7 @@ namespace Adletec.Sonic
 
         public Operation Build(IList<Token> tokens)
         {
+            // todo this has no performance benefit since the class is re-instantiated for each call of Build
             resultStack.Clear();
             operatorStack.Clear();
 
