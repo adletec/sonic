@@ -512,24 +512,21 @@ public class EvaluatorTests
     [TestMethod]
     public void TestFormulaBuilderInvalidParameterNameUnguarded()
     {
-        AssertExtensions.ThrowsException<ParseException>(() =>
-        {
             var engine = Sonic.Evaluator.Create()
                 .Build();
             engine.Evaluate("sin+2", new Dictionary<string, double> { { "sin", 2.0 } });
-        });
-            
     }
     
     [TestMethod]
     public void TestFormulaBuilderInvalidParameterNameGuarded()
     {
-        AssertExtensions.ThrowsException<ParseException>(() =>
+        AssertExtensions.ThrowsException<ArgumentException>(() =>
         {
             var engine = Sonic.Evaluator.Create()
                 .EnableGuardedMode()
                 .Build();
-            engine.Evaluate("sin+2", new Dictionary<string, double> { { "sin", 2.0 } });
+            double result = engine.Evaluate("sin+2", new Dictionary<string, double> { { "sin", 2.0 } });
+            Assert.AreEqual(4.0, result);
         });
     }
 
@@ -1591,6 +1588,17 @@ public class EvaluatorTests
             .Build();
 
         var result = engine.Evaluate("b(a)");
+        Assert.AreEqual(2.0, result);
+    }
+    
+    [TestMethod]
+    public void TestParameterlessFunction()
+    {
+        var engine = SonicBuilders.InterpretedNoCacheNoOptimizer()
+            .AddFunction("two", () => 2.0)
+            .Build();
+
+        var result = engine.Evaluate("two()");
         Assert.AreEqual(2.0, result);
     }
 

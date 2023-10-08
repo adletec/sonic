@@ -130,9 +130,19 @@ namespace Adletec.Sonic.Tokenizer
                     {
                         buffer += characters[i];
                     }
-
-                    tokens.Add(new Token { TokenType = TokenType.Text, Value = buffer, StartPosition = startPosition, Length = i -startPosition });
-                    isFormulaSubPart = false;
+                    
+                    if (characters.Length > i && characters[i] == '(')
+                    {
+                        tokens.Add(new Token { TokenType = TokenType.Function, Value = buffer, StartPosition = startPosition, Length = i - startPosition });
+                        tokens.Add(new Token { TokenType = TokenType.LeftBracket, Value = '(', StartPosition = i, Length = 1 });
+                        isFormulaSubPart = true;
+                        continue;
+                    }
+                    else
+                    {
+                        tokens.Add(new Token { TokenType = TokenType.Symbol, Value = buffer, StartPosition = startPosition, Length = i - startPosition });
+                        isFormulaSubPart = false;
+                    }
 
                     if (i == characters.Length)
                     {
@@ -256,9 +266,10 @@ namespace Adletec.Sonic.Tokenizer
             if (currentToken != '-') return false;
             var previousToken = tokens[tokens.Count - 1];
 
+            // can't be function since function is _always_ directly followed by a left bracket
             return !(previousToken.TokenType == TokenType.FloatingPoint ||
                      previousToken.TokenType == TokenType.Integer ||
-                     previousToken.TokenType == TokenType.Text ||
+                     previousToken.TokenType == TokenType.Symbol ||
                      previousToken.TokenType == TokenType.RightBracket);
 
         }

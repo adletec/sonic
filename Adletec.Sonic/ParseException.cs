@@ -65,6 +65,21 @@ namespace Adletec.Sonic
             LeftBracketPosition = leftBracketPosition;
         }
     }
+    
+    public class UnknownFunctionParserException : ParseException
+    {
+        public int FunctionNamePosition { get; }
+        public int FunctionNameLength { get; }
+        public string FunctionName { get; }
+
+        public UnknownFunctionParserException(string message, int functionNamePosition, int functionNameLength,
+            string functionName) : base(message)
+        {
+            FunctionNamePosition = functionNamePosition;
+            FunctionNameLength = functionNameLength;
+            FunctionName = functionName;
+        }
+    }
 
     public class InvalidNumberOfFunctionArgumentsParserException : ParseException
     {

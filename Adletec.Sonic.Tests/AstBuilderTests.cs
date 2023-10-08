@@ -178,7 +178,7 @@ public class AstBuilderTests
         {
             new() { Value = 10, TokenType = TokenType.Integer },
             new() { Value = '*', TokenType = TokenType.Operation },
-            new() { Value = "var1", TokenType = TokenType.Text }
+            new() { Value = "var1", TokenType = TokenType.Symbol}
         });
 
         var multiplication = (Multiplication)operation;
@@ -195,14 +195,14 @@ public class AstBuilderTests
         var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>()
         {
-            new() { Value = "var1", TokenType = TokenType.Text },
+            new() { Value = "var1", TokenType = TokenType.Symbol},
             new() { Value = '+', TokenType = TokenType.Operation },
             new() { Value = 2, TokenType = TokenType.Integer },
             new() { Value = '*', TokenType = TokenType.Operation },
             new() { Value = '(', TokenType = TokenType.LeftBracket },
             new() { Value = 3, TokenType = TokenType.Integer },
             new() { Value = '*', TokenType = TokenType.Operation },
-            new() { Value = "age", TokenType = TokenType.Text },
+            new() { Value = "age", TokenType = TokenType.Symbol},
             new() { Value = ')', TokenType = TokenType.RightBracket }
         });
 
@@ -224,7 +224,7 @@ public class AstBuilderTests
         var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
         {
-            new() { Value = "sin", TokenType = TokenType.Text },
+            new() { Value = "sin", TokenType = TokenType.Function},
             new() { Value = '(', TokenType = TokenType.LeftBracket },
             new() { Value = 2, TokenType = TokenType.Integer },
             new() { Value = ')', TokenType = TokenType.RightBracket }
@@ -242,7 +242,7 @@ public class AstBuilderTests
         var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
         {
-            new() { Value = "sin", TokenType = TokenType.Text },
+            new() { Value = "sin", TokenType = TokenType.Function},
             new() { Value = '(', TokenType = TokenType.LeftBracket },
             new() { Value = 2, TokenType = TokenType.Integer },
             new() { Value = '+', TokenType = TokenType.Operation },
@@ -265,7 +265,7 @@ public class AstBuilderTests
         var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
         {
-            new() { Value = "sin", TokenType = TokenType.Text },
+            new() { Value = "sin", TokenType = TokenType.Function},
             new() { Value = '(', TokenType = TokenType.LeftBracket },
             new() { Value = 2, TokenType = TokenType.Integer },
             new() { Value = '+', TokenType = TokenType.Operation },

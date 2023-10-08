@@ -4,7 +4,8 @@
     {
         Integer,
         FloatingPoint,
-        Text,
+        Symbol,
+        Function,
         Operation,
         LeftBracket,
         RightBracket,

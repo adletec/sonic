@@ -12,11 +12,11 @@ namespace Adletec.Sonic
         private readonly IFunctionRegistry functionRegistry;
         private readonly IConstantRegistry constantRegistry;
         private readonly Dictionary<char, int> operationPrecedence = new Dictionary<char, int>();
-        
+
         // todo: using class-member stacks prevents this from being thread safe and forces us to create a new instance of this class for each thread
         private readonly Stack<Operation> resultStack = new Stack<Operation>();
         private readonly Stack<Token> operatorStack = new Stack<Token>();
-        private readonly Stack<int> parameterCount = new Stack<int>();
+        private readonly Stack<int> parameterCountStack = new Stack<int>();
 
         public AstBuilder(IFunctionRegistry functionRegistry, IConstantRegistry constantRegistry)
         {
@@ -46,12 +46,12 @@ namespace Adletec.Sonic
             // todo this has no performance benefit since the class is re-instantiated for each call of Build
             resultStack.Clear();
             operatorStack.Clear();
-
-            parameterCount.Clear();
+            parameterCountStack.Clear();
             var tokenReferences = new List<TokenReference>(tokens.Count);
 
-            foreach (var token in tokens)
+            for (var i = 0; i < tokens.Count; i++)
             {
+                var token = tokens[i];
                 switch (token.TokenType)
                 {
                     case TokenType.Integer:
@@ -64,28 +64,47 @@ namespace Adletec.Sonic
                         tokenReferences.Add(new TokenReference(token, floatingPointConstant));
                         resultStack.Push(floatingPointConstant);
                         break;
-                    case TokenType.Text:
+                    case TokenType.Function:
+                        // todo idea: have a stack of parameter-stacks; when a function is encountered, push a new parameter-stack onto the stack; when the matching right bracket is encountered, pop the parameter-stack from the stack and push the function onto the result stack
+                        // might be slow.
+                        // the core problem is that we don't really know how many items whe should pop from the result stack,
+                        // since the parameter count is only a heuristic (counts the number of argument separators) and we
+                        // can't check if there are items between the argument separators because of brackets.
                         if (functionRegistry.IsFunctionName((string)token.Value))
                         {
                             operatorStack.Push(token);
-                            parameterCount.Push(1);
-                        }
-                        else
-                        {
-                            var tokenValue = (string)token.Value;
-                            if (constantRegistry.IsConstantName(tokenValue))
+                            // the next token is the left bracket, the token after that is the first argument or the right bracket
+                            // todo in case of something like function(()), this will assume that there is one parameter - validate that this is the desired behavior
+                            if (tokens.Count > i + 1 && tokens[i + 2].TokenType != TokenType.RightBracket)
                             {
-                                var registeredConstant =
-                                    new FloatingPointConstant(constantRegistry.GetConstantInfo(tokenValue).Value);
-                                tokenReferences.Add(new TokenReference(token, registeredConstant));
-                                resultStack.Push(registeredConstant);
+                                parameterCountStack.Push(1);
                             }
                             else
                             {
-                                var variable = new Variable(tokenValue);
-                                tokenReferences.Add(new TokenReference(token, variable));
-                                resultStack.Push(variable);
+                                parameterCountStack.Push(0);
                             }
+                        }
+                        else
+                        {
+                            throw new UnknownFunctionParserException("${token.Value} is not a known function.",
+                                token.StartPosition, token.Length, token.Value.ToString());
+                        }
+
+                        break;
+                    case TokenType.Symbol:
+                        var tokenValue = (string)token.Value;
+                        if (constantRegistry.IsConstantName(tokenValue))
+                        {
+                            var registeredConstant =
+                                new FloatingPointConstant(constantRegistry.GetConstantInfo(tokenValue).Value);
+                            tokenReferences.Add(new TokenReference(token, registeredConstant));
+                            resultStack.Push(registeredConstant);
+                        }
+                        else
+                        {
+                            var variable = new Variable(tokenValue);
+                            tokenReferences.Add(new TokenReference(token, variable));
+                            resultStack.Push(variable);
                         }
 
                         break;
@@ -97,16 +116,16 @@ namespace Adletec.Sonic
                         break;
                     case TokenType.ArgumentSeparator:
                         PopOperations(false, token);
-                        parameterCount.Push(parameterCount.Pop() + 1);
+                        parameterCountStack.Push(parameterCountStack.Pop() + 1);
                         break;
                     case TokenType.Operation:
                         var operation1 = (char)token.Value;
 
                         while (operatorStack.Count > 0 && (operatorStack.Peek().TokenType == TokenType.Operation ||
-                                                           operatorStack.Peek().TokenType == TokenType.Text))
+                                                           operatorStack.Peek().TokenType == TokenType.Function))
                         {
                             Token operation2Token = operatorStack.Peek();
-                            var isFunctionOnTopOfStack = operation2Token.TokenType == TokenType.Text;
+                            var isFunctionOnTopOfStack = operation2Token.TokenType == TokenType.Function;
 
                             if (!isFunctionOnTopOfStack)
                             {
@@ -162,9 +181,11 @@ namespace Adletec.Sonic
                     case TokenType.Operation:
                         resultStack.Push(ConvertOperation(token));
                         break;
-                    case TokenType.Text:
+                    case TokenType.Function:
                         resultStack.Push(ConvertFunction(token));
                         break;
+                    default:
+                        throw new InvalidOperationException("Unexpected token type.");
                 }
             }
 
@@ -311,20 +332,27 @@ namespace Adletec.Sonic
                 {
                     FunctionInfo functionInfo = functionRegistry.GetFunctionInfo(functionName);
 
-                    int numberOfParameters;
+                    // this is only derived from the number of argument separators and also always assumes that
+                    // there is at least one argument, therefore we still need the try catch block below
+                    int actualParameterCount;
 
                     if (functionInfo.IsDynamicFunc)
                     {
-                        numberOfParameters = parameterCount.Pop();
+                        actualParameterCount = parameterCountStack.Pop();
                     }
                     else
                     {
-                        parameterCount.Pop();
-                        numberOfParameters = functionInfo.NumberOfParameters;
+                        actualParameterCount = parameterCountStack.Pop();
+                        var expectedParameterCount = functionInfo.NumberOfParameters;
+                        if (actualParameterCount != expectedParameterCount)
+                            throw new InvalidNumberOfFunctionArgumentsParserException(
+                                $"There is a syntax issue for the function \"{functionToken.Value}\" at expression position {functionToken.StartPosition}. " +
+                                $"The number of arguments is {actualParameterCount} but {expectedParameterCount} are expected.",
+                                functionToken.StartPosition, functionToken.Length, (string)functionToken.Value);
                     }
 
                     var operations = new List<Operation>();
-                    for (var i = 0; i < numberOfParameters; i++)
+                    for (var i = 0; i < actualParameterCount; i++)
                         operations.Add(resultStack.Pop());
                     operations.Reverse();
 
@@ -340,9 +368,7 @@ namespace Adletec.Sonic
                 // the mathematical formula
                 throw new InvalidNumberOfFunctionArgumentsParserException(
                     $"There is a syntax issue for the function \"{functionToken.Value}\" at position {functionToken.StartPosition}. " +
-                    "The number of arguments does not match with what is expected. " +
-                    "This can also happen if the expression contains a variable with the same name as a function. " +
-                    "In that case please rename either the variable or the function.", functionToken.StartPosition,
+                    "The number of arguments does not match with what is expected.", functionToken.StartPosition,
                     functionToken.Length, (string)functionToken.Value);
             }
         }
@@ -357,6 +383,8 @@ namespace Adletec.Sonic
             {
                 Operation operation = operations[i];
 
+                // todo don't filter for types, the first operation is always ok, the second one is the one that is unexpected
+                // just check the second for what it is and throw the appropriate exception
                 if (operation.GetType() == typeof(IntegerConstant))
                 {
                     var constant = (IntegerConstant)operation;

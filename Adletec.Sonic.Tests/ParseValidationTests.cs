@@ -91,7 +91,7 @@ public class ParseValidationTests
     }
     
     [TestMethod]
-    public void TestValidateInvalidNumberOfArguments()
+    public void TestValidateTooManyArguments()
     {
         try
         {
@@ -104,6 +104,63 @@ public class ParseValidationTests
             Assert.AreEqual("sin", e.FunctionName);
             Assert.AreEqual(0, e.FunctionNamePosition);
             Assert.AreEqual(3, e.FunctionNameLength);
+            return;
+        }
+        Assert.Fail("Expected exception not thrown");
+    }
+    
+    [TestMethod]
+    public void TestValidateTooFewOfArguments()
+    {
+        try
+        {
+            var evaluator = Evaluator.CreateWithDefaults();
+            var expression = "sin()";
+            evaluator.Validate(expression);
+        }
+        catch (InvalidNumberOfFunctionArgumentsParserException e)
+        {
+            Assert.AreEqual("sin", e.FunctionName);
+            Assert.AreEqual(0, e.FunctionNamePosition);
+            Assert.AreEqual(3, e.FunctionNameLength);
+            return;
+        }
+        Assert.Fail("Expected exception not thrown");
+    }
+    
+    [TestMethod]
+    public void TestValidateWrongPlaceOfArgumentsEmpty()
+    {
+        try
+        {
+            var evaluator = Evaluator.CreateWithDefaults();
+            var expression = "a sin()";
+            evaluator.Validate(expression);
+        }
+        catch (InvalidNumberOfFunctionArgumentsParserException e)
+        {
+            Assert.AreEqual("sin", e.FunctionName);
+            Assert.AreEqual(2, e.FunctionNamePosition);
+            Assert.AreEqual(3, e.FunctionNameLength);
+            return;
+        }
+        Assert.Fail("Expected exception not thrown");
+    }
+    
+    [TestMethod]
+    public void TestValidateWrongPlaceOfArguments()
+    {
+        try
+        {
+            var evaluator = Evaluator.CreateWithDefaults();
+            var expression = "a ifless(,b,c,d)";
+            evaluator.Validate(expression);
+        }
+        catch (InvalidNumberOfFunctionArgumentsParserException e)
+        {
+            Assert.AreEqual("ifless", e.FunctionName);
+            Assert.AreEqual(2, e.FunctionNamePosition);
+            Assert.AreEqual(6, e.FunctionNameLength);
             return;
         }
         Assert.Fail("Expected exception not thrown");
@@ -140,8 +197,8 @@ public class ParseValidationTests
         }
         catch (UnexpectedIntegerConstantParserException e)
         {
-            Assert.AreEqual("1", e.Constant);
-            Assert.AreEqual(0, e.ConstantPosition);
+            Assert.AreEqual("2", e.Constant);
+            Assert.AreEqual(2, e.ConstantPosition);
             Assert.AreEqual(1, e.ConstantLength);
             return;
         }
