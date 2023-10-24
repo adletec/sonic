@@ -122,8 +122,8 @@ namespace Adletec.Sonic
                     case TokenType.Operation:
                         var operation1 = (char)token.Value;
 
-                        while (parserContextStack.Peek().OperatorStack.Count > 0 && (parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.Operation ||
-                                                           parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.Function))
+                        while (parserContextStack.Peek().OperatorStack.Count > 0 && 
+                               (parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.Operation || parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.Function))
                         {
                             Token operation2Token = parserContextStack.Peek().OperatorStack.Peek();
                             var isFunctionOnTopOfStack = operation2Token.TokenType == TokenType.Function;
@@ -143,13 +143,6 @@ namespace Adletec.Sonic
                                 {
                                     break;
                                 }
-                            }
-                            else
-                            {
-                                parserContextStack.Peek().OperatorStack.Pop();
-                                var function = ConvertFunction(operation2Token);
-                                parserContextStack.Pop();
-                                parserContextStack.Peek().ResultStack.Push(function);
                             }
                         }
 
@@ -194,6 +187,7 @@ namespace Adletec.Sonic
                 }
             }
 
+
             if (untilLeftBracket)
             {
                 if (parserContextStack.Peek().OperatorStack.Count > 0 && parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.LeftBracket)
@@ -212,6 +206,14 @@ namespace Adletec.Sonic
                                                                  $"bracket at position {parserContextStack.Peek().OperatorStack.Peek().StartPosition}.",
                         parserContextStack.Peek().OperatorStack.Peek().StartPosition);
             }
+            
+            if (parserContextStack.Count >= 1 && parserContextStack.Peek().OperatorStack.Count >= 1 && parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.Function)
+            {
+                var function = ConvertFunction(parserContextStack.Peek().OperatorStack.Pop());
+                parserContextStack.Pop();
+                parserContextStack.Peek().ResultStack.Push(function);
+            }
+            
         }
 
         private Operation ConvertOperation(Token operationToken)
