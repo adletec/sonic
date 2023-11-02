@@ -6,18 +6,17 @@ namespace Adletec.Sonic.Tests;
 [TestClass]
 public class ParseValidationTests
 {
-    
     [TestMethod]
     public void TestValidateValidExpression()
     {
         var evaluator = Evaluator.CreateWithDefaults();
         var expression = "1 + 2 + sin(x) + 34";
         evaluator.Validate(expression);
-        
+
         // does not throw
         Assert.IsTrue(true);
     }
-    
+
     [TestMethod]
     public void TestValidateInvalidToken()
     {
@@ -27,16 +26,17 @@ public class ParseValidationTests
             var expression = "a ! b";
             evaluator.Validate(expression);
         }
-        catch (InvalidTokenParserException e)
+        catch (InvalidTokenParseException e)
         {
             Assert.AreEqual(2, e.TokenPosition);
             Assert.AreEqual(1, e.TokenLength);
             Assert.AreEqual("!", e.Token);
             return;
         }
+
         Assert.Fail("Expected exception not thrown");
     }
-    
+
     [TestMethod]
     public void TestValidateInvalidFloatingPointNumberWithTwoCommas()
     {
@@ -53,9 +53,10 @@ public class ParseValidationTests
             Assert.AreEqual("0.23748.2", e.Token);
             return;
         }
+
         Assert.Fail("Expected exception not thrown");
     }
-    
+
     [TestMethod]
     public void TestValidateMissingLeftBracket()
     {
@@ -65,14 +66,15 @@ public class ParseValidationTests
             var expression = "a + b)";
             evaluator.Validate(expression);
         }
-        catch (MissingLeftBracketParserException e)
+        catch (MissingLeftBracketParseException e)
         {
             Assert.AreEqual(5, e.RightBracketPosition);
             return;
         }
+
         Assert.Fail("Expected exception not thrown");
     }
-    
+
     [TestMethod]
     public void TestValidateMissingRightBracket()
     {
@@ -82,14 +84,15 @@ public class ParseValidationTests
             var expression = "a + (b";
             evaluator.Validate(expression);
         }
-        catch (MissingRightBracketParserException e)
+        catch (MissingRightBracketParseException e)
         {
             Assert.AreEqual(4, e.LeftBracketPosition);
             return;
         }
+
         Assert.Fail("Expected exception not thrown");
     }
-    
+
     [TestMethod]
     public void TestValidateTooManyArguments()
     {
@@ -99,16 +102,17 @@ public class ParseValidationTests
             var expression = "sin(a, b)";
             evaluator.Validate(expression);
         }
-        catch (InvalidNumberOfFunctionArgumentsParserException e)
+        catch (InvalidFunctionArgumentCountParseException e)
         {
             Assert.AreEqual("sin", e.FunctionName);
             Assert.AreEqual(0, e.FunctionNamePosition);
             Assert.AreEqual(3, e.FunctionNameLength);
             return;
         }
+
         Assert.Fail("Expected exception not thrown");
     }
-    
+
     [TestMethod]
     public void TestValidateTooFewOfArguments()
     {
@@ -118,16 +122,17 @@ public class ParseValidationTests
             var expression = "sin()";
             evaluator.Validate(expression);
         }
-        catch (InvalidNumberOfFunctionArgumentsParserException e)
+        catch (InvalidFunctionArgumentCountParseException e)
         {
             Assert.AreEqual("sin", e.FunctionName);
             Assert.AreEqual(0, e.FunctionNamePosition);
             Assert.AreEqual(3, e.FunctionNameLength);
             return;
         }
+
         Assert.Fail("Expected exception not thrown");
     }
-    
+
     [TestMethod]
     public void TestValidateWrongPlaceOfArgumentsEmpty()
     {
@@ -137,16 +142,17 @@ public class ParseValidationTests
             var expression = "a sin()";
             evaluator.Validate(expression);
         }
-        catch (InvalidNumberOfFunctionArgumentsParserException e)
+        catch (InvalidFunctionArgumentCountParseException e)
         {
             Assert.AreEqual("sin", e.FunctionName);
             Assert.AreEqual(2, e.FunctionNamePosition);
             Assert.AreEqual(3, e.FunctionNameLength);
             return;
         }
+
         Assert.Fail("Expected exception not thrown");
     }
-    
+
     [TestMethod]
     public void TestValidateWrongPlaceOfArguments()
     {
@@ -156,16 +162,17 @@ public class ParseValidationTests
             var expression = "a ifless(,b,c,d)";
             evaluator.Validate(expression);
         }
-        catch (InvalidNumberOfFunctionArgumentsParserException e)
+        catch (InvalidFunctionArgumentCountParseException e)
         {
             Assert.AreEqual("ifless", e.FunctionName);
             Assert.AreEqual(2, e.FunctionNamePosition);
             Assert.AreEqual(6, e.FunctionNameLength);
             return;
         }
+
         Assert.Fail("Expected exception not thrown");
     }
-    
+
     [TestMethod]
     public void TestInvalidNumberOfOperationArguments()
     {
@@ -175,16 +182,36 @@ public class ParseValidationTests
             var expression = "a +";
             evaluator.Validate(expression);
         }
-        catch (InvalidNumberOfOperationArgumentsParserException e)
+        catch (MissingOperationArgumentParseException e)
         {
             Assert.AreEqual("+", e.Operator);
             Assert.AreEqual(2, e.OperatorPosition);
             return;
         }
+
         Assert.Fail("Expected exception not thrown");
     }
-    
-    
+
+
+    [TestMethod]
+    public void TestValidateUnexpectedDoubleOperators()
+    {
+        try
+        {
+            var evaluator = Evaluator.CreateWithDefaults();
+            var expression = "1 2 3 + +";
+            evaluator.Validate(expression);
+        }
+        catch (InvalidTokenParseException e)
+        {
+            Assert.AreEqual("2", e.Token);
+            Assert.AreEqual(2, e.TokenPosition);
+            Assert.AreEqual(1, e.TokenLength);
+            return;
+        }
+
+        Assert.Fail("Expected exception not thrown");
+    }
 
     [TestMethod]
     public void TestValidateUnexpectedConstantStart()
@@ -195,16 +222,17 @@ public class ParseValidationTests
             var expression = "1 2 + sin(x) + 34";
             evaluator.Validate(expression);
         }
-        catch (UnexpectedIntegerConstantParserException e)
+        catch (InvalidTokenParseException e)
         {
-            Assert.AreEqual("2", e.Constant);
-            Assert.AreEqual(2, e.ConstantPosition);
-            Assert.AreEqual(1, e.ConstantLength);
+            Assert.AreEqual("2", e.Token);
+            Assert.AreEqual(2, e.TokenPosition);
+            Assert.AreEqual(1, e.TokenLength);
             return;
         }
+
         Assert.Fail("Expected exception not thrown");
     }
-    
+
     [TestMethod]
     public void TestValidateUnexpectedConstantEnd()
     {
@@ -214,16 +242,17 @@ public class ParseValidationTests
             var expression = "1 + sin(x) 34";
             evaluator.Validate(expression);
         }
-        catch (UnexpectedIntegerConstantParserException e)
+        catch (InvalidTokenParseException e)
         {
-            Assert.AreEqual("34", e.Constant);
-            Assert.AreEqual(11, e.ConstantPosition);
-            Assert.AreEqual(2, e.ConstantLength);
+            Assert.AreEqual("34", e.Token);
+            Assert.AreEqual(11, e.TokenPosition);
+            Assert.AreEqual(2, e.TokenLength);
             return;
         }
+
         Assert.Fail("Expected exception not thrown");
     }
-    
+
     [TestMethod]
     public void TestUnexpectedFloatingPointConstant()
     {
@@ -233,14 +262,14 @@ public class ParseValidationTests
             var expression = "1 + 3 34.4";
             evaluator.Validate(expression);
         }
-        catch (UnexpectedFloatingPointConstantParserException e)
+        catch (InvalidTokenParseException e)
         {
-            Assert.AreEqual("34.4", e.Constant);
-            Assert.AreEqual(11, e.ConstantPosition);
-            Assert.AreEqual(2, e.ConstantLength);
+            Assert.AreEqual("34.4", e.Token);
+            Assert.AreEqual(11, e.TokenPosition);
+            Assert.AreEqual(2, e.TokenLength);
             return;
         }
+
         Assert.Fail("Expected exception not thrown");
     }
-    
 }

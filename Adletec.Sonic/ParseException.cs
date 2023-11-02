@@ -14,7 +14,7 @@ namespace Adletec.Sonic
         }
     }
 
-    public class InvalidTokenParserException : ParseException
+    public class InvalidTokenParseException : ParseException
     {
         public int TokenPosition { get; }
         
@@ -22,7 +22,7 @@ namespace Adletec.Sonic
         
         public string Token { get; }
 
-        public InvalidTokenParserException(string message, int tokenPosition, int tokenLength, string token) :
+        public InvalidTokenParseException(string message, int tokenPosition, int tokenLength, string token) :
             base(message)
         {
             TokenPosition = tokenPosition;
@@ -46,33 +46,33 @@ namespace Adletec.Sonic
         }
     }
 
-    public class MissingLeftBracketParserException : ParseException
+    public class MissingLeftBracketParseException : ParseException
     {
         public int RightBracketPosition { get; }
 
-        public MissingLeftBracketParserException(string message, int rightBracketPosition) : base(message)
+        public MissingLeftBracketParseException(string message, int rightBracketPosition) : base(message)
         {
             RightBracketPosition = rightBracketPosition;
         }
     }
 
-    public class MissingRightBracketParserException : ParseException
+    public class MissingRightBracketParseException : ParseException
     {
         public int LeftBracketPosition { get; }
 
-        public MissingRightBracketParserException(string message, int leftBracketPosition) : base(message)
+        public MissingRightBracketParseException(string message, int leftBracketPosition) : base(message)
         {
             LeftBracketPosition = leftBracketPosition;
         }
     }
     
-    public class UnknownFunctionParserException : ParseException
+    public class UnknownFunctionParseException : ParseException
     {
         public int FunctionNamePosition { get; }
         public int FunctionNameLength { get; }
         public string FunctionName { get; }
 
-        public UnknownFunctionParserException(string message, int functionNamePosition, int functionNameLength,
+        public UnknownFunctionParseException(string message, int functionNamePosition, int functionNameLength,
             string functionName) : base(message)
         {
             FunctionNamePosition = functionNamePosition;
@@ -81,13 +81,13 @@ namespace Adletec.Sonic
         }
     }
 
-    public class InvalidNumberOfFunctionArgumentsParserException : ParseException
+    public class InvalidFunctionArgumentCountParseException : ParseException
     {
         public int FunctionNamePosition { get; }
         public int FunctionNameLength { get; }
         public string FunctionName { get; }
 
-        public InvalidNumberOfFunctionArgumentsParserException(string message, int functionNamePosition,
+        public InvalidFunctionArgumentCountParseException(string message, int functionNamePosition,
             int functionNameLength, string functionName) : base(message)
         {
             FunctionNamePosition = functionNamePosition;
@@ -96,12 +96,12 @@ namespace Adletec.Sonic
         }
     }
 
-    public class InvalidNumberOfOperationArgumentsParserException : ParseException
+    public class MissingOperationArgumentParseException : ParseException
     {
         public int OperatorPosition { get; }
         public string Operator { get; }
 
-        public InvalidNumberOfOperationArgumentsParserException(string message, int operatorPosition, string @operator)
+        public MissingOperationArgumentParseException(string message, int operatorPosition, string @operator)
             : base(message)
         {
             OperatorPosition = operatorPosition;
@@ -109,41 +109,12 @@ namespace Adletec.Sonic
         }
     }
 
-    public class UnexpectedIntegerConstantParserException : ParseException
-    {
-        public int ConstantPosition { get; }
-        public int ConstantLength { get; }
-        public string Constant { get; }
-
-        public UnexpectedIntegerConstantParserException(string message, int constantPosition, int constantLength,
-            string constant) : base(message)
-        {
-            ConstantPosition = constantPosition;
-            ConstantLength = constantLength;
-            Constant = constant;
-        }
-    }
-
-    public class UnexpectedFloatingPointConstantParserException : ParseException
-    {
-        public int ConstantPosition { get; }
-        public int ConstantLength { get; }
-        public string Constant { get; }
-
-        public UnexpectedFloatingPointConstantParserException(string message, int constantPosition, int constantLength, string constant) : base(message)
-        {
-            ConstantPosition = constantPosition;
-            ConstantLength = constantLength;
-            Constant = constant;
-        }
-    }
-
-    public class InvalidSyntaxParserException : ParseException
+    public class InvalidSyntaxParseException : ParseException
     {
         private int SyntaxPosition { get; }
         private string Expression { get; }
 
-        public InvalidSyntaxParserException(string message, int syntaxPosition, string expression) : base(message)
+        public InvalidSyntaxParseException(string message, int syntaxPosition, string expression) : base(message)
         {
             SyntaxPosition = syntaxPosition;
             Expression = expression;

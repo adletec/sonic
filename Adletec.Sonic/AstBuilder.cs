@@ -87,7 +87,7 @@ namespace Adletec.Sonic
                         }
                         else
                         {
-                            throw new UnknownFunctionParserException("${token.Value} is not a known function.",
+                            throw new UnknownFunctionParseException("${token.Value} is not a known function.",
                                 token.StartPosition, token.Length, token.Value.ToString());
                         }
 
@@ -120,29 +120,29 @@ namespace Adletec.Sonic
                         parserContextStack.Peek().ParameterCountStack.Push(parserContextStack.Peek().ParameterCountStack.Pop() + 1);
                         break;
                     case TokenType.Operation:
-                        var operation1 = (char)token.Value;
-
-                        while (parserContextStack.Peek().OperatorStack.Count > 0 && 
-                               (parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.Operation || parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.Function))
+                        var currentOperationValue = (char)token.Value;
+                        // Check if the operator on top of the stack has a higher precedence than the current operator
+                        // If so, pop the operator from the stack and push it onto the result stack
+                        // Repeat until the operator stack is empty or the operator on top of the stack has a lower precedence
+                        while (parserContextStack.Peek().OperatorStack.Count > 0 && parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.Operation)
                         {
-                            Token operation2Token = parserContextStack.Peek().OperatorStack.Peek();
-                            var isFunctionOnTopOfStack = operation2Token.TokenType == TokenType.Function;
+                            Token operationOnTopOfStack = parserContextStack.Peek().OperatorStack.Peek();
 
-                            if (!isFunctionOnTopOfStack)
+                            var operationOnTopOfStackValue = (char)operationOnTopOfStack.Value;
+
+                            // if the current operation is left associative and has the same or higher precedence as
+                            // the operation on top of the stack, pop the operation from the stack and push it onto the
+                            // result stack
+                            if ((IsLeftAssociativeOperation(currentOperationValue) &&
+                                 operationPrecedence[currentOperationValue] <= operationPrecedence[operationOnTopOfStackValue]) ||
+                                operationPrecedence[currentOperationValue] < operationPrecedence[operationOnTopOfStackValue])
                             {
-                                var operation2 = (char)operation2Token.Value;
-
-                                if ((IsLeftAssociativeOperation(operation1) &&
-                                     operationPrecedence[operation1] <= operationPrecedence[operation2]) ||
-                                    operationPrecedence[operation1] < operationPrecedence[operation2])
-                                {
-                                    parserContextStack.Peek().OperatorStack.Pop();
-                                    parserContextStack.Peek().ResultStack.Push(ConvertOperation(operation2Token));
-                                }
-                                else
-                                {
-                                    break;
-                                }
+                                parserContextStack.Peek().OperatorStack.Pop();
+                                parserContextStack.Peek().ResultStack.Push(ConvertOperation(operationOnTopOfStack));
+                            }
+                            else
+                            {
+                                break;
                             }
                         }
 
@@ -163,11 +163,13 @@ namespace Adletec.Sonic
 
         private void PopOperations(bool untilLeftBracket, Token? currentToken)
         {
+            // Check preconditions -> todo: this prevents a programming error in the lib. should we really check this here?
             if (untilLeftBracket && !currentToken.HasValue)
                 throw new ArgumentNullException(nameof(currentToken),
                     $"If the parameter \"{nameof(untilLeftBracket)}\" is set to true, " +
                     $"the parameter \"${nameof(currentToken)}\" cannot be null.");
 
+            // Pop operations until operator stack is empty or left bracket is found
             while (parserContextStack.Peek().OperatorStack.Count > 0 && parserContextStack.Peek().OperatorStack.Peek().TokenType != TokenType.LeftBracket)
             {
                 Token token = parserContextStack.Peek().OperatorStack.Pop();
@@ -193,7 +195,7 @@ namespace Adletec.Sonic
                 if (parserContextStack.Peek().OperatorStack.Count > 0 && parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.LeftBracket)
                     parserContextStack.Peek().OperatorStack.Pop();
                 else
-                    throw new MissingLeftBracketParserException("No matching left bracket found for the right " +
+                    throw new MissingLeftBracketParseException("No matching left bracket found for the right " +
                                                                 $"bracket at position {currentToken.Value.StartPosition}.",
                         currentToken.Value.StartPosition);
             }
@@ -202,7 +204,7 @@ namespace Adletec.Sonic
                 if (parserContextStack.Peek().OperatorStack.Count > 0 && parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.LeftBracket
                                             && !(currentToken.HasValue && currentToken.Value.TokenType ==
                                                 TokenType.ArgumentSeparator))
-                    throw new MissingRightBracketParserException("No matching right bracket found for the left " +
+                    throw new MissingRightBracketParseException("No matching right bracket found for the left " +
                                                                  $"bracket at position {parserContextStack.Peek().OperatorStack.Peek().StartPosition}.",
                         parserContextStack.Peek().OperatorStack.Peek().StartPosition);
             }
@@ -321,7 +323,7 @@ namespace Adletec.Sonic
             {
                 // If we encounter a Stack empty issue this means there is a syntax issue in 
                 // the mathematical formula
-                throw new InvalidNumberOfOperationArgumentsParserException(
+                throw new MissingOperationArgumentParseException(
                     $"There is a syntax issue for the operation \"{operationToken.Value}\" at position {operationToken.StartPosition}. " +
                     "The number of arguments does not match with what is expected.", operationToken.StartPosition,
                     operationToken.Value.ToString());
@@ -352,7 +354,7 @@ namespace Adletec.Sonic
                         actualParameterCount = parserContextStack.Peek().ParameterCountStack.Pop();
                         var expectedParameterCount = functionInfo.NumberOfParameters;
                         if (actualParameterCount != expectedParameterCount)
-                            throw new InvalidNumberOfFunctionArgumentsParserException(
+                            throw new InvalidFunctionArgumentCountParseException(
                                 $"There is a syntax issue for the function \"{functionToken.Value}\" at expression position {functionToken.StartPosition}. " +
                                 $"The number of arguments is {actualParameterCount} but {expectedParameterCount} are expected.",
                                 functionToken.StartPosition, functionToken.Length, (string)functionToken.Value);
@@ -374,7 +376,7 @@ namespace Adletec.Sonic
             {
                 // If we encounter a Stack empty issue this means there is a syntax issue in 
                 // the mathematical formula
-                throw new InvalidNumberOfFunctionArgumentsParserException(
+                throw new InvalidFunctionArgumentCountParseException(
                     $"There is a syntax issue for the function \"{functionToken.Value}\" at position {functionToken.StartPosition}. " +
                     "The number of arguments does not match with what is expected.", functionToken.StartPosition,
                     functionToken.Length, (string)functionToken.Value);
@@ -397,7 +399,7 @@ namespace Adletec.Sonic
                 {
                     var constant = (IntegerConstant)operation;
                     var tokenReference = tokenReferences.First(t => ReferenceEquals(t.Operation, constant));
-                    throw new UnexpectedIntegerConstantParserException(
+                    throw new InvalidTokenParseException(
                         $"Unexpected integer constant \"{constant.Value}\" found.", tokenReference.Token.StartPosition,
                         tokenReference.Token.Length, tokenReference.Token.Value.ToString());
                 }
@@ -406,7 +408,7 @@ namespace Adletec.Sonic
                 {
                     var constant = (FloatingPointConstant)operation;
                     var tokenReference = tokenReferences.First(t => ReferenceEquals(t.Operation, constant));
-                    throw new UnexpectedFloatingPointConstantParserException(
+                    throw new InvalidTokenParseException(
                         $"Unexpected floating point constant \"{constant.Value}\" found.",
                         tokenReference.Token.StartPosition, tokenReference.Token.Length,
                         (string)tokenReference.Token.Value);
