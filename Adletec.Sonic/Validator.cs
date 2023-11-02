@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Adletec.Sonic.Execution;
 using Adletec.Sonic.Tokenizer;
 
@@ -31,13 +32,9 @@ namespace Adletec.Sonic
             // illegal predecessor: binary operation, argument separator, right bracket
             switch (firstToken.TokenType)
             {
-                case TokenType.Operation:
-                    if (IsBinaryOperation(firstToken))
-                    {
-                        // if the first token is a binary operation, there is no left argument
-                        ThrowMissingOperationArgumentParseException(firstToken, "There is no left argument.");
-                    }
-
+                case TokenType.Operation when IsBinaryOperation(firstToken):
+                    // if the first token is a binary operation, there is no left argument
+                    ThrowMissingOperationArgumentParseException(firstToken, "There is no left argument.");
                     break;
                 case TokenType.ArgumentSeparator:
                     // an argument separator must be inside a function, which is not the case for the first token
@@ -72,6 +69,12 @@ namespace Adletec.Sonic
                             case TokenType.RightBracket:
                                 ThrowInvalidTokenParseException(token);
                                 break;
+                        }
+
+                        // values (and bracketed clauses, see LeftBracket) are valid arguments for functions
+                        if (IsFunctionOnTopOfStack(contextStack))
+                        {
+                            contextStack.Peek().ActualArgumentCount++;
                         }
 
                         break;
@@ -123,7 +126,6 @@ namespace Adletec.Sonic
                                 "Argument separator must be a direct child of a function.");
                         }
 
-                        validationContext.ArgumentSeparatorCount++;
                         break;
                     case TokenType.LeftBracket:
                         // legal predecessor: argument separator, function, operation, left bracket
@@ -141,46 +143,53 @@ namespace Adletec.Sonic
                         var isFunction = tokenBefore.TokenType == TokenType.Function;
                         if (isFunction)
                         {
+                            // the bracket is part of a function call, so we create a function context
                             var functionInfo = functionRegistry.GetFunctionInfo((string)tokenBefore.Value);
                             contextStack.Push(
                                 new ValidationContext()
                                 {
                                     IsFunction = true,
-                                    ExpectedArgumentSeparatorCount = functionInfo.NumberOfParameters - 1,
-                                    ArgumentSeparatorCount = 0,
+                                    ExpectedArgumentCount = functionInfo.NumberOfParameters,
+                                    ActualArgumentCount = 0,
+                                    // the function:
                                     RootToken = tokenBefore
                                 }
                             );
                         }
                         else
                         {
+                            // the bracket is not part of a function call, so it's a bracketed clause
+                            if (IsFunctionOnTopOfStack(contextStack))
+                            {
+                                contextStack.Peek().ActualArgumentCount++;
+                            }
+
                             contextStack.Push(new ValidationContext()
                             {
                                 IsFunction = false,
-                                ArgumentSeparatorCount = 0,
-                                ExpectedArgumentSeparatorCount = 0
+                                ActualArgumentCount = 0,
+                                ExpectedArgumentCount = 0,
+                                // this bracket:
+                                RootToken = token
                             });
                         }
 
                         break;
                     case TokenType.RightBracket:
-                        // legal predecessor: value, function, right bracket
-                        // illegal predecessor: left bracket, operation, argument separator
+                        // legal predecessor: value (not including function), right bracket
+                        // illegal predecessor: left bracket (unless for parameterless functions), operation, argument separator
+                        // technically, also function. but that can never happen since function tokens must be followed
+                        // by a left bracket to be identified as such.
                         switch (tokenBefore.TokenType)
                         {
                             case TokenType.Operation:
-                                if (IsBinaryOperation(tokenBefore))
-                                {
-                                    ThrowMissingOperationArgumentParseException(token,
-                                        "There is no right argument.");
-                                }
-
+                                ThrowMissingOperationArgumentParseException(token, "There is no right argument.");
                                 break;
                             case TokenType.ArgumentSeparator:
                                 ThrowInvalidTokenParseException(token,
                                     "Argument separator without following argument.");
                                 break;
-                            case TokenType.LeftBracket:
+                            case TokenType.LeftBracket when !IsParameterlessFunctionOnTopOfStack(contextStack):
                                 ThrowInvalidTokenParseException(token, "Empty brackets are not allowed.");
                                 break;
                         }
@@ -189,17 +198,23 @@ namespace Adletec.Sonic
                         {
                             ThrowMissingLeftBracketParseException(token);
                         }
+
                         var context = contextStack.Pop();
-                        if (context.ExpectedArgumentSeparatorCount != context.ArgumentSeparatorCount)
+                        if (context.ExpectedArgumentCount != context.ActualArgumentCount)
                         {
                             ThrowInvalidFunctionArgumentCountParseException(context.RootToken,
-                                context.ExpectedArgumentSeparatorCount, context.ArgumentSeparatorCount);
+                                context.ExpectedArgumentCount, context.ActualArgumentCount);
                         }
 
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+            }
+
+            if (contextStack.Any())
+            {
+                ThrowMissingRightBracketParseException(contextStack.Peek().RootToken);
             }
         }
 
@@ -240,17 +255,47 @@ namespace Adletec.Sonic
                 tokenPosition);
         }
 
+        private static void ThrowMissingRightBracketParseException(Token token, string message = null)
+        {
+            var tokenPosition = token.StartPosition;
+            throw new MissingRightBracketParseException(
+                $"Missing right bracket for left bracket at position {tokenPosition}. {message}",
+                tokenPosition);
+        }
+
         private static bool IsBinaryOperation(Token token)
         {
             // the only unary operation is the negation
             return token.TokenType == TokenType.Operation && (char)token.Value != '_';
         }
 
+        private static bool IsParameterlessFunctionOnTopOfStack(Stack<ValidationContext> contextStack)
+        {
+            if (contextStack.Count == 0)
+            {
+                return false;
+            }
+
+            var contextOnTop = contextStack.Peek();
+            return contextOnTop.IsFunction && contextOnTop.ExpectedArgumentCount == 0;
+        }
+
+        private static bool IsFunctionOnTopOfStack(Stack<ValidationContext> contextStack)
+        {
+            if (contextStack.Count == 0)
+            {
+                return false;
+            }
+
+            var contextOnTop = contextStack.Peek();
+            return contextOnTop.IsFunction;
+        }
+
         private class ValidationContext
         {
             public bool IsFunction { get; set; }
-            public int ArgumentSeparatorCount { get; set; }
-            public int ExpectedArgumentSeparatorCount { get; set; }
+            public int ExpectedArgumentCount { get; set; }
+            public int ActualArgumentCount { get; set; }
             public Token RootToken { get; set; }
         }
     }
