@@ -12,12 +12,10 @@ namespace Adletec.Sonic
         private readonly IFunctionRegistry functionRegistry;
         private readonly IConstantRegistry constantRegistry;
         private readonly Dictionary<char, int> operationPrecedence = new Dictionary<char, int>();
-
-        // todo: using class-member stacks prevents this from being thread safe and forces us to create a new instance of this class for each thread
-        // the parser context encapsulates the state of the parser; when we encounter a function, we push a new parser
-        // context onto the stack, and we'll pop it whenever the function has been parsed;
-        // that way we don't take parameters off the result stack that belong to the parent function
-        private readonly Stack<ParserContext> parserContextStack = new Stack<ParserContext>();
+        
+        private readonly Stack<Operation> resultStack = new Stack<Operation>();
+        private readonly Stack<Token> operatorStack = new Stack<Token>();
+        private readonly Stack<int> parameterCountStack = new Stack<int>();
 
         public AstBuilder(IFunctionRegistry functionRegistry, IConstantRegistry constantRegistry)
         {
@@ -44,9 +42,6 @@ namespace Adletec.Sonic
 
         public Operation Build(IList<Token> tokens)
         {
-            parserContextStack.Clear();
-            parserContextStack.Push(new ParserContext());
-            
             var tokenReferences = new List<TokenReference>(tokens.Count);
 
             for (var i = 0; i < tokens.Count; i++)
@@ -57,12 +52,12 @@ namespace Adletec.Sonic
                     case TokenType.Integer:
                         var integerConstant = new IntegerConstant((int)token.Value);
                         tokenReferences.Add(new TokenReference(token, integerConstant));
-                        parserContextStack.Peek().ResultStack.Push(integerConstant);
+                        resultStack.Push(integerConstant);
                         break;
                     case TokenType.FloatingPoint:
                         var floatingPointConstant = new FloatingPointConstant((double)token.Value);
                         tokenReferences.Add(new TokenReference(token, floatingPointConstant));
-                        parserContextStack.Peek().ResultStack.Push(floatingPointConstant);
+                        resultStack.Push(floatingPointConstant);
                         break;
                     case TokenType.Function:
                         // todo idea: have a stack of parameter-stacks; when a function is encountered, push a new parameter-stack onto the stack; when the matching right bracket is encountered, pop the parameter-stack from the stack and push the function onto the result stack
@@ -72,17 +67,16 @@ namespace Adletec.Sonic
                         // can't check if there are items between the argument separators because of brackets.
                         if (functionRegistry.IsFunctionName((string)token.Value))
                         {
-                            parserContextStack.Push(new ParserContext());
-                            parserContextStack.Peek().OperatorStack.Push(token);
+                            operatorStack.Push(token);
                             // the next token is the left bracket, the token after that is the first argument or the right bracket
                             // todo in case of something like function(()), this will assume that there is one parameter - validate that this is the desired behavior
                             if (tokens.Count > i + 1 && tokens[i + 2].TokenType != TokenType.RightBracket)
                             {
-                                parserContextStack.Peek().ParameterCountStack.Push(1);
+                                parameterCountStack.Push(1);
                             }
                             else
                             {
-                                parserContextStack.Peek().ParameterCountStack.Push(0);
+                                parameterCountStack.Push(0);
                             }
                         }
                         else
@@ -99,34 +93,36 @@ namespace Adletec.Sonic
                             var registeredConstant =
                                 new FloatingPointConstant(constantRegistry.GetConstantInfo(tokenValue).Value);
                             tokenReferences.Add(new TokenReference(token, registeredConstant));
-                            parserContextStack.Peek().ResultStack.Push(registeredConstant);
+                            resultStack.Push(registeredConstant);
                         }
                         else
                         {
                             var variable = new Variable(tokenValue);
                             tokenReferences.Add(new TokenReference(token, variable));
-                            parserContextStack.Peek().ResultStack.Push(variable);
+                            resultStack.Push(variable);
                         }
 
                         break;
                     case TokenType.LeftBracket:
-                        parserContextStack.Peek().OperatorStack.Push(token);
+                        operatorStack.Push(token);
                         break;
                     case TokenType.RightBracket:
                         PopOperations(true, token);
                         break;
                     case TokenType.ArgumentSeparator:
                         PopOperations(false, token);
-                        parserContextStack.Peek().ParameterCountStack.Push(parserContextStack.Peek().ParameterCountStack.Pop() + 1);
+                        parameterCountStack
+                            .Push(parameterCountStack.Pop() + 1);
                         break;
                     case TokenType.Operation:
                         var currentOperationValue = (char)token.Value;
                         // Check if the operator on top of the stack has a higher precedence than the current operator
                         // If so, pop the operator from the stack and push it onto the result stack
                         // Repeat until the operator stack is empty or the operator on top of the stack has a lower precedence
-                        while (parserContextStack.Peek().OperatorStack.Count > 0 && parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.Operation)
+                        while (operatorStack.Count > 0 &&
+                               operatorStack.Peek().TokenType == TokenType.Operation)
                         {
-                            Token operationOnTopOfStack = parserContextStack.Peek().OperatorStack.Peek();
+                            Token operationOnTopOfStack = operatorStack.Peek();
 
                             var operationOnTopOfStackValue = (char)operationOnTopOfStack.Value;
 
@@ -134,11 +130,13 @@ namespace Adletec.Sonic
                             // the operation on top of the stack, pop the operation from the stack and push it onto the
                             // result stack
                             if ((IsLeftAssociativeOperation(currentOperationValue) &&
-                                 operationPrecedence[currentOperationValue] <= operationPrecedence[operationOnTopOfStackValue]) ||
-                                operationPrecedence[currentOperationValue] < operationPrecedence[operationOnTopOfStackValue])
+                                 operationPrecedence[currentOperationValue] <=
+                                 operationPrecedence[operationOnTopOfStackValue]) ||
+                                operationPrecedence[currentOperationValue] <
+                                operationPrecedence[operationOnTopOfStackValue])
                             {
-                                parserContextStack.Peek().OperatorStack.Pop();
-                                parserContextStack.Peek().ResultStack.Push(ConvertOperation(operationOnTopOfStack));
+                                operatorStack.Pop();
+                                resultStack.Push(ConvertOperation(operationOnTopOfStack));
                             }
                             else
                             {
@@ -146,7 +144,7 @@ namespace Adletec.Sonic
                             }
                         }
 
-                        parserContextStack.Peek().OperatorStack.Push(token);
+                        operatorStack.Push(token);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(token),
@@ -158,7 +156,7 @@ namespace Adletec.Sonic
 
             VerifyResultStack(tokenReferences);
 
-            return parserContextStack.Peek().ResultStack.First();
+            return resultStack.First();
         }
 
         private void PopOperations(bool untilLeftBracket, Token? currentToken)
@@ -170,19 +168,19 @@ namespace Adletec.Sonic
                     $"the parameter \"${nameof(currentToken)}\" cannot be null.");
 
             // Pop operations until operator stack is empty or left bracket is found
-            while (parserContextStack.Peek().OperatorStack.Count > 0 && parserContextStack.Peek().OperatorStack.Peek().TokenType != TokenType.LeftBracket)
+            while (operatorStack.Count > 0 &&
+                   operatorStack.Peek().TokenType != TokenType.LeftBracket)
             {
-                Token token = parserContextStack.Peek().OperatorStack.Pop();
+                Token token = operatorStack.Pop();
 
                 switch (token.TokenType)
                 {
                     case TokenType.Operation:
-                        parserContextStack.Peek().ResultStack.Push(ConvertOperation(token));
+                        resultStack.Push(ConvertOperation(token));
                         break;
                     case TokenType.Function:
                         var function = ConvertFunction(token);
-                        parserContextStack.Pop();
-                        parserContextStack.Peek().ResultStack.Push(function);
+                        resultStack.Push(function);
                         break;
                     default:
                         throw new InvalidOperationException("Unexpected token type.");
@@ -192,30 +190,32 @@ namespace Adletec.Sonic
 
             if (untilLeftBracket)
             {
-                if (parserContextStack.Peek().OperatorStack.Count > 0 && parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.LeftBracket)
-                    parserContextStack.Peek().OperatorStack.Pop();
+                if (operatorStack.Count > 0 &&
+                    operatorStack.Peek().TokenType == TokenType.LeftBracket)
+                    operatorStack.Pop();
                 else
                     throw new MissingLeftBracketParseException("No matching left bracket found for the right " +
-                                                                $"bracket at position {currentToken.Value.StartPosition}.",
+                                                               $"bracket at position {currentToken.Value.StartPosition}.",
                         currentToken.Value.StartPosition);
             }
             else
             {
-                if (parserContextStack.Peek().OperatorStack.Count > 0 && parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.LeftBracket
-                                            && !(currentToken.HasValue && currentToken.Value.TokenType ==
-                                                TokenType.ArgumentSeparator))
+                if (operatorStack.Count > 0 && operatorStack.Peek()
+                                                                          .TokenType == TokenType.LeftBracket
+                                                                      && !(currentToken.HasValue &&
+                                                                           currentToken.Value.TokenType ==
+                                                                           TokenType.ArgumentSeparator))
                     throw new MissingRightBracketParseException("No matching right bracket found for the left " +
-                                                                 $"bracket at position {parserContextStack.Peek().OperatorStack.Peek().StartPosition}.",
-                        parserContextStack.Peek().OperatorStack.Peek().StartPosition);
+                                                                $"bracket at position {operatorStack.Peek().StartPosition}.",
+                        operatorStack.Peek().StartPosition);
             }
-            
-            if (parserContextStack.Count >= 1 && parserContextStack.Peek().OperatorStack.Count >= 1 && parserContextStack.Peek().OperatorStack.Peek().TokenType == TokenType.Function)
+
+            if (operatorStack.Count >= 1 &&
+                operatorStack.Peek().TokenType == TokenType.Function)
             {
-                var function = ConvertFunction(parserContextStack.Peek().OperatorStack.Pop());
-                parserContextStack.Pop();
-                parserContextStack.Peek().ResultStack.Push(function);
+                var function = ConvertFunction(operatorStack.Pop());
+                resultStack.Push(function);
             }
-            
         }
 
         private Operation ConvertOperation(Token operationToken)
@@ -231,87 +231,87 @@ namespace Adletec.Sonic
                 switch ((char)operationToken.Value)
                 {
                     case '+':
-                        argument2 = parserContextStack.Peek().ResultStack.Pop();
-                        argument1 = parserContextStack.Peek().ResultStack.Pop();
+                        argument2 = resultStack.Pop();
+                        argument1 = resultStack.Pop();
                         dataType = RequiredDataType(argument1, argument2);
 
                         return new Addition(dataType, argument1, argument2);
                     case '-':
-                        argument2 = parserContextStack.Peek().ResultStack.Pop();
-                        argument1 = parserContextStack.Peek().ResultStack.Pop();
+                        argument2 = resultStack.Pop();
+                        argument1 = resultStack.Pop();
                         dataType = RequiredDataType(argument1, argument2);
 
                         return new Subtraction(dataType, argument1, argument2);
                     case '*':
-                        argument2 = parserContextStack.Peek().ResultStack.Pop();
-                        argument1 = parserContextStack.Peek().ResultStack.Pop();
+                        argument2 = resultStack.Pop();
+                        argument1 = resultStack.Pop();
                         dataType = RequiredDataType(argument1, argument2);
 
                         return new Multiplication(dataType, argument1, argument2);
                     case '/':
-                        divisor = parserContextStack.Peek().ResultStack.Pop();
-                        dividend = parserContextStack.Peek().ResultStack.Pop();
+                        divisor = resultStack.Pop();
+                        dividend = resultStack.Pop();
 
                         return new Division(DataType.FloatingPoint, dividend, divisor);
                     case '%':
-                        divisor = parserContextStack.Peek().ResultStack.Pop();
-                        dividend = parserContextStack.Peek().ResultStack.Pop();
+                        divisor = resultStack.Pop();
+                        dividend = resultStack.Pop();
 
                         return new Modulo(DataType.FloatingPoint, dividend, divisor);
                     case '_':
-                        argument1 = parserContextStack.Peek().ResultStack.Pop();
+                        argument1 = resultStack.Pop();
 
                         return new UnaryMinus(argument1.DataType, argument1);
                     case '^':
-                        Operation exponent = parserContextStack.Peek().ResultStack.Pop();
-                        Operation @base = parserContextStack.Peek().ResultStack.Pop();
+                        Operation exponent = resultStack.Pop();
+                        Operation @base = resultStack.Pop();
 
                         return new Exponentiation(DataType.FloatingPoint, @base, exponent);
                     case '&':
-                        argument2 = parserContextStack.Peek().ResultStack.Pop();
-                        argument1 = parserContextStack.Peek().ResultStack.Pop();
+                        argument2 = resultStack.Pop();
+                        argument1 = resultStack.Pop();
                         dataType = RequiredDataType(argument1, argument2);
 
                         return new And(dataType, argument1, argument2);
                     case '|':
-                        argument2 = parserContextStack.Peek().ResultStack.Pop();
-                        argument1 = parserContextStack.Peek().ResultStack.Pop();
+                        argument2 = resultStack.Pop();
+                        argument1 = resultStack.Pop();
                         dataType = RequiredDataType(argument1, argument2);
 
                         return new Or(dataType, argument1, argument2);
                     case '<':
-                        argument2 = parserContextStack.Peek().ResultStack.Pop();
-                        argument1 = parserContextStack.Peek().ResultStack.Pop();
+                        argument2 = resultStack.Pop();
+                        argument1 = resultStack.Pop();
                         dataType = RequiredDataType(argument1, argument2);
 
                         return new LessThan(dataType, argument1, argument2);
                     case '≤':
-                        argument2 = parserContextStack.Peek().ResultStack.Pop();
-                        argument1 = parserContextStack.Peek().ResultStack.Pop();
+                        argument2 = resultStack.Pop();
+                        argument1 = resultStack.Pop();
                         dataType = RequiredDataType(argument1, argument2);
 
                         return new LessOrEqualThan(dataType, argument1, argument2);
                     case '>':
-                        argument2 = parserContextStack.Peek().ResultStack.Pop();
-                        argument1 = parserContextStack.Peek().ResultStack.Pop();
+                        argument2 = resultStack.Pop();
+                        argument1 = resultStack.Pop();
                         dataType = RequiredDataType(argument1, argument2);
 
                         return new GreaterThan(dataType, argument1, argument2);
                     case '≥':
-                        argument2 = parserContextStack.Peek().ResultStack.Pop();
-                        argument1 = parserContextStack.Peek().ResultStack.Pop();
+                        argument2 = resultStack.Pop();
+                        argument1 = resultStack.Pop();
                         dataType = RequiredDataType(argument1, argument2);
 
                         return new GreaterOrEqualThan(dataType, argument1, argument2);
                     case '=':
-                        argument2 = parserContextStack.Peek().ResultStack.Pop();
-                        argument1 = parserContextStack.Peek().ResultStack.Pop();
+                        argument2 = resultStack.Pop();
+                        argument1 = resultStack.Pop();
                         dataType = RequiredDataType(argument1, argument2);
 
                         return new Equal(dataType, argument1, argument2);
                     case '≠':
-                        argument2 = parserContextStack.Peek().ResultStack.Pop();
-                        argument1 = parserContextStack.Peek().ResultStack.Pop();
+                        argument2 = resultStack.Pop();
+                        argument1 = resultStack.Pop();
                         dataType = RequiredDataType(argument1, argument2);
 
                         return new NotEqual(dataType, argument1, argument2);
@@ -347,11 +347,11 @@ namespace Adletec.Sonic
 
                     if (functionInfo.IsDynamicFunc)
                     {
-                        actualParameterCount = parserContextStack.Peek().ParameterCountStack.Pop();
+                        actualParameterCount = parameterCountStack.Pop();
                     }
                     else
                     {
-                        actualParameterCount = parserContextStack.Peek().ParameterCountStack.Pop();
+                        actualParameterCount = parameterCountStack.Pop();
                         var expectedParameterCount = functionInfo.NumberOfParameters;
                         if (actualParameterCount != expectedParameterCount)
                             throw new InvalidFunctionArgumentCountParseException(
@@ -363,7 +363,7 @@ namespace Adletec.Sonic
                     var operations = new List<Operation>();
                     // todo: we should now be able to pop all operations in the current context
                     for (var i = 0; i < actualParameterCount; i++)
-                        operations.Add(parserContextStack.Peek().ResultStack.Pop());
+                        operations.Add(resultStack.Pop());
                     operations.Reverse();
 
                     return new Function(DataType.FloatingPoint, functionName, operations, functionInfo.IsIdempotent);
@@ -385,9 +385,9 @@ namespace Adletec.Sonic
 
         private void VerifyResultStack(IList<TokenReference> tokenReferences)
         {
-            if (parserContextStack.Peek().ResultStack.Count <= 1) return;
+            if (resultStack.Count <= 1) return;
 
-            Operation[] operations = parserContextStack.Peek().ResultStack.ToArray();
+            Operation[] operations = resultStack.ToArray();
 
             for (var i = 1; i < operations.Length; i++)
             {
@@ -444,9 +444,6 @@ namespace Adletec.Sonic
 
         private class ParserContext
         {
-            public Stack<Operation> ResultStack { get; } = new Stack<Operation>();
-            public Stack<Token> OperatorStack { get; } = new Stack<Token>();
-            public Stack<int> ParameterCountStack { get; } = new Stack<int>();
         }
     }
 }
