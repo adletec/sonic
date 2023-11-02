@@ -42,8 +42,6 @@ namespace Adletec.Sonic
 
         public Operation Build(IList<Token> tokens)
         {
-            var tokenReferences = new List<TokenReference>(tokens.Count);
-
             for (var i = 0; i < tokens.Count; i++)
             {
                 var token = tokens[i];
@@ -51,12 +49,10 @@ namespace Adletec.Sonic
                 {
                     case TokenType.Integer:
                         var integerConstant = new IntegerConstant((int)token.Value);
-                        tokenReferences.Add(new TokenReference(token, integerConstant));
                         resultStack.Push(integerConstant);
                         break;
                     case TokenType.FloatingPoint:
                         var floatingPointConstant = new FloatingPointConstant((double)token.Value);
-                        tokenReferences.Add(new TokenReference(token, floatingPointConstant));
                         resultStack.Push(floatingPointConstant);
                         break;
                     case TokenType.Function:
@@ -92,13 +88,11 @@ namespace Adletec.Sonic
                         {
                             var registeredConstant =
                                 new FloatingPointConstant(constantRegistry.GetConstantInfo(tokenValue).Value);
-                            tokenReferences.Add(new TokenReference(token, registeredConstant));
                             resultStack.Push(registeredConstant);
                         }
                         else
                         {
                             var variable = new Variable(tokenValue);
-                            tokenReferences.Add(new TokenReference(token, variable));
                             resultStack.Push(variable);
                         }
 
@@ -153,8 +147,6 @@ namespace Adletec.Sonic
             }
 
             PopOperations(false, null);
-
-            VerifyResultStack(tokenReferences);
 
             return resultStack.First();
         }
@@ -381,41 +373,6 @@ namespace Adletec.Sonic
                     "The number of arguments does not match with what is expected.", functionToken.StartPosition,
                     functionToken.Length, (string)functionToken.Value);
             }
-        }
-
-        private void VerifyResultStack(IList<TokenReference> tokenReferences)
-        {
-            if (resultStack.Count <= 1) return;
-
-            Operation[] operations = resultStack.ToArray();
-
-            for (var i = 1; i < operations.Length; i++)
-            {
-                Operation operation = operations[i];
-
-                // todo don't filter for types, the first operation is always ok, the second one is the one that is unexpected
-                // just check the second for what it is and throw the appropriate exception
-                if (operation.GetType() == typeof(IntegerConstant))
-                {
-                    var constant = (IntegerConstant)operation;
-                    var tokenReference = tokenReferences.First(t => ReferenceEquals(t.Operation, constant));
-                    throw new InvalidTokenParseException(
-                        $"Unexpected integer constant \"{constant.Value}\" found.", tokenReference.Token.StartPosition,
-                        tokenReference.Token.Length, tokenReference.Token.Value.ToString());
-                }
-
-                if (operation.GetType() == typeof(FloatingPointConstant))
-                {
-                    var constant = (FloatingPointConstant)operation;
-                    var tokenReference = tokenReferences.First(t => ReferenceEquals(t.Operation, constant));
-                    throw new InvalidTokenParseException(
-                        $"Unexpected floating point constant \"{constant.Value}\" found.",
-                        tokenReference.Token.StartPosition, tokenReference.Token.Length,
-                        (string)tokenReference.Token.Value);
-                }
-            }
-
-            throw new ParseException("The syntax of the provided formula is not valid.");
         }
 
         private bool IsLeftAssociativeOperation(char character)

@@ -399,41 +399,4 @@ public class AstBuilderTests
         });
     }
 
-    [TestMethod]
-    public void TestBuildInvalidFormula4()
-    {
-        IFunctionRegistry registry = new MockFunctionRegistry();
-
-        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
-
-        AssertExtensions.ThrowsException<ParseException>(() =>
-        {
-            var operation = builder.Build(new List<Token>
-            {
-                new() { Value = 5, TokenType = TokenType.Integer, StartPosition = 0 },
-                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 1 },
-                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 3 },
-                new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 4 }
-            });
-        });
-    }
-
-    [TestMethod]
-    public void TestBuildInvalidFormula5()
-    {
-        IFunctionRegistry registry = new MockFunctionRegistry();
-
-        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
-
-        AssertExtensions.ThrowsException<ParseException>(() =>
-        {
-            var operation = builder.Build(new List<Token>
-            {
-                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 0 },
-                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 2 },
-                new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 3 },
-                new() { Value = 5, TokenType = TokenType.Integer, StartPosition = 4 }
-            });
-        });
-    }
 }
