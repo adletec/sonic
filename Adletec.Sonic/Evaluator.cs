@@ -17,6 +17,7 @@ namespace Adletec.Sonic
         private readonly TokenReader tokenReader;
         private readonly Optimizer optimizer;
         private readonly IExecutor executor;
+        private readonly Validator validator;
         
         private readonly MemoryCache<string, Func<IDictionary<string, double>, double>> executionFormulaCache;
         private readonly bool cacheEnabled;
@@ -24,6 +25,7 @@ namespace Adletec.Sonic
         private readonly bool guardedMode;
 
         private readonly Random random;
+        private readonly CultureInfo cultureInfo;
 
         /// <summary>
         /// Create a new instance of the evaluator with default settings.
@@ -54,7 +56,7 @@ namespace Adletec.Sonic
             this.FunctionRegistry = new FunctionRegistry(caseSensitive, options.GuardedMode);
             this.ConstantRegistry = new ConstantRegistry(caseSensitive, options.GuardedMode);
             
-            var cultureInfo = options.CultureInfo;
+            cultureInfo = options.CultureInfo;
             var argumentSeparator = options.ArgumentSeparator;
             tokenReader = new TokenReader(cultureInfo, argumentSeparator);
             
@@ -115,6 +117,8 @@ namespace Adletec.Sonic
                     FunctionRegistry.RegisterFunction(function.Name, function.Function, function.IsIdempotent);
                 }
             }
+            
+            this.validator = new Validator(FunctionRegistry, cultureInfo);
         }
 
         internal IFunctionRegistry FunctionRegistry { get; }
@@ -214,6 +218,7 @@ namespace Adletec.Sonic
         private Operation BuildAbstractSyntaxTree(string formulaText, IConstantRegistry compiledConstants, bool optimize)
         {
             List<Token> tokens = tokenReader.Read(formulaText);
+            validator.Validate(tokens);
             
             var astBuilder = new AstBuilder(FunctionRegistry, compiledConstants);
             Operation operation = astBuilder.Build(tokens);
