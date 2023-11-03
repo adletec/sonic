@@ -175,6 +175,11 @@ namespace Adletec.Sonic
                         {
                             // the bracket is part of a function call, so we create a function context
                             var functionInfo = functionRegistry.GetFunctionInfo((string)tokenBefore.Value);
+                            if (functionInfo == null)
+                            {
+                                ThrowUnknownFunctionParseException(tokenBefore);
+                            }
+
                             contextStack.Push(
                                 new ValidationContext()
                                 {
@@ -233,6 +238,12 @@ namespace Adletec.Sonic
                         var context = contextStack.Pop();
                         if (context.IsDynamic)
                         {
+                            if (context.ActualArgumentCount < 1)
+                            {
+                                ThrowInvalidFunctionArgumentCountParseException(context.RootToken, -1,
+                                    context.ActualArgumentCount, "Dynamic functions must have at least one argument.");
+                            }
+
                             // dynamic functions can have any number of arguments
                             break;
                         }
@@ -282,6 +293,16 @@ namespace Adletec.Sonic
                 $"Missing argument for operation \"{tokenString}\" at position {tokenPosition}. {message}",
                 tokenPosition, tokenString);
         }
+        
+        private static void ThrowInvalidDynamicFunctionArgumentCountParseException(Token rootToken, string message = null)
+        {
+            var functionName = rootToken.Value.ToString();
+            var functionNamePosition = rootToken.StartPosition;
+            var functionNameLength = rootToken.Length;
+            throw new InvalidFunctionArgumentCountParseException(
+                $"Invalid argument count for dynamic function \"{functionName}\" at position {functionNamePosition}. Expected to find at least one argument, but found none. {message}",
+                functionNamePosition, functionNameLength, functionName);
+        }
 
         private static void ThrowInvalidFunctionArgumentCountParseException(Token rootToken, int expectedArguments,
             int foundArguments, string message = null)
@@ -308,6 +329,15 @@ namespace Adletec.Sonic
             throw new MissingRightBracketParseException(
                 $"Missing right bracket for left bracket at position {tokenPosition}. {message}",
                 tokenPosition);
+        }
+
+        private static void ThrowUnknownFunctionParseException(Token token, string message = null)
+        {
+            var tokenString = token.Value.ToString();
+            var tokenPosition = token.StartPosition;
+            throw new UnknownFunctionParseException(
+                $"Unknown function \"{tokenString}\" at position {tokenPosition}. {message}",
+                tokenPosition, token.Length, token.Value.ToString());
         }
 
         private static bool IsUnaryOperation(Token token)

@@ -388,11 +388,49 @@ public class ValidatorTest
     }
     
     [TestMethod]
+    public void TestDynamicFunctionsWithoutArgument()
+    {
+        
+        try
+        {
+            ValidateExpression("max()");
+        }
+        catch (InvalidFunctionArgumentCountParseException e)
+        {
+            Assert.AreEqual(3, e.FunctionNameLength);
+            Assert.AreEqual(0, e.FunctionNamePosition);
+            Assert.AreEqual("max", e.FunctionName);
+            return;
+        }
+
+        Assert.Fail("Expected exception not thrown");
+    }
+    
+    
+    [TestMethod]
     public void TestBracketedOperationsInFunctions()
     {
         ValidateExpression("ifless(0.57, (3000-500)/(1500-500), 10, 20)");
         // does not throw
         Assert.IsTrue(true);
+    }
+    
+    [TestMethod]
+    public void TestUnknownFunction()
+    {
+        try
+        {
+            ValidateExpression("foo(bar)");
+        }
+        catch (UnknownFunctionParseException e)
+        {
+            Assert.AreEqual(0, e.FunctionNamePosition);
+            Assert.AreEqual(3, e.FunctionNameLength);
+            Assert.AreEqual("foo", e.FunctionName);
+            return;
+        }
+
+        Assert.Fail("Expected exception not thrown");
     }
 
     private static void ValidateExpression(string expression)
