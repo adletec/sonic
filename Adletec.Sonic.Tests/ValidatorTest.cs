@@ -37,7 +37,6 @@ public class ValidatorTest
         {
             Assert.AreEqual("34.4", e.Token);
             Assert.AreEqual(6, e.TokenPosition);
-            Assert.AreEqual(4, e.TokenLength);
             return;
         }
 
@@ -55,7 +54,6 @@ public class ValidatorTest
         {
             Assert.AreEqual("a", e.Token);
             Assert.AreEqual(2, e.TokenPosition);
-            Assert.AreEqual(1, e.TokenLength);
             return;
         }
 
@@ -73,7 +71,6 @@ public class ValidatorTest
         {
             Assert.AreEqual(",", e.Token);
             Assert.AreEqual(1, e.TokenPosition);
-            Assert.AreEqual(1, e.TokenLength);
             return;
         }
 
@@ -91,7 +88,6 @@ public class ValidatorTest
         {
             Assert.AreEqual("ifless", e.FunctionName);
             Assert.AreEqual(23, e.FunctionNamePosition);
-            Assert.AreEqual(6, e.FunctionNameLength);
             return;
         }
 
@@ -109,7 +105,6 @@ public class ValidatorTest
         {
             Assert.AreEqual("ifless", e.FunctionName);
             Assert.AreEqual(23, e.FunctionNamePosition);
-            Assert.AreEqual(6, e.FunctionNameLength);
             return;
         }
 
@@ -169,7 +164,6 @@ public class ValidatorTest
         {
             Assert.AreEqual(")", e.Token);
             Assert.AreEqual(9, e.TokenPosition);
-            Assert.AreEqual(1, e.TokenLength);
             return;
         }
 
@@ -227,7 +221,6 @@ public class ValidatorTest
         {
             Assert.AreEqual("random", e.FunctionName);
             Assert.AreEqual(4, e.FunctionNamePosition);
-            Assert.AreEqual(6, e.FunctionNameLength);
             return;
         }
 
@@ -277,7 +270,6 @@ public class ValidatorTest
         {
             Assert.AreEqual("ifless", e.Token);
             Assert.AreEqual(2, e.TokenPosition);
-            Assert.AreEqual(6, e.TokenLength);
             return;
         }
 
@@ -295,7 +287,6 @@ public class ValidatorTest
         {
             Assert.AreEqual("sin", e.Token);
             Assert.AreEqual(2, e.TokenPosition);
-            Assert.AreEqual(3, e.TokenLength);
             return;
         }
 
@@ -338,7 +329,6 @@ public class ValidatorTest
         {
             Assert.AreEqual("2", e.Token);
             Assert.AreEqual(2, e.TokenPosition);
-            Assert.AreEqual(1, e.TokenLength);
             return;
         }
 
@@ -355,7 +345,6 @@ public class ValidatorTest
         catch (InvalidTokenParseException e)
         {
             Assert.AreEqual(2, e.TokenPosition);
-            Assert.AreEqual(1, e.TokenLength);
             Assert.AreEqual("!", e.Token);
             return;
         }
@@ -397,7 +386,6 @@ public class ValidatorTest
         }
         catch (InvalidFunctionArgumentCountParseException e)
         {
-            Assert.AreEqual(3, e.FunctionNameLength);
             Assert.AreEqual(0, e.FunctionNamePosition);
             Assert.AreEqual("max", e.FunctionName);
             return;
@@ -425,13 +413,30 @@ public class ValidatorTest
         catch (UnknownFunctionParseException e)
         {
             Assert.AreEqual(0, e.FunctionNamePosition);
-            Assert.AreEqual(3, e.FunctionNameLength);
             Assert.AreEqual("foo", e.FunctionName);
             return;
         }
 
         Assert.Fail("Expected exception not thrown");
     }
+    
+    [TestMethod]
+    public void TestInvalidFloatingPointNumber()
+    {
+        try
+        {
+            ValidateExpression("123.456.78");
+        }
+        catch (InvalidFloatingPointNumberException e)
+        {
+            Assert.AreEqual(0, e.TokenPosition);
+            Assert.AreEqual("123.456.78", e.Token);
+            return;
+        }
+
+        Assert.Fail("Expected exception not thrown");
+    }
+
 
     private static void ValidateExpression(string expression)
     {

@@ -240,8 +240,7 @@ namespace Adletec.Sonic
                         {
                             if (context.ActualArgumentCount < 1)
                             {
-                                ThrowInvalidFunctionArgumentCountParseException(context.RootToken, -1,
-                                    context.ActualArgumentCount, "Dynamic functions must have at least one argument.");
+                                 ThrowInvalidDynamicFunctionArgumentCountParseException(context.RootToken);
                             }
 
                             // dynamic functions can have any number of arguments
@@ -282,7 +281,7 @@ namespace Adletec.Sonic
             var tokenPosition = token.StartPosition;
             throw new InvalidTokenParseException(
                 $"Unexpected token at position {tokenPosition} in expression: \"{tokenString}\". {message}",
-                tokenPosition, token.Length, tokenString);
+                tokenPosition, tokenString);
         }
 
         private static void ThrowMissingOperationArgumentParseException(Token token, string message = null)
@@ -298,10 +297,9 @@ namespace Adletec.Sonic
         {
             var functionName = rootToken.Value.ToString();
             var functionNamePosition = rootToken.StartPosition;
-            var functionNameLength = rootToken.Length;
             throw new InvalidFunctionArgumentCountParseException(
                 $"Invalid argument count for dynamic function \"{functionName}\" at position {functionNamePosition}. Expected to find at least one argument, but found none. {message}",
-                functionNamePosition, functionNameLength, functionName);
+                functionNamePosition, functionName);
         }
 
         private static void ThrowInvalidFunctionArgumentCountParseException(Token rootToken, int expectedArguments,
@@ -309,10 +307,9 @@ namespace Adletec.Sonic
         {
             var functionName = rootToken.Value.ToString();
             var functionNamePosition = rootToken.StartPosition;
-            var functionNameLength = rootToken.Length;
             throw new InvalidFunctionArgumentCountParseException(
                 $"Invalid argument count for function \"{functionName}\" at position {functionNamePosition}. Expected {expectedArguments}, but found {foundArguments}. {message}",
-                functionNamePosition, functionNameLength, functionName);
+                functionNamePosition, functionName);
         }
 
         private static void ThrowMissingLeftBracketParseException(Token token, string message = null)
@@ -337,7 +334,7 @@ namespace Adletec.Sonic
             var tokenPosition = token.StartPosition;
             throw new UnknownFunctionParseException(
                 $"Unknown function \"{tokenString}\" at position {tokenPosition}. {message}",
-                tokenPosition, token.Length, token.Value.ToString());
+                tokenPosition, token.Value.ToString());
         }
 
         private static bool IsUnaryOperation(Token token)
