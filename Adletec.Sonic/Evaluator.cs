@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Adletec.Sonic.Execution;
 using Adletec.Sonic.Operations;
@@ -25,7 +24,6 @@ namespace Adletec.Sonic
         private readonly bool guardedMode;
 
         private readonly Random random;
-        private readonly CultureInfo cultureInfo;
 
         /// <summary>
         /// Create a new instance of the evaluator with default settings.
@@ -56,7 +54,7 @@ namespace Adletec.Sonic
             this.FunctionRegistry = new FunctionRegistry(caseSensitive, options.GuardedMode);
             this.ConstantRegistry = new ConstantRegistry(caseSensitive, options.GuardedMode);
             
-            cultureInfo = options.CultureInfo;
+            var cultureInfo = options.CultureInfo;
             var argumentSeparator = options.ArgumentSeparator;
             tokenReader = new TokenReader(cultureInfo, argumentSeparator);
             
@@ -154,6 +152,10 @@ namespace Adletec.Sonic
             return BuildEvaluator(expression, operation);
         }
 
+        /// <summary>
+        /// Validates the given expression. If the expression is invalid, a matching subtype of ParseException is thrown.
+        /// </summary>
+        /// <param name="expression">The expression to check.</param>
         public void Validate(string expression)
         {
             BuildAbstractSyntaxTree(expression, ConstantRegistry, false);
