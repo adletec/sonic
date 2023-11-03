@@ -7,17 +7,30 @@ using Adletec.Sonic.Tokenizer;
 
 namespace Adletec.Sonic
 {
+    /// <summary>
+    /// A validator for the token list produced by the <see cref="TokenReader"/>.
+    /// </summary>
     public class Validator
     {
         private readonly IFunctionRegistry functionRegistry;
         private readonly CultureInfo cultureInfo;
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="functionRegistry">The function registry also used for evaluation.</param>
+        /// <param name="cultureInfo">The culture info also used for evaluation.</param>
         public Validator(IFunctionRegistry functionRegistry, CultureInfo cultureInfo)
         {
             this.functionRegistry = functionRegistry;
             this.cultureInfo = cultureInfo;
         }
 
+        /// <summary>
+        /// Validates the token list produced by the <see cref="TokenReader"/>.
+        /// </summary>
+        /// <param name="tokenList">The token list as produced by <see cref="TokenReader"/>.</param>
+        /// <exception cref="ArgumentException">If the token list is empty.</exception>
         public void Validate(IList<Token> tokenList)
         {
             var contextStack = new Stack<ValidationContext>();
@@ -240,7 +253,7 @@ namespace Adletec.Sonic
                         {
                             if (context.ActualArgumentCount < 1)
                             {
-                                 ThrowInvalidDynamicFunctionArgumentCountParseException(context.RootToken);
+                                ThrowInvalidDynamicFunctionArgumentCountParseException(context.RootToken);
                             }
 
                             // dynamic functions can have any number of arguments
@@ -292,8 +305,9 @@ namespace Adletec.Sonic
                 $"Missing argument for operation \"{tokenString}\" at position {tokenPosition}. {message}",
                 tokenPosition, tokenString);
         }
-        
-        private static void ThrowInvalidDynamicFunctionArgumentCountParseException(Token rootToken, string message = null)
+
+        private static void ThrowInvalidDynamicFunctionArgumentCountParseException(Token rootToken,
+            string message = null)
         {
             var functionName = rootToken.Value.ToString();
             var functionNamePosition = rootToken.StartPosition;
