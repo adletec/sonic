@@ -16,15 +16,19 @@ public class SonicDelegateBenchmarkExecutor : IBenchmarkExecutor
         engine = Evaluator.CreateWithDefaults();
     }
 
-    public SonicDelegateBenchmarkExecutor(bool caseSensitive, bool interpreted, bool cached, bool optimize = true, bool guardedMode = false)
+    public SonicDelegateBenchmarkExecutor(bool caseSensitive, bool interpreted, bool cached, bool optimize = true,
+        bool guardedMode = false, bool validate = true)
     {
         var engineBuilder = Evaluator.Create();
 
         engineBuilder = caseSensitive ? engineBuilder.EnableCaseSensitivity() : engineBuilder.DisableCaseSensitivity();
-        engineBuilder = interpreted ? engineBuilder.UseExecutionMode(ExecutionMode.Interpreted) : engineBuilder.UseExecutionMode(ExecutionMode.Compiled);
+        engineBuilder = interpreted
+            ? engineBuilder.UseExecutionMode(ExecutionMode.Interpreted)
+            : engineBuilder.UseExecutionMode(ExecutionMode.Compiled);
         engineBuilder = cached ? engineBuilder.EnableCache() : engineBuilder.DisableCache();
         engineBuilder = guardedMode ? engineBuilder.EnableGuardedMode() : engineBuilder.DisableGuardedMode();
         engineBuilder = optimize ? engineBuilder.EnableOptimizer() : engineBuilder.DisableOptimizer();
+        engineBuilder = validate ? engineBuilder.EnableValidation() : engineBuilder.DisableValidation();
         engine = engineBuilder.Build();
     }
 
@@ -38,6 +42,7 @@ public class SonicDelegateBenchmarkExecutor : IBenchmarkExecutor
             {
                 variables[variableName] = valueProvider.GetNextValue();
             }
+
             calculate(variables);
         }
     }
@@ -55,6 +60,7 @@ public class SonicDelegateBenchmarkExecutor : IBenchmarkExecutor
                 {
                     variables[variableName] = valueProvider.GetNextValue();
                 }
+
                 calculate(variables);
             }
         }

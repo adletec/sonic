@@ -17,7 +17,7 @@ public class SonicEvaluateBenchmarkExecutor : IBenchmarkExecutor
         engine = Evaluator.CreateWithDefaults();
     }
 
-    public SonicEvaluateBenchmarkExecutor(bool caseSensitive, bool interpreted, bool cached, bool optimize = true, bool guardedMode = false)
+    public SonicEvaluateBenchmarkExecutor(bool caseSensitive, bool interpreted, bool cached, bool optimize = true, bool guardedMode = false, bool validate = true)
     {
 
         var engineBuilder = Evaluator.Create();
@@ -27,6 +27,7 @@ public class SonicEvaluateBenchmarkExecutor : IBenchmarkExecutor
         engineBuilder = cached ? engineBuilder.EnableCache() : engineBuilder.DisableCache();
         engineBuilder = guardedMode ? engineBuilder.EnableGuardedMode() : engineBuilder.DisableGuardedMode();
         engineBuilder = optimize ? engineBuilder.EnableOptimizer() : engineBuilder.DisableOptimizer();
+        engineBuilder = validate ? engineBuilder.EnableValidation() : engineBuilder.DisableValidation();
         engine = engineBuilder.Build();
     }
 
