@@ -11,8 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Adletec.Sonic.Execution;
 using Adletec.Sonic.Operations;
+using Adletec.Sonic.Parsing;
+using Adletec.Sonic.Parsing.Tokenizing;
 using Adletec.Sonic.Tests.Mocks;
-using Adletec.Sonic.Tokenizer;
 
 namespace Adletec.Sonic.Tests;
 

@@ -15,7 +15,6 @@ namespace Adletec.Sonic
         private const int DefaultCacheReductionSize = 50;
         private static readonly List<char> IllegalArgumentSeparators = new List<char> {' ','+', '-', '*', '/', '^', '(', ')', '_', '%', '>', '<', '=', '&', '|', '≠', '≤', '≥'};
 
-        // todo adjust tests
         internal CultureInfo CultureInfo { get; private set; } = CultureInfo.InvariantCulture;
         
         internal ExecutionMode ExecutionMode { get; private set; } = ExecutionMode.Compiled;
@@ -34,7 +33,9 @@ namespace Adletec.Sonic
 
         internal int CacheReductionSize { get; private set; } = DefaultCacheReductionSize;
         
-        internal bool GuardedMode { get; private set; } = false;
+        internal bool GuardedModeEnabled { get; private set; } = false;
+        
+        internal bool ValidationEnabled { get; private set; } = true;
         
         internal char ArgumentSeparator { get; private set; } = ',';
 
@@ -68,6 +69,8 @@ namespace Adletec.Sonic
             DefaultFunctions = evaluatorBuilder.DefaultFunctions;
             CacheMaximumSize = evaluatorBuilder.CacheMaximumSize;
             CacheReductionSize = evaluatorBuilder.CacheReductionSize;
+            GuardedModeEnabled = evaluatorBuilder.GuardedModeEnabled;
+            ValidationEnabled = evaluatorBuilder.ValidationEnabled;
             ArgumentSeparator = evaluatorBuilder.ArgumentSeparator;
             OverrideArgumentSeparator = evaluatorBuilder.OverrideArgumentSeparator;
 
@@ -241,12 +244,15 @@ namespace Adletec.Sonic
         ///  - the same constant is defined multiple times (default: last definition is used).
         ///  - the same function is defined multiple times (default: last definition is used).
         ///
+        /// Guarded mode is useful for debugging, but should usually be disabled in production environments, unless
+        /// performance is not a concern and the defaults are not acceptable.
+        /// 
         /// Default: guarded mode disabled.
         /// </summary>
         /// <returns></returns>
         public EvaluatorBuilder EnableGuardedMode()
         {
-            GuardedMode = true;
+            GuardedModeEnabled = true;
             return this;
         }
         
@@ -259,12 +265,64 @@ namespace Adletec.Sonic
         ///  - the same constant is defined multiple times (default: last definition is used).
         ///  - the same function is defined multiple times (default: last definition is used).
         ///
+        /// Guarded mode is useful for debugging, but should usually be disabled in production environments, unless
+        /// performance is not a concern and the defaults are not acceptable.
+        /// 
         /// Default: guarded mode disabled.
         /// </summary>
         /// <returns></returns>
         public EvaluatorBuilder DisableGuardedMode()
         {
-            GuardedMode = false;
+            GuardedModeEnabled = false;
+            return this;
+        }
+        
+        /// <summary>
+        /// Enables validation. This means that the engine will throw a matching subtype of <see cref="ParseException"/>
+        /// for invalid input, i.e. if expressions are not well-formed.
+        ///
+        /// This includes:
+        ///  - Malformed numbers.
+        ///  - Unbalanced parentheses.
+        ///  - Unexpected tokens.
+        ///  - Unknown function names.
+        ///  - Wrong number of arguments for functions or operators.
+        ///
+        /// Skipping validation slightly improves the performance of parsing, but should only be done if the input is
+        /// guaranteed to be valid. This can be done by using <see cref="IEvaluator.Validate"/> on the input before evaluating it.
+        /// If the input has been validated before, validation can safely be skipped. However, unvalidated user
+        /// input can lead to unexpected (i.e. wrong) results or runtime exceptions.
+        ///
+        /// Default: validation enabled.
+        /// </summary>
+        /// <returns></returns>
+        public EvaluatorBuilder EnableValidation()
+        {
+            ValidationEnabled = true;
+            return this;
+        }
+        
+        /// <summary>
+        /// Disables validation. This means that the engine will not check the input for:
+        ///
+        /// This includes:
+        ///  - Malformed numbers.
+        ///  - Unbalanced parentheses.
+        ///  - Unexpected tokens.
+        ///  - Unknown function names.
+        ///  - Wrong number of arguments for functions or operators.
+        /// 
+        /// Skipping validation slightly improves the performance of parsing, but should only be done if the input is
+        /// guaranteed to be valid. This can be done by using <see cref="IEvaluator.Validate"/> on the input before evaluating it.
+        /// If the input has been validated before, validation can safely be skipped. However, unvalidated user
+        /// input can lead to unexpected (i.e. wrong) results or runtime exceptions.
+        ///
+        /// Default: validation enabled.
+        /// </summary>
+        /// <returns></returns>
+        public EvaluatorBuilder DisableValidation()
+        {
+            ValidationEnabled = false;
             return this;
         }
 
@@ -599,7 +657,7 @@ namespace Adletec.Sonic
                    CaseSensitive == other.CaseSensitive && DefaultFunctions == other.DefaultFunctions &&
                    DefaultConstants == other.DefaultConstants && CacheMaximumSize == other.CacheMaximumSize &&
                    CacheReductionSize == other.CacheReductionSize && Functions.SequenceEqual(other.Functions) &&
-                   Constants.SequenceEqual(other.Constants) && GuardedMode == other.GuardedMode;
+                   Constants.SequenceEqual(other.Constants) && GuardedModeEnabled == other.GuardedModeEnabled && ValidationEnabled == other.ValidationEnabled;
         }
 
         public override bool Equals(object obj)
@@ -625,7 +683,8 @@ namespace Adletec.Sonic
                 hashCode = (hashCode * 397) ^ DefaultConstants.GetHashCode();
                 hashCode = (hashCode * 397) ^ CacheMaximumSize;
                 hashCode = (hashCode * 397) ^ CacheReductionSize;
-                hashCode = (hashCode * 397) ^ GuardedMode.GetHashCode();
+                hashCode = (hashCode * 397) ^ GuardedModeEnabled.GetHashCode();
+                hashCode = (hashCode * 397) ^ ValidationEnabled.GetHashCode();
                 hashCode = (hashCode * 397) ^ (Functions != null ? Functions.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Constants != null ? Constants.GetHashCode() : 0);
                 return hashCode;

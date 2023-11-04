@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Adletec.Sonic.Execution;
 using Adletec.Sonic.Operations;
-using Adletec.Sonic.Tokenizer;
+using Adletec.Sonic.Parsing.Tokenizing;
 
-namespace Adletec.Sonic
+namespace Adletec.Sonic.Parsing
 {
     public class AstBuilder
     {

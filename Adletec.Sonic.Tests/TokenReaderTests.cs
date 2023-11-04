@@ -10,7 +10,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Adletec.Sonic.Tokenizer;
+using Adletec.Sonic.Parsing;
+using Adletec.Sonic.Parsing.Tokenizing;
 
 namespace Adletec.Sonic.Tests;
 

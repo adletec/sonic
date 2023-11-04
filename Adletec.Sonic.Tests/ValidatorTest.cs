@@ -2,7 +2,8 @@ using System;
 using System.Globalization;
 using System.Linq;
 using Adletec.Sonic.Execution;
-using Adletec.Sonic.Tokenizer;
+using Adletec.Sonic.Parsing;
+using Adletec.Sonic.Parsing.Tokenizing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Adletec.Sonic.Tests;
@@ -84,7 +85,7 @@ public class ValidatorTest
         {
             ValidateExpression("1 + a * (sin(cos(3)) + ifless(1,2,3))");
         }
-        catch (InvalidFunctionArgumentCountParseException e)
+        catch (InvalidArgumentCountParseException e)
         {
             Assert.AreEqual("ifless", e.FunctionName);
             Assert.AreEqual(23, e.FunctionNamePosition);
@@ -101,7 +102,7 @@ public class ValidatorTest
         {
             ValidateExpression("1 + a * (sin(cos(3)) + ifless(1,2,3,4,5))");
         }
-        catch (InvalidFunctionArgumentCountParseException e)
+        catch (InvalidArgumentCountParseException e)
         {
             Assert.AreEqual("ifless", e.FunctionName);
             Assert.AreEqual(23, e.FunctionNamePosition);
@@ -126,7 +127,7 @@ public class ValidatorTest
         {
             ValidateExpression("* 1 + a * (sin(cos(3)) + ifless(1,2,3,4))");
         }
-        catch (MissingOperationArgumentParseException e)
+        catch (MissingOperandParseException e)
         {
             Assert.AreEqual("*", e.Operator);
             Assert.AreEqual(0, e.OperatorPosition);
@@ -143,7 +144,7 @@ public class ValidatorTest
         {
             ValidateExpression("1 + * (sin(cos(3)) + ifless(1,2,3,4))");
         }
-        catch (MissingOperationArgumentParseException e)
+        catch (MissingOperandParseException e)
         {
             Assert.AreEqual("+", e.Operator);
             Assert.AreEqual(2, e.OperatorPosition);
@@ -177,9 +178,9 @@ public class ValidatorTest
         {
             ValidateExpression("1 + a )");
         }
-        catch (MissingLeftBracketParseException e)
+        catch (MissingLeftParenthesisParseException e)
         {
-            Assert.AreEqual(6, e.RightBracketPosition);
+            Assert.AreEqual(6, e.RightParenthesisPosition);
             return;
         }
 
@@ -193,9 +194,9 @@ public class ValidatorTest
         {
             ValidateExpression("1 + (a * 2");
         }
-        catch (MissingRightBracketParseException e)
+        catch (MissingRightParenthesisParseException e)
         {
-            Assert.AreEqual(4, e.LeftBracketPosition);
+            Assert.AreEqual(4, e.LeftParenthesisPosition);
             return;
         }
 
@@ -217,7 +218,7 @@ public class ValidatorTest
         {
             ValidateExpression("1 + random(1)");
         }
-        catch (InvalidFunctionArgumentCountParseException e)
+        catch (InvalidArgumentCountParseException e)
         {
             Assert.AreEqual("random", e.FunctionName);
             Assert.AreEqual(4, e.FunctionNamePosition);
@@ -234,9 +235,9 @@ public class ValidatorTest
         {
             ValidateExpression(")+1");
         }
-        catch (MissingLeftBracketParseException e)
+        catch (MissingLeftParenthesisParseException e)
         {
-            Assert.AreEqual(0, e.RightBracketPosition);
+            Assert.AreEqual(0, e.RightParenthesisPosition);
             return;
         }
 
@@ -250,9 +251,9 @@ public class ValidatorTest
         {
             ValidateExpression("sin)");
         }
-        catch (MissingLeftBracketParseException e)
+        catch (MissingLeftParenthesisParseException e)
         {
-            Assert.AreEqual(3, e.RightBracketPosition);
+            Assert.AreEqual(3, e.RightParenthesisPosition);
             return;
         }
 
@@ -308,7 +309,7 @@ public class ValidatorTest
         {
             ValidateExpression("a +");
         }
-        catch (MissingOperationArgumentParseException e)
+        catch (MissingOperandParseException e)
         {
             Assert.AreEqual("+", e.Operator);
             Assert.AreEqual(2, e.OperatorPosition);
@@ -384,7 +385,7 @@ public class ValidatorTest
         {
             ValidateExpression("max()");
         }
-        catch (InvalidFunctionArgumentCountParseException e)
+        catch (InvalidArgumentCountParseException e)
         {
             Assert.AreEqual(0, e.FunctionNamePosition);
             Assert.AreEqual("max", e.FunctionName);

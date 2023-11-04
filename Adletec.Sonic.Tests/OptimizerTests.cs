@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using Adletec.Sonic.Execution;
 using Adletec.Sonic.Operations;
-using Adletec.Sonic.Tokenizer;
+using Adletec.Sonic.Parsing;
+using Adletec.Sonic.Parsing.Tokenizing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Adletec.Sonic.Tests;

@@ -1,4 +1,4 @@
-﻿namespace Adletec.Sonic.Tokenizer
+﻿namespace Adletec.Sonic.Parsing
 {
     public enum TokenType
     {

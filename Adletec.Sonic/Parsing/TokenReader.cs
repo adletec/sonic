@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Adletec.Sonic.Parsing.Tokenizing;
 
-namespace Adletec.Sonic.Tokenizer
+namespace Adletec.Sonic.Parsing
 {
     /// <summary>
     /// A token reader that converts the input string in a list of tokens.

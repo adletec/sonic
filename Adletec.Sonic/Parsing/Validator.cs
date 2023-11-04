@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Adletec.Sonic.Execution;
-using Adletec.Sonic.Tokenizer;
+using Adletec.Sonic.Parsing.Tokenizing;
 
-namespace Adletec.Sonic
+namespace Adletec.Sonic.Parsing
 {
     /// <summary>
     /// A validator for the token list produced by the <see cref="TokenReader"/>.
@@ -301,7 +301,7 @@ namespace Adletec.Sonic
         {
             var tokenString = token.Value.ToString();
             var tokenPosition = token.StartPosition;
-            throw new MissingOperationArgumentParseException(
+            throw new MissingOperandParseException(
                 $"Missing argument for operation \"{tokenString}\" at position {tokenPosition}. {message}",
                 tokenPosition, tokenString);
         }
@@ -311,7 +311,7 @@ namespace Adletec.Sonic
         {
             var functionName = rootToken.Value.ToString();
             var functionNamePosition = rootToken.StartPosition;
-            throw new InvalidFunctionArgumentCountParseException(
+            throw new InvalidArgumentCountParseException(
                 $"Invalid argument count for dynamic function \"{functionName}\" at position {functionNamePosition}. Expected to find at least one argument, but found none. {message}",
                 functionNamePosition, functionName);
         }
@@ -321,7 +321,7 @@ namespace Adletec.Sonic
         {
             var functionName = rootToken.Value.ToString();
             var functionNamePosition = rootToken.StartPosition;
-            throw new InvalidFunctionArgumentCountParseException(
+            throw new InvalidArgumentCountParseException(
                 $"Invalid argument count for function \"{functionName}\" at position {functionNamePosition}. Expected {expectedArguments}, but found {foundArguments}. {message}",
                 functionNamePosition, functionName);
         }
@@ -329,7 +329,7 @@ namespace Adletec.Sonic
         private static void ThrowMissingLeftBracketParseException(Token token, string message = null)
         {
             var tokenPosition = token.StartPosition;
-            throw new MissingLeftBracketParseException(
+            throw new MissingLeftParenthesisParseException(
                 $"Missing left bracket for right bracket at position {tokenPosition}. {message}",
                 tokenPosition);
         }
@@ -337,7 +337,7 @@ namespace Adletec.Sonic
         private static void ThrowMissingRightBracketParseException(Token token, string message = null)
         {
             var tokenPosition = token.StartPosition;
-            throw new MissingRightBracketParseException(
+            throw new MissingRightParenthesisParseException(
                 $"Missing right bracket for left bracket at position {tokenPosition}. {message}",
                 tokenPosition);
         }

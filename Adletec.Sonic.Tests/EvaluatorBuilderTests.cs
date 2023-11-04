@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using Adletec.Sonic.Execution;
-using Adletec.Sonic.Tokenizer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Adletec.Sonic.Tests;
@@ -23,6 +22,8 @@ public class EvaluatorBuilderTests
             .DisableCaseSensitivity()
             .DisableDefaultFunctions()
             .DisableDefaultConstants()
+            .EnableGuardedMode()
+            .DisableValidation()
             .UseCacheMaximumSize(12345)
             .UseCacheReductionSize(123)
             .AddConstant("a", 12345)

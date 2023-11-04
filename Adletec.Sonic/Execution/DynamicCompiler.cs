@@ -375,7 +375,7 @@ namespace Adletec.Sonic.Execution
             {
                 if (context.Variables.TryGetValue(variableName, out double result))
                     return result;
-                throw new VariableNotDefinedException($"The variable \"{variableName}\" used is not defined.");
+                throw new VariableNotDefinedException($"The variable \"{variableName}\" used is not defined.", variableName);
             }
         }
     }

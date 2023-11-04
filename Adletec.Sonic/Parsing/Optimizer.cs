@@ -3,7 +3,7 @@ using System.Linq;
 using Adletec.Sonic.Execution;
 using Adletec.Sonic.Operations;
 
-namespace Adletec.Sonic
+namespace Adletec.Sonic.Parsing
 {
     public class Optimizer
     {
