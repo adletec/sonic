@@ -7,8 +7,8 @@
         Symbol,
         Function,
         Operation,
-        LeftBracket,
-        RightBracket,
+        LeftParenthesis,
+        RightParenthesis,
         ArgumentSeparator
     }
 }

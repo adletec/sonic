@@ -155,7 +155,7 @@ public class ValidatorTest
     }
 
     [TestMethod]
-    public void TestEmptyBrackets()
+    public void TestEmptyParentheses()
     {
         try
         {
@@ -172,7 +172,7 @@ public class ValidatorTest
     }
 
     [TestMethod]
-    public void TestMissingLeftBracket()
+    public void TestMissingLeftParenthesis()
     {
         try
         {
@@ -188,7 +188,7 @@ public class ValidatorTest
     }
 
     [TestMethod]
-    public void TestMissingRightBracket()
+    public void TestMissingRightParenthesis()
     {
         try
         {
@@ -229,7 +229,7 @@ public class ValidatorTest
     }
 
     [TestMethod]
-    public void TestRightBracketAsFirstToken()
+    public void TestRightParenthesisAsFirstToken()
     {
         try
         {
@@ -245,7 +245,7 @@ public class ValidatorTest
     }
 
     [TestMethod]
-    public void TestRightBracketAfterFunctionName()
+    public void TestRightParenthesisAfterFunctionName()
     {
         try
         {
@@ -354,7 +354,7 @@ public class ValidatorTest
     }
 
     [TestMethod]
-    public void TestExpressionStartingWithLeftBracket()
+    public void TestExpressionStartingWithLeftParenthesis()
     {
         ValidateExpression("(-3)^2");
         // does not throw
@@ -397,7 +397,7 @@ public class ValidatorTest
     
     
     [TestMethod]
-    public void TestBracketedOperationsInFunctions()
+    public void TestParenthesisedOperationsInFunctions()
     {
         ValidateExpression("ifless(0.57, (3000-500)/(1500-500), 10, 20)");
         // does not throw

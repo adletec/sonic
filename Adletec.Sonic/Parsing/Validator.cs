@@ -44,8 +44,8 @@ namespace Adletec.Sonic.Parsing
             // we'll validate all validate all tokens on the base of their predecessor and check for illegal combinations
 
             // the first token is a special case, since it has no predecessor
-            // legal first token: value (function, integer, floating point, symbol), left bracket
-            // illegal predecessor: binary operation, argument separator, right bracket
+            // legal first token: value (function, integer, floating point, symbol), left parenthesis
+            // illegal predecessor: binary operation, argument separator, right parenthesis
             switch (firstToken.TokenType)
             {
                 case TokenType.Operation when IsBinaryOperation(firstToken):
@@ -56,18 +56,18 @@ namespace Adletec.Sonic.Parsing
                     // an argument separator must be inside a function, which is not the case for the first token
                     ThrowInvalidTokenParseException(firstToken);
                     break;
-                case TokenType.RightBracket:
-                    // if the first token is a right bracket, there is no matching left bracket
-                    ThrowMissingLeftBracketParseException(firstToken);
+                case TokenType.RightParenthesis:
+                    // if the first token is a right parenthesis, there is no matching left parenthesis
+                    ThrowMissingLeftParenthesisParseException(firstToken);
                     break;
-                case TokenType.LeftBracket:
-                    // the first token is a left bracket, so we start a bracketed clause
+                case TokenType.LeftParenthesis:
+                    // the first token is a left parenthesis, so we start a parenthesised clause
                     contextStack.Push(new ValidationContext()
                     {
                         IsFunction = false,
                         ActualArgumentCount = 0,
                         ExpectedArgumentCount = 0,
-                        // this bracket:
+                        // this parenthesis:
                         RootToken = firstToken
                     });
                     break;
@@ -87,18 +87,18 @@ namespace Adletec.Sonic.Parsing
                     case TokenType.Symbol:
                         switch (tokenBefore.TokenType)
                         {
-                            // legal predecessor: operation, left bracket, argument separator
-                            // illegal predecessor: another value (function, integer, floating point, symbol), right bracket
+                            // legal predecessor: operation, left parenthesis, argument separator
+                            // illegal predecessor: another value (function, integer, floating point, symbol), right parenthesis
                             case TokenType.Function:
                             case TokenType.Integer:
                             case TokenType.FloatingPoint:
                             case TokenType.Symbol:
-                            case TokenType.RightBracket:
+                            case TokenType.RightParenthesis:
                                 ThrowInvalidTokenParseException(token);
                                 break;
                         }
 
-                        // values (and bracketed clauses, see LeftBracket) are valid arguments for functions
+                        // values (and parenthesised clauses, see LeftParenthesis) are valid arguments for functions
                         if (IsStartOfArgument(contextStack, tokenBefore))
                         {
                             contextStack.Peek().ActualArgumentCount++;
@@ -109,24 +109,24 @@ namespace Adletec.Sonic.Parsing
                         // basically the same as a value, but doesn't count as argument for a function
                         switch (tokenBefore.TokenType)
                         {
-                            // legal predecessor: operation, left bracket, argument separator
-                            // illegal predecessor: another value (function, integer, floating point, symbol), right bracket
+                            // legal predecessor: operation, left parenthesis, argument separator
+                            // illegal predecessor: another value (function, integer, floating point, symbol), right parenthesis
                             case TokenType.Function:
                             case TokenType.Integer:
                             case TokenType.FloatingPoint:
                             case TokenType.Symbol:
-                            case TokenType.RightBracket:
+                            case TokenType.RightParenthesis:
                                 ThrowInvalidTokenParseException(token);
                                 break;
                         }
 
                         break;
                     case TokenType.Operation:
-                        // legal predecessor: value, function, right bracket
-                        // illegal: consecutive operations, left bracket, argument separator
+                        // legal predecessor: value, function, right parenthesis
+                        // illegal: consecutive operations, left parenthesis, argument separator
                         switch (tokenBefore.TokenType)
                         {
-                            case TokenType.LeftBracket:
+                            case TokenType.LeftParenthesis:
                             case TokenType.ArgumentSeparator:
                                 ThrowInvalidTokenParseException(token);
                                 break;
@@ -137,12 +137,12 @@ namespace Adletec.Sonic.Parsing
 
                         break;
                     case TokenType.ArgumentSeparator:
-                        // legal predecessor: values, functions, right bracket
-                        // illegal predecessor: consecutive argument separators, left bracket, operation
+                        // legal predecessor: values, functions, right parenthesis
+                        // illegal predecessor: consecutive argument separators, left parenthesis, operation
                         switch (tokenBefore.TokenType)
                         {
                             case TokenType.ArgumentSeparator:
-                            case TokenType.LeftBracket:
+                            case TokenType.LeftParenthesis:
                                 ThrowInvalidTokenParseException(token);
                                 break;
                             case TokenType.Operation:
@@ -170,15 +170,15 @@ namespace Adletec.Sonic.Parsing
                         }
 
                         break;
-                    case TokenType.LeftBracket:
-                        // legal predecessor: argument separator, function, operation, left bracket
-                        // illegal predecessor: right bracket, value
+                    case TokenType.LeftParenthesis:
+                        // legal predecessor: argument separator, function, operation, left parenthesis
+                        // illegal predecessor: right parenthesis, value
                         switch (tokenBefore.TokenType)
                         {
                             case TokenType.Integer:
                             case TokenType.FloatingPoint:
                             case TokenType.Symbol:
-                            case TokenType.RightBracket:
+                            case TokenType.RightParenthesis:
                                 ThrowInvalidTokenParseException(token);
                                 break;
                         }
@@ -186,7 +186,7 @@ namespace Adletec.Sonic.Parsing
                         var isFunction = tokenBefore.TokenType == TokenType.Function;
                         if (isFunction)
                         {
-                            // the bracket is part of a function call, so we create a function context
+                            // the parenthesis is part of a function call, so we create a function context
                             var functionInfo = functionRegistry.GetFunctionInfo((string)tokenBefore.Value);
                             if (functionInfo == null)
                             {
@@ -207,7 +207,7 @@ namespace Adletec.Sonic.Parsing
                         }
                         else
                         {
-                            // the bracket is not part of a function call, so it's a bracketed clause
+                            // the parenthesis is not part of a function call, so it's a parenthesised clause
                             if (IsStartOfArgument(contextStack, tokenBefore))
                             {
                                 contextStack.Peek().ActualArgumentCount++;
@@ -218,17 +218,17 @@ namespace Adletec.Sonic.Parsing
                                 IsFunction = false,
                                 ActualArgumentCount = 0,
                                 ExpectedArgumentCount = 0,
-                                // this bracket:
+                                // this parenthesis:
                                 RootToken = token
                             });
                         }
 
                         break;
-                    case TokenType.RightBracket:
-                        // legal predecessor: value (not including function), right bracket
-                        // illegal predecessor: left bracket (unless for parameterless functions), operation, argument separator
+                    case TokenType.RightParenthesis:
+                        // legal predecessor: value (not including function), right parenthesis
+                        // illegal predecessor: left parenthesis (unless for parameterless functions), operation, argument separator
                         // technically, also function. but that can never happen since function tokens must be followed
-                        // by a left bracket to be identified as such.
+                        // by a left parenthesis to be identified as such.
                         switch (tokenBefore.TokenType)
                         {
                             case TokenType.Operation:
@@ -238,14 +238,14 @@ namespace Adletec.Sonic.Parsing
                                 ThrowInvalidTokenParseException(token,
                                     "Argument separator without following argument.");
                                 break;
-                            case TokenType.LeftBracket when !IsFunctionOnTopOfStack(contextStack):
-                                ThrowInvalidTokenParseException(token, "Empty brackets are not allowed.");
+                            case TokenType.LeftParenthesis when !IsFunctionOnTopOfStack(contextStack):
+                                ThrowInvalidTokenParseException(token, "Empty parentheses are not allowed.");
                                 break;
                         }
 
                         if (contextStack.Count == 0)
                         {
-                            ThrowMissingLeftBracketParseException(token);
+                            ThrowMissingLeftParenthesisParseException(token);
                         }
 
                         var context = contextStack.Pop();
@@ -274,14 +274,14 @@ namespace Adletec.Sonic.Parsing
 
             if (contextStack.Any())
             {
-                ThrowMissingRightBracketParseException(contextStack.Peek().RootToken);
+                ThrowMissingRightParenthesisParseException(contextStack.Peek().RootToken);
             }
 
             // the last token is a special case, since it has no successor
-            // legal last token: value (function, integer, floating point, symbol), right bracket
+            // legal last token: value (function, integer, floating point, symbol), right parenthesis
             // illegal last token: operation
-            // also illegal, but already checked: argument separator (already checked -> outside function or missing right bracket),
-            // left bracket (already checked -> missing right bracket)
+            // also illegal, but already checked: argument separator (already checked -> outside function or missing right parenthesis),
+            // left parenthesis (already checked -> missing right parenthesis)
             if (tokenList[tokenList.Count - 1].TokenType == TokenType.Operation)
             {
                 ThrowMissingOperationArgumentParseException(tokenList.Last(), "There is no right argument.");
@@ -326,19 +326,19 @@ namespace Adletec.Sonic.Parsing
                 functionNamePosition, functionName);
         }
 
-        private static void ThrowMissingLeftBracketParseException(Token token, string message = null)
+        private static void ThrowMissingLeftParenthesisParseException(Token token, string message = null)
         {
             var tokenPosition = token.StartPosition;
             throw new MissingLeftParenthesisParseException(
-                $"Missing left bracket for right bracket at position {tokenPosition}. {message}",
+                $"Missing left parenthesis for right parenthesis at position {tokenPosition}. {message}",
                 tokenPosition);
         }
 
-        private static void ThrowMissingRightBracketParseException(Token token, string message = null)
+        private static void ThrowMissingRightParenthesisParseException(Token token, string message = null)
         {
             var tokenPosition = token.StartPosition;
             throw new MissingRightParenthesisParseException(
-                $"Missing right bracket for left bracket at position {tokenPosition}. {message}",
+                $"Missing right parenthesis for left parenthesis at position {tokenPosition}. {message}",
                 tokenPosition);
         }
 
@@ -367,7 +367,7 @@ namespace Adletec.Sonic.Parsing
         {
             return IsFunctionOnTopOfStack(contextStack) && (
                 previousToken.TokenType == TokenType.ArgumentSeparator ||
-                previousToken.TokenType == TokenType.LeftBracket
+                previousToken.TokenType == TokenType.LeftParenthesis
             );
         }
 

@@ -135,7 +135,7 @@ namespace Adletec.Sonic.Parsing
                     if (characters.Length > i && characters[i] == '(')
                     {
                         tokens.Add(new Token { TokenType = TokenType.Function, Value = buffer, StartPosition = startPosition, Length = i - startPosition });
-                        tokens.Add(new Token { TokenType = TokenType.LeftBracket, Value = '(', StartPosition = i, Length = 1 });
+                        tokens.Add(new Token { TokenType = TokenType.LeftParenthesis, Value = '(', StartPosition = i, Length = 1 });
                         isFormulaSubPart = true;
                         continue;
                     }
@@ -186,11 +186,11 @@ namespace Adletec.Sonic.Parsing
                             isFormulaSubPart = true;
                             break;
                         case '(':
-                            tokens.Add(new Token { TokenType = TokenType.LeftBracket, Value = characters[i], StartPosition = i, Length = 1 });
+                            tokens.Add(new Token { TokenType = TokenType.LeftParenthesis, Value = characters[i], StartPosition = i, Length = 1 });
                             isFormulaSubPart = true;
                             break;
                         case ')':
-                            tokens.Add(new Token { TokenType = TokenType.RightBracket, Value = characters[i], StartPosition = i, Length = 1 });
+                            tokens.Add(new Token { TokenType = TokenType.RightParenthesis, Value = characters[i], StartPosition = i, Length = 1 });
                             isFormulaSubPart = false;
                             break;
                         case '<':
@@ -267,11 +267,11 @@ namespace Adletec.Sonic.Parsing
             if (currentToken != '-') return false;
             var previousToken = tokens[tokens.Count - 1];
 
-            // can't be function since function is _always_ directly followed by a left bracket
+            // can't be function since function is _always_ directly followed by a left parenthesis
             return !(previousToken.TokenType == TokenType.FloatingPoint ||
                      previousToken.TokenType == TokenType.Integer ||
                      previousToken.TokenType == TokenType.Symbol ||
-                     previousToken.TokenType == TokenType.RightBracket);
+                     previousToken.TokenType == TokenType.RightParenthesis);
 
         }
 

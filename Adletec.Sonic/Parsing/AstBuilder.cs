@@ -76,15 +76,15 @@ namespace Adletec.Sonic.Parsing
                         }
 
                         break;
-                    case TokenType.LeftBracket:
+                    case TokenType.LeftParenthesis:
                         operatorStack.Push(token);
                         break;
-                    case TokenType.RightBracket:
-                        // Bracketed clause is finished, pop all operations in the clause from the operator stack
-                        // (including the left bracket and the function if there is one)
+                    case TokenType.RightParenthesis:
+                        // parenthesised clause is finished, pop all operations in the clause from the operator stack
+                        // (including the left parenthesis and the function if there is one)
                         PopOperations();
 
-                        // Pop left bracket
+                        // Pop left parenthesis
                         operatorStack.Pop();
 
                         // If the operator stack is not empty and the token on top of the stack is a function, we just processed
@@ -99,9 +99,9 @@ namespace Adletec.Sonic.Parsing
                         break;
                     case TokenType.ArgumentSeparator:
                         // Argument finished, pop all operations in the argument from the operator stack until the
-                        // left bracket is encountered. Since this is done for every argument, we can assume that
+                        // left parenthesis is encountered. Since this is done for every argument, we can assume that
                         // there won't be another argument on the operator stack and this can be repeated
-                        // until the right bracket is encountered.
+                        // until the right parenthesis is encountered.
                         PopOperations();
                         dynamicFunctionArgumentCountStack.Push(dynamicFunctionArgumentCountStack.Pop() + 1);
                         break;
@@ -151,15 +151,15 @@ namespace Adletec.Sonic.Parsing
 
         /// <summary>
         /// Pops operations from the operator stack and pushes them onto the result stack until the context ends (result
-        /// stack is empty or a left bracket is encountered).
+        /// stack is empty or a left parenthesis is encountered).
         /// 
-        /// This is done whenever the end of a context is encountered (e.g. an argument separator or a right bracket).
+        /// This is done whenever the end of a context is encountered (e.g. an argument separator or a right parenthesis).
         /// </summary>
         private void PopOperations()
         {
-            // Pop operations until operator stack is empty or left bracket is found
+            // Pop operations until operator stack is empty or left parenthesis is found
             while (operatorStack.Count > 0 &&
-                   operatorStack.Peek().TokenType != TokenType.LeftBracket)
+                   operatorStack.Peek().TokenType != TokenType.LeftParenthesis)
             {
                 Token token = operatorStack.Pop();
 
