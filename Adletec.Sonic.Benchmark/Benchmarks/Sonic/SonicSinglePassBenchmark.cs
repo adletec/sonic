@@ -28,14 +28,19 @@ public class SonicSinglePassBenchmark
     
     [ParamsAllValues]
     public bool Optimize { get; set; }
+    
+    [Params (false)]
+    public bool Guarded { get; set; }
+    
+    [Params (false)]
+    public bool Validate { get; set; }
 
 
     [Benchmark (Description = "Sonic [using Evaluate]", Baseline = true)]
-    public void SonicEvaluate() => RunBenchmark(new SonicEvaluateBenchmarkExecutor(CaseSensitive, Interpreted, Cached, Optimize));
+    public void SonicEvaluate() => RunBenchmark(new SonicEvaluateBenchmarkExecutor(CaseSensitive, Interpreted, Cached, Optimize, Guarded, Validate));
     
     [Benchmark (Description = "Sonic [using CreateDelegate]")]
-    public void SonicDelegate() => RunBenchmark(new SonicDelegateBenchmarkExecutor(CaseSensitive, Interpreted, Cached, Optimize));
-    
+    public void SonicDelegate() => RunBenchmark(new SonicDelegateBenchmarkExecutor(CaseSensitive, Interpreted, Cached, Optimize, Guarded, Validate));
     
     private void RunBenchmark(IBenchmarkExecutor executor)
     {
