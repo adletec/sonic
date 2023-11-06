@@ -35,12 +35,12 @@ namespace Adletec.Sonic
     /// <summary>
     /// This exception is thrown when an invalid number is encountered during parsing (e.g. "4.3.2" or a malformed scientific notation).
     /// </summary>
-    public class InvalidFloatingPointNumberException : ParseException
+    public class InvalidFloatingPointNumberParseException : ParseException
     {
         public int TokenPosition { get; }
         public string Token { get; }
 
-        public InvalidFloatingPointNumberException(string message, int tokenPosition, string token) :
+        public InvalidFloatingPointNumberParseException(string message, int tokenPosition, string token) :
             base(message)
         {
             TokenPosition = tokenPosition;

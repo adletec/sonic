@@ -428,7 +428,7 @@ public class ValidatorTest
         {
             ValidateExpression("123.456.78");
         }
-        catch (InvalidFloatingPointNumberException e)
+        catch (InvalidFloatingPointNumberParseException e)
         {
             Assert.AreEqual(0, e.TokenPosition);
             Assert.AreEqual("123.456.78", e.Token);

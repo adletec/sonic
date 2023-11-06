@@ -110,7 +110,7 @@ namespace Adletec.Sonic.Parsing
                         }
                         else
                         {
-                            throw new InvalidFloatingPointNumberException($"Invalid floating point number: {buffer}",
+                            throw new InvalidFloatingPointNumberParseException($"Invalid floating point number: {buffer}",
                                 startPosition, buffer.ToString());
                         }
                     }

@@ -58,7 +58,7 @@ namespace Adletec.Sonic
         /// </summary>
         /// <param name="expression">The expression to be validated.</param>
         /// <exception cref="InvalidTokenParseException">If an invalid token is encountered.</exception>
-        /// <exception cref="InvalidFloatingPointNumberException">If a malformed floating point number is encountered.</exception>
+        /// <exception cref="InvalidFloatingPointNumberParseException">If a malformed floating point number is encountered.</exception>
         /// <exception cref="MissingLeftParenthesisParseException">If parentheses are unbalanced (fewer left than right).</exception>
         /// <exception cref="MissingRightParenthesisParseException">If parentheses are unbalanced (fewer right than left).</exception>
         /// <exception cref="UnknownFunctionParseException">If an unknown function name is referenced.</exception>
