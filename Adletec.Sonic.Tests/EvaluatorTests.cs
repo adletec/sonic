@@ -349,7 +349,7 @@ public class EvaluatorTests
 
         Assert.AreEqual(-4.0, result);
     }
-    
+
     [TestMethod]
     public void TestUnaryMinus7Compiled()
     {
@@ -357,7 +357,7 @@ public class EvaluatorTests
         var result = engine.Evaluate("-1.0^2");
         Assert.AreEqual(-1.0, result);
     }
-    
+
     [TestMethod]
     public void TestUnaryMinus7Interpreted()
     {
@@ -365,8 +365,8 @@ public class EvaluatorTests
         var result = engine.Evaluate("-1.0^2");
         Assert.AreEqual(-1.0, result);
     }
-    
-    
+
+
     [TestMethod]
     public void TestUnaryMinus8Compiled()
     {
@@ -374,7 +374,7 @@ public class EvaluatorTests
         var result = engine.Evaluate("-(1.0)^2");
         Assert.AreEqual(-1.0, result);
     }
-    
+
     [TestMethod]
     public void TestUnaryMinus8Interpreted()
     {
@@ -382,8 +382,8 @@ public class EvaluatorTests
         var result = engine.Evaluate("-(1.0)^2");
         Assert.AreEqual(-1.0, result);
     }
-    
-    
+
+
     [TestMethod]
     public void TestUnaryMinus9Compiled()
     {
@@ -391,7 +391,7 @@ public class EvaluatorTests
         var result = engine.Evaluate("1--1");
         Assert.AreEqual(2.0, result);
     }
-    
+
     [TestMethod]
     public void TestUnaryMinus9Interpreted()
     {
@@ -399,8 +399,8 @@ public class EvaluatorTests
         var result = engine.Evaluate("1--1");
         Assert.AreEqual(2.0, result);
     }
-    
-    
+
+
     [TestMethod]
     public void TestUnaryMinus10Compiled()
     {
@@ -408,7 +408,7 @@ public class EvaluatorTests
         var result = engine.Evaluate("1.0-1.0");
         Assert.AreEqual(0.0, result);
     }
-    
+
     [TestMethod]
     public void TestUnaryMinus10Interpreted()
     {
@@ -416,8 +416,8 @@ public class EvaluatorTests
         var result = engine.Evaluate("1.0-1.0");
         Assert.AreEqual(0.0, result);
     }
-    
-    
+
+
     [TestMethod]
     public void TestUnaryMinus11Compiled()
     {
@@ -425,7 +425,7 @@ public class EvaluatorTests
         var result = engine.Evaluate("5*-2");
         Assert.AreEqual(-10.0, result);
     }
-    
+
     [TestMethod]
     public void TestUnaryMinus11Interpreted()
     {
@@ -433,7 +433,7 @@ public class EvaluatorTests
         var result = engine.Evaluate("5*-2");
         Assert.AreEqual(-10.0, result);
     }
-    
+
     [TestMethod]
     public void TestUnaryMinus12Compiled()
     {
@@ -441,7 +441,7 @@ public class EvaluatorTests
         var result = engine.Evaluate("(-3)^2");
         Assert.AreEqual(9, result);
     }
-    
+
     [TestMethod]
     public void TestUnaryMinus12Interpreted()
     {
@@ -512,11 +512,11 @@ public class EvaluatorTests
     [TestMethod]
     public void TestFormulaBuilderInvalidParameterNameUnguarded()
     {
-            var engine = Sonic.Evaluator.Create()
-                .Build();
-            engine.Evaluate("sin+2", new Dictionary<string, double> { { "sin", 2.0 } });
+        var engine = Sonic.Evaluator.Create()
+            .Build();
+        engine.Evaluate("sin+2", new Dictionary<string, double> { { "sin", 2.0 } });
     }
-    
+
     [TestMethod]
     public void TestFormulaBuilderInvalidParameterNameGuarded()
     {
@@ -544,19 +544,19 @@ public class EvaluatorTests
             var result = func(new Dictionary<string, double> { { "a", 2.0 } });
         });
     }
-    
+
     [TestMethod]
     public void TestVariableNameCollidesWithConstantNameUnguardedInCompiledDelegate()
     {
-            var engine = Sonic.Evaluator.Create()
-                .AddConstant("a", 1.0)
-                .Build();
+        var engine = Sonic.Evaluator.Create()
+            .AddConstant("a", 1.0)
+            .Build();
 
-            var func = engine.CreateDelegate("a + 2");
-            var result = func(new Dictionary<string, double> { { "a", 2.0 } });
-            Assert.AreEqual(3.0, result);
+        var func = engine.CreateDelegate("a + 2");
+        var result = func(new Dictionary<string, double> { { "a", 2.0 } });
+        Assert.AreEqual(3.0, result);
     }
-    
+
     [TestMethod]
     public void TestVariableNameCollidesWithConstantNameGuardedInInterpretedDelegate()
     {
@@ -572,20 +572,20 @@ public class EvaluatorTests
             var result = func(new Dictionary<string, double> { { "a", 2.0 } });
         });
     }
-    
+
     [TestMethod]
     public void TestVariableNameCollidesWithConstantNameUnguardedInInterpretedDelegate()
     {
-            var engine = Sonic.Evaluator.Create()
-                .UseExecutionMode(ExecutionMode.Interpreted)
-                .AddConstant("a", 1.0)
-                .Build();
+        var engine = Sonic.Evaluator.Create()
+            .UseExecutionMode(ExecutionMode.Interpreted)
+            .AddConstant("a", 1.0)
+            .Build();
 
-            var func = engine.CreateDelegate("a + 2");
-            var result = func(new Dictionary<string, double> { { "a", 2.0 } });
-            Assert.AreEqual(3.0, result);
+        var func = engine.CreateDelegate("a + 2");
+        var result = func(new Dictionary<string, double> { { "a", 2.0 } });
+        Assert.AreEqual(3.0, result);
     }
-    
+
     // Test variable name collides with function name
     [TestMethod]
     public void TestVariableNameCollidesWithFunctionNameGuardedInCompiledDelegate()
@@ -601,19 +601,19 @@ public class EvaluatorTests
             var result = func(new Dictionary<string, double> { { "a", 2.0 } });
         });
     }
-    
+
     [TestMethod]
     public void TestVariableNameCollidesWithFunctionNameUnguardedInCompiledDelegate()
     {
-            var engine = Sonic.Evaluator.Create()
-                .AddFunction("a", x => x)
-                .Build();
+        var engine = Sonic.Evaluator.Create()
+            .AddFunction("a", x => x)
+            .Build();
 
-            var func = engine.CreateDelegate("a(2)");
-            var result = func(new Dictionary<string, double> { { "a", 3.0 } });
-            Assert.AreEqual(2.0, result);
+        var func = engine.CreateDelegate("a(2)");
+        var result = func(new Dictionary<string, double> { { "a", 3.0 } });
+        Assert.AreEqual(2.0, result);
     }
-    
+
     [TestMethod]
     public void TestVariableNameCollidesWithFunctionNameGuardedInInterpretedDelegate()
     {
@@ -629,20 +629,20 @@ public class EvaluatorTests
             var result = func(new Dictionary<string, double> { { "a", 3.0 } });
         });
     }
-    
+
     [TestMethod]
     public void TestVariableNameCollidesWithFunctionNameUnguardedInInterpretedDelegate()
     {
-            var engine = Sonic.Evaluator.Create()
-                .UseExecutionMode(ExecutionMode.Interpreted)
-                .AddFunction("a", x => x)
-                .Build();
+        var engine = Sonic.Evaluator.Create()
+            .UseExecutionMode(ExecutionMode.Interpreted)
+            .AddFunction("a", x => x)
+            .Build();
 
-            var func = engine.CreateDelegate("a(2)");
-            var result = func(new Dictionary<string, double> { { "a", 3.0 } });
-            Assert.AreEqual(2.0, result);
+        var func = engine.CreateDelegate("a(2)");
+        var result = func(new Dictionary<string, double> { { "a", 3.0 } });
+        Assert.AreEqual(2.0, result);
     }
-    
+
     [TestMethod]
     public void TestPiMultiplication()
     {
@@ -663,7 +663,7 @@ public class EvaluatorTests
                 .DisableCaseSensitivity()
                 .EnableGuardedMode()
                 .Build();
-            
+
             double result = engine.Evaluate("2 * pI", variables);
         });
     }
@@ -1330,7 +1330,7 @@ public class EvaluatorTests
         var result = engine.Evaluate("a");
         Assert.AreEqual(2.0, result);
     }
-    
+
     [TestMethod]
     public void TestDuplicateConstantDefaultInterpreted()
     {
@@ -1359,14 +1359,14 @@ public class EvaluatorTests
     [TestMethod]
     public void TestConflictingConstantAndVariableUnguardedCompiled()
     {
-            var engine = SonicBuilders.Compiled()
-                .AddConstant("a", 1)
-                .Build();
+        var engine = SonicBuilders.Compiled()
+            .AddConstant("a", 1)
+            .Build();
 
-            var result = engine.Evaluate("a+a", new Dictionary<string, double> { { "a", 2 } });
-            Assert.AreEqual(2.0, result);
+        var result = engine.Evaluate("a+a", new Dictionary<string, double> { { "a", 2 } });
+        Assert.AreEqual(2.0, result);
     }
-    
+
     [TestMethod]
     public void TestConflictingConstantAndVariableGuardedCompiled()
     {
@@ -1384,13 +1384,13 @@ public class EvaluatorTests
     [TestMethod]
     public void TestDuplicateFunctionCompiledUnguarded()
     {
-            var engine = SonicBuilders.Compiled()
-                .AddFunction("a", x => x)
-                .AddFunction("a", x => 2 * x)
-                .Build();
+        var engine = SonicBuilders.Compiled()
+            .AddFunction("a", x => x)
+            .AddFunction("a", x => 2 * x)
+            .Build();
 
-            var result = engine.Evaluate("a(1)");
-            Assert.AreEqual(2.0, result);
+        var result = engine.Evaluate("a(1)");
+        Assert.AreEqual(2.0, result);
     }
 
     [TestMethod]
@@ -1422,15 +1422,15 @@ public class EvaluatorTests
     [TestMethod]
     public void TestDuplicateConstantInterpretedUnguarded()
     {
-            var engine = SonicBuilders.Interpreted()
-                .AddConstant("a", 1)
-                .AddConstant("a", 2)
-                .Build();
+        var engine = SonicBuilders.Interpreted()
+            .AddConstant("a", 1)
+            .AddConstant("a", 2)
+            .Build();
 
-            var result = engine.Evaluate("a");
-            Assert.AreEqual(result, 2.0);
+        var result = engine.Evaluate("a");
+        Assert.AreEqual(result, 2.0);
     }
-    
+
     [TestMethod]
     public void TestDuplicateConstantInterpretedGuarded()
     {
@@ -1447,12 +1447,12 @@ public class EvaluatorTests
     [TestMethod]
     public void TestConflictingConstantAndVariableUnguardedInterpreted()
     {
-            var engine = SonicBuilders.Interpreted()
-                .AddConstant("a", 1)
-                .Build();
+        var engine = SonicBuilders.Interpreted()
+            .AddConstant("a", 1)
+            .Build();
 
-            var result = engine.Evaluate("a+a", new Dictionary<string, double> { { "a", 2 } });
-            Assert.AreEqual(2.0, result);
+        var result = engine.Evaluate("a+a", new Dictionary<string, double> { { "a", 2 } });
+        Assert.AreEqual(2.0, result);
     }
 
     [TestMethod]
@@ -1485,13 +1485,13 @@ public class EvaluatorTests
     [TestMethod]
     public void TestDuplicateFunctionInterpretedUnguarded()
     {
-            var engine = SonicBuilders.Interpreted()
-                .AddFunction("a", x => x)
-                .AddFunction("a", x => 2 * x)
-                .Build();
+        var engine = SonicBuilders.Interpreted()
+            .AddFunction("a", x => x)
+            .AddFunction("a", x => 2 * x)
+            .Build();
 
-            var result = engine.Evaluate("a(1)");
-            Assert.AreEqual(2.0, result);
+        var result = engine.Evaluate("a(1)");
+        Assert.AreEqual(2.0, result);
     }
 
     [TestMethod]
@@ -1590,7 +1590,7 @@ public class EvaluatorTests
         var result = engine.Evaluate("b(a)");
         Assert.AreEqual(2.0, result);
     }
-    
+
     [TestMethod]
     public void TestParameterlessFunction()
     {
@@ -1602,8 +1602,57 @@ public class EvaluatorTests
         Assert.AreEqual(2.0, result);
     }
 
-}
+    [TestMethod]
+    public void TestFunctionHasSameNameAsVariable()
+    {
+        var engine = SonicBuilders.InterpretedNoCacheNoOptimizer()
+            .AddFunction("a", () => 2.0)
+            .Build();
 
+        var result = engine.Evaluate("a()+a", new Dictionary<string, double> { { "a", 1.0 } });
+        Assert.AreEqual(3.0, result);
+    }
+
+    [TestMethod]
+    public void TestFunctionHasSameNameAsConstant()
+    {
+        var engine = SonicBuilders.InterpretedNoCacheNoOptimizer()
+            .AddFunction("a", () => 2.0)
+            .AddConstant("a", 1.0)
+            .Build();
+
+        var result = engine.Evaluate("a()+a");
+        Assert.AreEqual(3.0, result);
+    }
+
+    [TestMethod]
+    public void TestFunctionHasSameNameAsVariableGuarded()
+    {
+        var engine = SonicBuilders.InterpretedNoCacheNoOptimizer()
+            .AddFunction("a", () => 2.0)
+            .EnableGuardedMode()
+            .Build();
+
+
+        AssertExtensions.ThrowsException<ArgumentException>(() =>
+        {
+            engine.Evaluate("a()+a", new Dictionary<string, double> { { "a", 1.0 } });
+        });
+    }
+
+    [TestMethod]
+    public void TestFunctionHasSameNameAsConstantGuarded()
+    {
+        AssertExtensions.ThrowsException<ArgumentException>(() =>
+        {
+            SonicBuilders.InterpretedNoCacheNoOptimizer()
+                .AddFunction("a", () => 2.0)
+                .AddConstant("a", 1.0)
+                .EnableGuardedMode()
+                .Build();
+        });
+    }
+}
 
 internal static class SonicEngines
 {
