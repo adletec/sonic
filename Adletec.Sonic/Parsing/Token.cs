@@ -1,4 +1,4 @@
-﻿namespace Adletec.Sonic.Tokenizer
+﻿namespace Adletec.Sonic.Parsing.Tokenizing
 {
     /// <summary>
     /// Represents an input token

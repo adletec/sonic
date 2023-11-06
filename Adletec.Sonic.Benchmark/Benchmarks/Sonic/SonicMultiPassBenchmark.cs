@@ -33,10 +33,13 @@ public class SonicMultiPassBenchmark
     public bool Cached { get; set; }
 
     [ParamsAllValues]
-    public bool Guarded { get; set; }
-
-    [ParamsAllValues]
     public bool Optimize { get; set; }
+    
+    [Params(false)]
+    public bool Guarded { get; set; }
+    
+    [Params(false)]
+    public bool Validate { get; set; }
 
     /// <summary>
     /// All expressions to run the benchmark with.
@@ -44,10 +47,10 @@ public class SonicMultiPassBenchmark
     public IEnumerable<BenchmarkExpression> ExpressionValues => new DefaultFixedExpressionProvider().GetExpressions();
 
     [Benchmark(Description = "Delegate [using CreateDelegate]", Baseline = true)]
-    public void SonicDelegate() => RunBenchmark(new SonicDelegateBenchmarkExecutor(CaseSensitive, Interpreted, Cached, Optimize, Guarded));
+    public void SonicDelegate() => RunBenchmark(new SonicDelegateBenchmarkExecutor(CaseSensitive, Interpreted, Cached, Optimize, Guarded, Validate));
 
     [Benchmark(Description = "Delegate [using Evaluate]")]
-    public void SonicEvaluate() => RunBenchmark(new SonicEvaluateBenchmarkExecutor(CaseSensitive, Interpreted, Cached, Optimize, Guarded));
+    public void SonicEvaluate() => RunBenchmark(new SonicEvaluateBenchmarkExecutor(CaseSensitive, Interpreted, Cached, Optimize, Guarded, Validate));
 
 
     private void RunBenchmark(IBenchmarkExecutor executor)

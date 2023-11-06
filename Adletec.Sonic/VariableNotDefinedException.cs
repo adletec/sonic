@@ -3,18 +3,22 @@
 namespace Adletec.Sonic
 {
     /// <summary>
-    /// An exception thrown when a formula must be executed with a variable that is not defined.
+    /// An exception thrown when an expression references an undefined variable.
     /// </summary>
     public class VariableNotDefinedException : Exception
     {
-        public VariableNotDefinedException(string message)
+        public string VariableName { get; }
+        
+        public VariableNotDefinedException(string message, string variableName)
             : base(message)
         {
+            VariableName = variableName;
         }
 
-        public VariableNotDefinedException(string message, Exception innerException)
+        public VariableNotDefinedException(string message, Exception innerException, string variableName)
             : base(message, innerException)
         {
+            VariableName = variableName;
         }
     }
 }

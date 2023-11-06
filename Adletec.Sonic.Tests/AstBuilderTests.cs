@@ -11,8 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Adletec.Sonic.Execution;
 using Adletec.Sonic.Operations;
+using Adletec.Sonic.Parsing;
+using Adletec.Sonic.Parsing.Tokenizing;
 using Adletec.Sonic.Tests.Mocks;
-using Adletec.Sonic.Tokenizer;
 
 namespace Adletec.Sonic.Tests;
 
@@ -27,11 +28,11 @@ public class AstBuilderTests
         var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
         {
-            new() { Value = '(', TokenType = TokenType.LeftBracket },
+            new() { Value = '(', TokenType = TokenType.LeftParenthesis },
             new() { Value = 42, TokenType = TokenType.Integer },
             new() { Value = '+', TokenType = TokenType.Operation },
             new() { Value = 8, TokenType = TokenType.Integer },
-            new() { Value = ')', TokenType = TokenType.RightBracket },
+            new() { Value = ')', TokenType = TokenType.RightParenthesis },
             new() { Value = '*', TokenType = TokenType.Operation },
             new() { Value = 2, TokenType = TokenType.Integer }
         });
@@ -178,7 +179,7 @@ public class AstBuilderTests
         {
             new() { Value = 10, TokenType = TokenType.Integer },
             new() { Value = '*', TokenType = TokenType.Operation },
-            new() { Value = "var1", TokenType = TokenType.Text }
+            new() { Value = "var1", TokenType = TokenType.Symbol}
         });
 
         var multiplication = (Multiplication)operation;
@@ -195,15 +196,15 @@ public class AstBuilderTests
         var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>()
         {
-            new() { Value = "var1", TokenType = TokenType.Text },
+            new() { Value = "var1", TokenType = TokenType.Symbol},
             new() { Value = '+', TokenType = TokenType.Operation },
             new() { Value = 2, TokenType = TokenType.Integer },
             new() { Value = '*', TokenType = TokenType.Operation },
-            new() { Value = '(', TokenType = TokenType.LeftBracket },
+            new() { Value = '(', TokenType = TokenType.LeftParenthesis },
             new() { Value = 3, TokenType = TokenType.Integer },
             new() { Value = '*', TokenType = TokenType.Operation },
-            new() { Value = "age", TokenType = TokenType.Text },
-            new() { Value = ')', TokenType = TokenType.RightBracket }
+            new() { Value = "age", TokenType = TokenType.Symbol},
+            new() { Value = ')', TokenType = TokenType.RightParenthesis }
         });
 
         var addition = (Addition)operation;
@@ -224,10 +225,10 @@ public class AstBuilderTests
         var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
         {
-            new() { Value = "sin", TokenType = TokenType.Text },
-            new() { Value = '(', TokenType = TokenType.LeftBracket },
+            new() { Value = "sin", TokenType = TokenType.Function},
+            new() { Value = '(', TokenType = TokenType.LeftParenthesis },
             new() { Value = 2, TokenType = TokenType.Integer },
-            new() { Value = ')', TokenType = TokenType.RightBracket }
+            new() { Value = ')', TokenType = TokenType.RightParenthesis }
         });
 
         var sineFunction = (Function)operation;
@@ -242,12 +243,12 @@ public class AstBuilderTests
         var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
         {
-            new() { Value = "sin", TokenType = TokenType.Text },
-            new() { Value = '(', TokenType = TokenType.LeftBracket },
+            new() { Value = "sin", TokenType = TokenType.Function},
+            new() { Value = '(', TokenType = TokenType.LeftParenthesis },
             new() { Value = 2, TokenType = TokenType.Integer },
             new() { Value = '+', TokenType = TokenType.Operation },
             new() { Value = 3, TokenType = TokenType.Integer },
-            new() { Value = ')', TokenType = TokenType.RightBracket }
+            new() { Value = ')', TokenType = TokenType.RightParenthesis }
         });
 
         var sineFunction = (Function)operation;
@@ -265,12 +266,12 @@ public class AstBuilderTests
         var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
         var operation = builder.Build(new List<Token>
         {
-            new() { Value = "sin", TokenType = TokenType.Text },
-            new() { Value = '(', TokenType = TokenType.LeftBracket },
+            new() { Value = "sin", TokenType = TokenType.Function},
+            new() { Value = '(', TokenType = TokenType.LeftParenthesis },
             new() { Value = 2, TokenType = TokenType.Integer },
             new() { Value = '+', TokenType = TokenType.Operation },
             new() { Value = 3, TokenType = TokenType.Integer },
-            new() { Value = ')', TokenType = TokenType.RightBracket },
+            new() { Value = ')', TokenType = TokenType.RightParenthesis },
             new() { Value = '*', TokenType = TokenType.Operation },
             new() { Value = 4.9, TokenType = TokenType.FloatingPoint }
         });
@@ -297,11 +298,11 @@ public class AstBuilderTests
             new() { Value = 5.3, TokenType = TokenType.FloatingPoint },
             new() { Value = '*', TokenType = TokenType.Operation },
             new() { Value = '_', TokenType = TokenType.Operation },
-            new() { Value = '(', TokenType = TokenType.LeftBracket },
+            new() { Value = '(', TokenType = TokenType.LeftParenthesis },
             new() { Value = 5, TokenType = TokenType.Integer },
             new() { Value = '+', TokenType = TokenType.Operation },
             new() { Value = 42, TokenType = TokenType.Integer },
-            new() { Value = ')', TokenType = TokenType.RightBracket },
+            new() { Value = ')', TokenType = TokenType.RightParenthesis },
         });
 
         var multiplication = (Multiplication)operation;
@@ -323,9 +324,9 @@ public class AstBuilderTests
         var operation = builder.Build(new List<Token>
         {
             new() { Value = '_', TokenType = TokenType.Operation },
-            new() { Value = '(', TokenType = TokenType.LeftBracket },
+            new() { Value = '(', TokenType = TokenType.LeftParenthesis },
             new() { Value = 1, TokenType = TokenType.Integer },
-            new() { Value = ')', TokenType = TokenType.RightBracket },
+            new() { Value = ')', TokenType = TokenType.RightParenthesis },
             new() { Value = '^', TokenType = TokenType.Operation },
             new() { Value = 2, TokenType = TokenType.Integer },
         });
@@ -337,103 +338,4 @@ public class AstBuilderTests
         Assert.AreEqual(new IntegerConstant(2), exponentiation.Exponent);
     }
 
-
-    [TestMethod]
-    public void TestBuildInvalidFormula1()
-    {
-        IFunctionRegistry registry = new MockFunctionRegistry();
-
-        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
-
-        AssertExtensions.ThrowsException<ParseException>(() =>
-        {
-            var operation = builder.Build(new List<Token>
-            {
-                new() { Value = '(', TokenType = TokenType.LeftBracket, StartPosition = 0 },
-                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 1 },
-                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 3 },
-                new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 4 },
-                new() { Value = ')', TokenType = TokenType.RightBracket, StartPosition = 5 },
-                new() { Value = '*', TokenType = TokenType.Operation, StartPosition = 6 },
-            });
-        });
-    }
-
-    [TestMethod]
-    public void TestBuildInvalidFormula2()
-    {
-        IFunctionRegistry registry = new MockFunctionRegistry();
-
-        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
-
-        AssertExtensions.ThrowsException<ParseException>(() =>
-        {
-            var operation = builder.Build(new List<Token>
-            {
-                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 0 },
-                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 2 },
-                new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 3 },
-                new() { Value = ')', TokenType = TokenType.RightBracket, StartPosition = 4 },
-                new() { Value = '*', TokenType = TokenType.Operation, StartPosition = 5 },
-                new() { Value = 2, TokenType = TokenType.Integer, StartPosition = 6 },
-            });
-        });
-    }
-
-    [TestMethod]
-    public void TestBuildInvalidFormula3()
-    {
-        IFunctionRegistry registry = new MockFunctionRegistry();
-
-        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
-
-        AssertExtensions.ThrowsException<ParseException>(() =>
-        {
-            var operation = builder.Build(new List<Token>
-            {
-                new() { Value = '(', TokenType = TokenType.LeftBracket, StartPosition = 0 },
-                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 1 },
-                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 3 },
-                new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 4 }
-            });
-        });
-    }
-
-    [TestMethod]
-    public void TestBuildInvalidFormula4()
-    {
-        IFunctionRegistry registry = new MockFunctionRegistry();
-
-        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
-
-        AssertExtensions.ThrowsException<ParseException>(() =>
-        {
-            var operation = builder.Build(new List<Token>
-            {
-                new() { Value = 5, TokenType = TokenType.Integer, StartPosition = 0 },
-                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 1 },
-                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 3 },
-                new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 4 }
-            });
-        });
-    }
-
-    [TestMethod]
-    public void TestBuildInvalidFormula5()
-    {
-        IFunctionRegistry registry = new MockFunctionRegistry();
-
-        var builder = new AstBuilder(registry, new ConstantRegistry(false, false));
-
-        AssertExtensions.ThrowsException<ParseException>(() =>
-        {
-            var operation = builder.Build(new List<Token>
-            {
-                new() { Value = 42, TokenType = TokenType.Integer, StartPosition = 0 },
-                new() { Value = '+', TokenType = TokenType.Operation, StartPosition = 2 },
-                new() { Value = 8, TokenType = TokenType.Integer, StartPosition = 3 },
-                new() { Value = 5, TokenType = TokenType.Integer, StartPosition = 4 }
-            });
-        });
-    }
 }
