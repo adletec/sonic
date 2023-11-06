@@ -29,10 +29,10 @@ public class SonicSinglePassBenchmark
     [ParamsAllValues]
     public bool Optimize { get; set; }
     
-    [Params (false)]
+    [Params(false)]
     public bool Guarded { get; set; }
     
-    [Params (false)]
+    [Params(true)]
     public bool Validate { get; set; }
 
 

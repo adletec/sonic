@@ -33,12 +33,12 @@ public class SonicMultiPassBenchmark
     public bool Cached { get; set; }
 
     [ParamsAllValues]
-    public bool Guarded { get; set; }
-
-    [ParamsAllValues]
     public bool Optimize { get; set; }
     
-    [Params (false)]
+    [Params(false)]
+    public bool Guarded { get; set; }
+    
+    [Params(false)]
     public bool Validate { get; set; }
 
     /// <summary>
