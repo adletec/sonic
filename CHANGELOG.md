@@ -1,4 +1,44 @@
 # Changelog
+## 1.3.0 (2023-11-06)
+### Summary
+This release is all about validation. Jace, and thus _sonic_, has always been a bit lenient when it comes to validating expressions. This is due to the fact that Jace didn't actually
+validate the expression, but rather handled errors when they occurred. Improving upon the existing validation quickly proved close to impossible, since all of the existing error handling
+was part of the AST Builder, which uses the Shunting Yard algorithm. The Shunting Yard algorithm is a stack-based algorithm, which means that it's not possible to handle things like
+mixed up orders of operators and operands, or missing function arguments in a reliable way. This is because the Shunting Yard algorithm doesn't know the context of the expression it's
+parsing. It only knows the current token and the tokens it has already seen, but it doesn't know the order of operations and values since they are stored in different stacks.
+
+For example, something like "a sin()" would have been parsed as "sin(a)" while "sin() a" would have thrown an error. Also, typos like "a b +" had been silently parsed as "a + b".
+
+To improve upon this, we've introduced a new validation step before the Shunting Yard algorithm is run. This validation step is able to detect a lot of errors, which previously would
+not have been detected. The validation throws a detailed exception, which contains the position of the error in the expression, the token the error is related to, and a human-readable
+error message. This makes it a lot easier to debug errors in expressions.
+
+Best of all, we could simplify the AST Builder a lot, since it doesn't have to handle errors anymore. This makes the code a lot easier to read and maintain. As a consequence,
+the validation comes at close to no performance cost, since the AST Builder doesn't have to do any additional work. The validation is also completely optional, so if you don't
+need it or did already validate your expressions in a previous step, you can disable it.
+
+To enable this, we've also added the "Validate()"-method to the Evaluator. This method will validate the expression without evaluation and throw an exception if the expression is invalid.
+
+### Performance Improvements
+- Improve performance of the AST Builder by removing unnecessary operations and simplifying the code.
+- Removal of unnecessary case conversion in the function lookup of the AST Builder.
+- Slightly faster unary minus check in the AST Builder.
+
+### Features
+- Add validation of expressions. Validation of expressions on parsing is enabled by default and can be disabled in the EvaluatorBuilder. Validation can also be triggered manually by calling the "Validate()" method on the Evaluator.
+- New option to override the argument separator in the EvaluatorBuilder (also see bugfixes).
+
+### Changes
+- (BREAKING) Improved internal architectural structure. Only elements considered public API are now part of the top-level namespace. You can still access elements like the ASTBuilder, but there is no guarantee that there won't be breaking changes in the future.
+- (BREAKING) Functions are now treated as their own type of token instead of being treated as operators. As a consequence, function names do no longer collide with variable or constant names. This means that an expression like "a(123) + a" is now valid, whereas it was invalid before. In guarded mode, this will still throw an exception, since guarded mode aims to prevent ambiguous expressions.
+- Improved public API documentation.
+- Adjusted benchmark to use the new validation feature.
+- (INTERNAL) Parantheses are now consistently named "Parentheses" instead of "Brackets" in the code base to prevent AE/BE mixups ([]/()).
+
+### Bugfix
+- Fix a bug in which the argument separator could collide with the decimal separator in some cases. Before, the argument separator was taken from the current culture, which could lead to issues if the decimal separator was the same as the argument separator. Now, the argument separator is a comma (",") for cultures which use a colon (".") as decimal separator and a semi colon (";") for cultures which use a comma (",") as decimal separator. This is the same behavior as in Excel, which some might call exptected.
+- Fix missing unary minus handling for numerics. The fix for #8 was incomplete and didn't handle unary minus for numerics. This means that the Wikipedia example '-3^2' still evaluated to 9.0 instead of -9.0. This is now fixed. If you want 9.0, you now have to write '(-3)^2' instead.
+
 ## 1.2.0 (2023-09-20)
 ### Summary
 This is the first public release of _sonic_.
