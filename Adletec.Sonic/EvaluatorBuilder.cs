@@ -37,6 +37,7 @@ namespace Adletec.Sonic
         
         internal bool ValidationEnabled { get; private set; } = true;
         
+        // Will be set to ';' in Build() if the decimal separator is ',' and to ',' otherwise.
         internal char ArgumentSeparator { get; private set; } = ',';
 
         private char? OverrideArgumentSeparator { get; set; } = null;
