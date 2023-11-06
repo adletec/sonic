@@ -82,7 +82,7 @@ you can use the **interpreted mode** as a fallback.
 _sonic_ is available via [nuget](https://www.nuget.org/packages/Adletec.Sonic):
 
 ```bash
-dotnet add package Adletec.Sonic --version 1.2.0
+dotnet add package Adletec.Sonic --version 1.3.0
 ```
 
 ## Usage
