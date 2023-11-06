@@ -21,7 +21,10 @@ _sonic_ originally started as a fork of [_Jace.NET_ by Pieter De Rycke](https://
 no longer actively maintained. It is not a drop-in replacement for _Jace.NET_, but you should be able to switch to
 _sonic_ with minimal effort.
 
-_sonic_ is **considerably faster** than _Jace.NET_ (see benchmarks below). It contains numerous **bugfixes** and a lot of **maintenance work** over the latest _Jace.NET_ release (1.0.0). Many of them were originally suggested and developed by the community for _Jace.NET_, but never merged due to the dormant state of the project. See the [changelog](CHANGELOG.md) for details and a complete list.
+_sonic_ is **considerably faster** than _Jace.NET_ (see benchmarks below). It contains numerous **bugfixes** and a lot
+of **maintenance work** over the latest _Jace.NET_ release (1.0.0). Many of them were originally suggested and developed
+by the community for _Jace.NET_, but never merged due to the dormant state of the project. See the [changelog](CHANGELOG.md) for
+details and a complete list.
 
 ## Build Status
 
@@ -62,7 +65,11 @@ double result = engine.Evaluate("ft2m(30)"); // 9.144
 
 You can find more examples below.
 
-_sonic_ can execute formulas in two modes: **dynamic compilation mode** and **interpreted mode**. If **dynamic compilation mode** is used, _sonic_ will create a dynamic method at runtime and will generate the MSIL opcodes necessary for the native execution of the evaluation. If a formula is re-evaluated with other variables, _sonic_ will take the dynamically generated method from its cache (if enabled, which it is by default). Dynamic compilation mode is a lot faster when evaluating an expression, but has a higher overhead when building the evaluator.
+_sonic_ can execute formulas in two modes: **dynamic compilation mode** and **interpreted mode**. If **dynamic 
+compilation mode** is used, _sonic_ will create a dynamic method at runtime and will generate the MSIL opcodes necessary
+for the native execution of the evaluation. If a formula is re-evaluated with other variables, _sonic_ will take the
+dynamically generated method from its cache (if enabled, which it is by default). Dynamic compilation mode is a lot
+faster when evaluating an expression, but has a higher overhead when building the evaluator.
 
 As a rule of thumb, you should use **dynamic compilation mode** if you are evaluating the same expressions multiple
 times with different variables, and **interpreted mode** if you are evaluating many different expressions only once.
@@ -164,12 +171,12 @@ _sonic_ supports most common functions out-of-the-box:
 | Sum               | `median(a,b,...)`  | `a,b,...`: series of numbers to build the sum of                                                        |
 | Random            | `random()`         | no parameters, returns random number in `[0..1]`                                                        |
 
-The function names are reserved keywords and cannot be overwritten. If you need to override a function, you can globaly
+The function names are reserved keywords and cannot be overwritten. If you need to override a function, you can globally
 disable the built-in functions using the configuration (see below).
 
 #### Custom Functions
 
-You can define your own functions using the `.AddFunction()`-method while instanciating the evaluator.
+You can define your own functions using the `.AddFunction()`-method while instantiating the evaluator.
 
 ```csharp
 var engine = Evaluator.Create()
@@ -193,7 +200,7 @@ var engine = Evaluator.Create()
 double result = engine.Evaluate("customSum(1,2,3,4,5,6)"); // 21.0
 ```
 
-Custom function names are overwritable, so you can re-register the same name with a different implementation.
+Custom function names are overridable, so you can re-register the same name with a different implementation.
 
 ### Using Constants
 
@@ -211,11 +218,11 @@ evaluated when you build a delegate and the result is cached.
 The constant names are reserved keywords and cannot be overwritten. If you define a variable with the same name as a
 constant, the constant will take precedence.
 
-If you need to override a constant, you can globaly disable the built-in constants using the configuration (see below).
+If you need to override a constant, you can globally disable the built-in constants using the configuration (see below).
 
 #### Custom Constants
 
-You can define your own constants using the `.AddConstant()`-method while instanciating the evaluator.
+You can define your own constants using the `.AddConstant()`-method while instantiating the evaluator.
 
 ```csharp
 var engine = Evaluator.Create()
@@ -270,11 +277,11 @@ The `Evaluator`-builder also allows you to configure the evaluator. The followin
 | Option                                                   | Values (bold = default)                                                                                                                            | Comment                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 |----------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `UseCulture(CultureInfo cultureInfo)`                    | **`CultureInfo.CurrentCulture`**<br/>[`CultureInfo.*`](https://learn.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo?view=net-7.0) | Determines the number format (e.g. decimal separator, thousands separator, etc.); defaults to your system default;                                                                                                                                                                                                                                                                                                                                                                                   | 
-| `UseArgumentSeparator(char argumentSeparator)`           | **`,`** or **`;`** (depending on `Culture`)                                                                                                        | Can be used to define the argument separator used for functions (e.g. ";" instead of ","). If unset, defaults to `,` for `Culture`s with a `.` as decimal separator and to `;` for `Culture`s with a `,` as decimal separator.                                                                                                                                                                                                                                                               | 
+| `UseArgumentSeparator(char argumentSeparator)`           | **`,`** or **`;`** (depending on `Culture`)                                                                                                        | Can be used to define the argument separator used for functions (e.g. ";" instead of ","). If unset, defaults to `,` for `Culture`s with a `.` as decimal separator and to `;` for `Culture`s with a `,` as decimal separator.                                                                                                                                                                                                                                                                       | 
 | `UseExecutionMode(ExecutionMode executionMode)`          | **`ExecutionMode.Compiled`**<br/>`ExecutionMode.Interpreted`                                                                                       | `Compiled` will dynamically compile the evaluation to MSIL which grants the best evaluation performance, but comes with the overhead of compilation. If you are using a platform where dynamic compilation is restricted, or don't want to re-evaluate the same expressions, you should use `Interpreted`.                                                                                                                                                                                           |
 | `EnableCache()` / `DisableCache()`                       | **`enabled`**                                                                                                                                      | Can be used to disable the formula cache if set to `false`. The formula cache keeps a copy of the optimized AST for every given formula string, so it can be re-used. This makes subsequent evaluations of the same formula significantly faster. If you don't intend to re-evaluate the same expressions, you can disable the cache. This will reduce memory consumption and improve initial evaluation performance.                                                                                |
-| `EnableOptimizer()` / `DisableOptimizer()`               | **`enabled`**                                                                                                                                      | Can be used to disable the optimizer if set to `false`. The optimizer will pre-evaluate parts of the equation which do not depend on variables, including multiplications with 0 or 0 exponents. You can disable the optimizer if you know for a fact that the given expressions won't contain foldable constants or if you don't intend to re-evalute the same expressions.                                                                                                                         |
-| `EnableCaseSensitivity()` / `DisableCaseSensitivity()`   | **`enabled`**                                                                                                                                      | Determines wether the provided variable names will be evaluated case-sensitive (enabled) or case-insensitive (disabled). If you don't absolutely need case-insensitivity, you should keep this option set to case-sensitive since this has a notable performance impact.                                                                                                                                                                                                                             |
+| `EnableOptimizer()` / `DisableOptimizer()`               | **`enabled`**                                                                                                                                      | Can be used to disable the optimizer if set to `false`. The optimizer will pre-evaluate parts of the equation which do not depend on variables, including multiplications with 0 or 0 exponents. You can disable the optimizer if you know for a fact that the given expressions won't contain foldable constants or if you don't intend to re-evaluate the same expressions.                                                                                                                        |
+| `EnableCaseSensitivity()` / `DisableCaseSensitivity()`   | **`enabled`**                                                                                                                                      | Determines whether the provided variable names will be evaluated case-sensitive (enabled) or case-insensitive (disabled). If you don't absolutely need case-insensitivity, you should keep this option set to case-sensitive since this has a notable performance impact.                                                                                                                                                                                                                            |
 | `EnableDefaultFunctions()` / `DisableDefaultFunctions()` | **`enabled`**                                                                                                                                      | Can be used to disable the built-in functions.                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `EnableDefaultConstants()` / `DisableDefaultConstants()` | **`enabled`**                                                                                                                                      | Can be used to disable the built-in constants.                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `EnableGuardedMode()` / `DisableGuardedMode()`           | **`disabled`**                                                                                                                                     | Enables guarded mode. This means that the engine will throw exceptions for non-fatal errors, i.e. if it receives ambiguous input for which a sane default exists, but which is possibly not what the user intended. You can use this if you want to pin down hard to find bugs in your expressions. Since it comes with a severe performance impact, it is recommended to keep guarded mode disabled in production. Alas, if you prioritize validation over performance, you might decide otherwise. |
@@ -390,7 +397,7 @@ Your contributions are welcome. To streamline the process, take note of the foll
 * Always discuss your goal and solution in an issue before implementing a solution or even opening a pull request. This
   potentially saves a lot of time and rework compared to having the same conversation after you open your pull request.
 * Do one thing (feature, bugfix, change,...) per pull request. If you need one thing to do another, break them up in
-  seperate requests.
+  separate requests.
 * Please keep pull requests to a manageable size, so we can clearly understand the changes and intent.
 * Add tests to prove your code is doing what it says and make sure there are no broken tests.
 * Run the benchmark suite and make sure that your change didn't (negatively) impact performance. If so, clearly state
