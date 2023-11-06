@@ -256,22 +256,22 @@ The `Validate()`-method will throw a matching sub-type of [`ParseException`](htt
 Each exception contains a `Message`-property which contains a human-readable error message, and additional properties
 which contain more detailed information about the error.
 
-This is espacially useful if you want to assist your users in writing valid expressions. You can use the information
+This is especially useful if you want to assist your users in writing valid expressions. You can use the information
 contained in the exception to provide meaningful error messages or syntax highlighting.
 
 The following exceptions are thrown by `Validate()`:
 
-| Exception Type | Description                                                                                       |
-|----------------|---------------------------------------------------------------------------------------------------|
-| InvalidTokenParseException | Thrown if the expression contains an invalid or unexpected token (e.g. `var1*var2 var3`) |
-| InvalidFloatingPointNumberParseException | Thrown if the expression contains an invalid floating point number (e.g. `var1*2.3.4`) |
-| MissingLeftParenthesisParseException | Thrown if the expression contains a closing parenthesis without a matching opening parenthesis (e.g. `var1*2)`) |
-| MissingRightParenthesisParseException | Thrown if the expression contains an opening parenthesis without a matching closing parenthesis (e.g. `var1*(2+3`) |
-| UnknownFunctionParseException | Thrown if the expression contains an unknown function (e.g. `var1*unknownFunction(2+3)`) |
-| InvalidArgumentCountParseException | Thrown if the expression contains a function with an invalid number of arguments (e.g. `var1*sin(2;3)`) |
-| MissingOperandParseException | Thrown if the expression contains an operator without operands (e.g. `var1*`) |
+| Exception Type                           | Description                                                                                                        |
+|------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| InvalidTokenParseException               | Thrown if the expression contains an invalid or unexpected token (e.g. `var1*var2 var3`)                           |
+| InvalidFloatingPointNumberParseException | Thrown if the expression contains an invalid floating point number (e.g. `var1*2.3.4`)                             |
+| MissingLeftParenthesisParseException     | Thrown if the expression contains a closing parenthesis without a matching opening parenthesis (e.g. `var1*2)`)    |
+| MissingRightParenthesisParseException    | Thrown if the expression contains an opening parenthesis without a matching closing parenthesis (e.g. `var1*(2+3`) |
+| UnknownFunctionParseException            | Thrown if the expression contains an unknown function (e.g. `var1*unknownFunction(2+3)`)                           |
+| InvalidArgumentCountParseException       | Thrown if the expression contains a function with an invalid number of arguments (e.g. `var1*sin(2;3)`)            |
+| MissingOperandParseException             | Thrown if the expression contains an operator without operands (e.g. `var1*`)                                      |
 
-You can find more details about the differenct exception types in the [source code](https://github.com/adletec/sonic/blob/main/Adletec.Sonic/ParseException.cs).
+You can find more details about the different exception types in the [source code](https://github.com/adletec/sonic/blob/main/Adletec.Sonic/ParseException.cs).
 
 #### Disable Validation
 If you don't want _sonic_ to validate the expression, you can disable validation globally using the configuration (see
