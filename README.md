@@ -31,7 +31,7 @@ details and a complete list.
 | branch             | status                                                                                                                                                                                    |
 |--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | main (development) | [![Build status](https://github.com/adletec/jace/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/adletec/jace/actions/workflows/dotnet.yml?query=branch%3Amain) |
-| release            | ![Build status](https://github.com/adletec/jace/actions/workflows/release.yml/badge.svg)                                                                                                  |
+| release            | ![Build status](https://github.com/adletec/jace/actions/workflows/release.yml/badge.svg?branch=release)                                                                                                  |
 
 ## Quick Start
 
