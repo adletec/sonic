@@ -233,22 +233,73 @@ double result = engine.Evaluate("g*2"); // 19.6133
 
 Custom constants will also be taken into account during the optimization phase of the compilation process.
 
-#### Guarded Mode
-There are some cases in which _sonic_ can get ambiguous inputs. If there is no sane way to continue, _sonic_ will throw an Exception:
+### Validation
 
-* A constant name collides with a function name
-* A function name collides with a variable name
+By default, _sonic_ will validate the given expression upon evaluation (`Evaluate()`-method) or delegate creation
+(`CreateDelegate()`-method). This means that _sonic_ will check if the given expression is syntactically correct and
+contains no unknown functions.
+
+#### Validate an Expression
+If you want to validate an expression without evaluating it, you can use the `Validate()`-method of the `Evaluator`:
+
+```csharp
+var engine = Evaluator.CreateWithDefaults();
+try {
+  engine.Validate("var1*var2");
+} catch (ParseException e) {
+  // handle exception
+}
+```
+
+#### Parse Exception Types
+The `Validate()`-method will throw a matching sub-type of [`ParseException`](https://github.com/adletec/sonic/blob/main/Adletec.Sonic/ParseException.cs) if the given expression is invalid.
+Each exception contains a `Message`-property which contains a human-readable error message, and additional properties
+which contain more detailed information about the error.
+
+This is espacially useful if you want to assist your users in writing valid expressions. You can use the information
+contained in the exception to provide meaningful error messages or syntax highlighting.
+
+The following exceptions are thrown by `Validate()`:
+
+| Exception Type | Description                                                                                       |
+| InvalidTokenParseException | Thrown if the expression contains an invalid or unexpected token (e.g. `var1*var2 var3`) |
+| InvalidFloatingPointNumberParseException | Thrown if the expression contains an invalid floating point number (e.g. `var1*2.3.4`) |
+| MissingLeftParenthesisParseException | Thrown if the expression contains a closing parenthesis without a matching opening parenthesis (e.g. `var1*2)`) |
+| MissingRightParenthesisParseException | Thrown if the expression contains an opening parenthesis without a matching closing parenthesis (e.g. `var1*(2+3`) |
+| UnknownFunctionParseException | Thrown if the expression contains an unknown function (e.g. `var1*unknownFunction(2+3)`) |
+| InvalidArgumentCountParseException | Thrown if the expression contains a function with an invalid number of arguments (e.g. `var1*sin(2;3)`) |
+| MissingOperandParseException | Thrown if the expression contains an operator without operands (e.g. `var1*`) |
+
+You can find more details about the differenct exception types in the [source code](https://github.com/adletec/sonic/blob/main/Adletec.Sonic/ParseException.cs).
+
+#### Disable Validation
+If you don't want _sonic_ to validate the expression, you can disable validation globally using the configuration (see
+below). This can slightly improve parsing performance. However, you should only do this if you are absolutely sure that
+the given expression is valid (e.g. by validating it using the `Validate()`-method before).
+
+A common use-case for disabling validation is when you are validating the expressions on user input. In that case, you
+can avoid re-validating the expression upon evaluation.
+
+In any case, validation is pretty fast. Don't expect a significant performance boost by disabling it or rewrite your
+code to avoid validation, unless every millisecond counts.
+
+
+### Guarded Mode
+There are some cases in which _sonic_ can get ambiguous inputs. If there is no sane way to continue, _sonic_ will throw an Exception (see [Validation](#validation)).
 
 Both cases are easy to find during AST creation, since a text token can't be unambiguously resolved.
 
 Other ambiguous inputs are a little more subtle which makes them harder to find:
 
+* A constant name collides with a function name
+* A function name collides with a variable name
 * The given variables include a variable name which is also a constant name
 * A constant is defined multiple times with different values
 * A function is defined multiple times with different implementations
 
 _sonic_ doesn't automatically recognize those cases, since it's explicitly designed to have a sane default which doesn't require additional checks:
 
+* Functions are always followed by an opening parenthesis, so they can be distinguished from constants/variables
 * Constants always have precedence over variables
 * Of two different constant definitions, the latter wins
 * Of two different function definitions, the latter wins
