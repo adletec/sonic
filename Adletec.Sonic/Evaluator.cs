@@ -34,7 +34,7 @@ namespace Adletec.Sonic
         /// <returns></returns>
         public static Evaluator CreateWithDefaults()
         {
-            return new Evaluator(new EvaluatorBuilder());
+            return new EvaluatorBuilder().Build();
         }
 
         /// <summary>

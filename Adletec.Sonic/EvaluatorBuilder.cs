@@ -15,7 +15,7 @@ namespace Adletec.Sonic
         private const int DefaultCacheReductionSize = 50;
         private static readonly List<char> IllegalArgumentSeparators = new List<char> {' ','+', '-', '*', '/', '^', '(', ')', '_', '%', '>', '<', '=', '&', '|', '≠', '≤', '≥'};
 
-        internal CultureInfo CultureInfo { get; private set; } = CultureInfo.InvariantCulture;
+        internal CultureInfo CultureInfo { get; private set; } = CultureInfo.CurrentCulture;
         
         internal ExecutionMode ExecutionMode { get; private set; } = ExecutionMode.Compiled;
 
