@@ -1,13 +1,14 @@
-﻿namespace Adletec.Sonic.Tokenizer
+﻿namespace Adletec.Sonic.Parsing
 {
     public enum TokenType
     {
         Integer,
         FloatingPoint,
-        Text,
+        Symbol,
+        Function,
         Operation,
-        LeftBracket,
-        RightBracket,
+        LeftParenthesis,
+        RightParenthesis,
         ArgumentSeparator
     }
 }

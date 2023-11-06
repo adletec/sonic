@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using Adletec.Sonic.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,13 +14,16 @@ public class EvaluatorBuilderTests
 
         // change all values from their default values.
         var baseBuilder = Evaluator.Create()
-            .UseCulture(CultureInfo.InvariantCulture)
+            .UseCulture(CultureInfo.CurrentCulture)
+            .UseArgumentSeparator('\\')
             .UseExecutionMode(ExecutionMode.Interpreted)
             .DisableCache()
             .DisableOptimizer()
             .DisableCaseSensitivity()
             .DisableDefaultFunctions()
             .DisableDefaultConstants()
+            .EnableGuardedMode()
+            .DisableValidation()
             .UseCacheMaximumSize(12345)
             .UseCacheReductionSize(123)
             .AddConstant("a", 12345)
@@ -29,6 +33,15 @@ public class EvaluatorBuilderTests
         
         // values must match in copied object
         Assert.AreEqual(baseBuilder, copiedBuilder);
+    }
+
+    [TestMethod]
+    public void TestIllegalArgumentSeparator()
+    {
+        AssertExtensions.ThrowsException<ArgumentException>(() =>
+        {
+            Evaluator.Create().UseArgumentSeparator('a');
+        });
     }
 
 }

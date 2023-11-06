@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Adletec.Sonic.Execution;
 using Adletec.Sonic.Operations;
-using Adletec.Sonic.Tokenizer;
+using Adletec.Sonic.Parsing;
+using Adletec.Sonic.Parsing.Tokenizing;
 using Adletec.Sonic.Util;
 
 namespace Adletec.Sonic
@@ -14,14 +14,16 @@ namespace Adletec.Sonic
     /// <inheritdoc/>
     public class Evaluator : IEvaluator
     {
-        private readonly IExecutor executor;
+        private readonly TokenReader tokenReader;
         private readonly Optimizer optimizer;
-        private readonly CultureInfo cultureInfo;
+        private readonly IExecutor executor;
+        private readonly Validator validator;
+        
         private readonly MemoryCache<string, Func<IDictionary<string, double>, double>> executionFormulaCache;
         private readonly bool cacheEnabled;
         private readonly bool optimizerEnabled;
-        private readonly bool caseSensitive;
-        private readonly bool guardedMode;
+        private readonly bool guardedModeEnabled;
+        private readonly bool validationEnabled;
 
         private readonly Random random;
 
@@ -32,7 +34,7 @@ namespace Adletec.Sonic
         /// <returns></returns>
         public static Evaluator CreateWithDefaults()
         {
-            return new Evaluator(new EvaluatorBuilder());
+            return new EvaluatorBuilder().Build();
         }
 
         /// <summary>
@@ -47,26 +49,32 @@ namespace Adletec.Sonic
 
         internal Evaluator(EvaluatorBuilder options)
         {
-            this.caseSensitive = options.CaseSensitive;
+            var caseSensitive = options.CaseSensitive;
             this.executionFormulaCache =
                 new MemoryCache<string, Func<IDictionary<string, double>, double>>(options.CacheMaximumSize,
                     options.CacheReductionSize);
-            this.FunctionRegistry = new FunctionRegistry(caseSensitive, options.GuardedMode);
-            this.ConstantRegistry = new ConstantRegistry(caseSensitive, options.GuardedMode);
-            this.cultureInfo = options.CultureInfo;
+            this.FunctionRegistry = new FunctionRegistry(caseSensitive, options.GuardedModeEnabled);
+            this.ConstantRegistry = new ConstantRegistry(caseSensitive, options.GuardedModeEnabled);
+            
+            var cultureInfo = options.CultureInfo;
+            var argumentSeparator = options.ArgumentSeparator;
+            tokenReader = new TokenReader(cultureInfo, argumentSeparator);
+            
             this.cacheEnabled = options.CacheEnabled;
             this.optimizerEnabled = options.OptimizerEnabled;
-            this.guardedMode = options.GuardedMode;
+            this.guardedModeEnabled = options.GuardedModeEnabled;
+            this.validationEnabled = options.ValidationEnabled;
 
             this.random = new Random();
+
 
             switch (options.ExecutionMode)
             {
                 case ExecutionMode.Interpreted:
-                    executor = new Interpreter(caseSensitive, guardedMode);
+                    executor = new Interpreter(caseSensitive, guardedModeEnabled);
                     break;
                 case ExecutionMode.Compiled:
-                    executor = new DynamicCompiler(caseSensitive, guardedMode);
+                    executor = new DynamicCompiler(caseSensitive, guardedModeEnabled);
                     break;
                 default:
                     throw new ArgumentException($"Unsupported execution mode \"{options.ExecutionMode}\".",
@@ -88,7 +96,7 @@ namespace Adletec.Sonic
             {
                 foreach (var constant in options.Constants)
                 {
-                    if (guardedMode && FunctionRegistry.IsFunctionName(constant.Name))
+                    if (guardedModeEnabled && FunctionRegistry.IsFunctionName(constant.Name))
                     {
                         throw new ArgumentException("The constant name cannot be the same as a function name.");
                     }
@@ -102,7 +110,7 @@ namespace Adletec.Sonic
             {
                 foreach (var function in options.Functions)
                 {
-                    if (guardedMode && ConstantRegistry.IsConstantName(function.Name))
+                    if (guardedModeEnabled && ConstantRegistry.IsConstantName(function.Name))
                     {
                         throw new ArgumentException("The function name cannot be the same as a constant name.");
                     }
@@ -110,6 +118,8 @@ namespace Adletec.Sonic
                     FunctionRegistry.RegisterFunction(function.Name, function.Function, function.IsIdempotent);
                 }
             }
+            
+            this.validator = new Validator(FunctionRegistry, cultureInfo);
         }
 
         internal IFunctionRegistry FunctionRegistry { get; }
@@ -141,8 +151,17 @@ namespace Adletec.Sonic
                 return result;
             }
 
-            Operation operation = BuildAbstractSyntaxTree(expression, ConstantRegistry);
+            Operation operation = BuildAbstractSyntaxTree(expression, ConstantRegistry, optimizerEnabled, validationEnabled);
             return BuildEvaluator(expression, operation);
+        }
+
+        /// <summary>
+        /// Validates the given expression. If the expression is invalid, a matching subtype of ParseException is thrown.
+        /// </summary>
+        /// <param name="expression">The expression to check.</param>
+        public void Validate(string expression)
+        {
+            BuildAbstractSyntaxTree(expression, ConstantRegistry, false, true);
         }
 
         private void RegisterDefaultFunctions()
@@ -199,16 +218,20 @@ namespace Adletec.Sonic
         /// <param name="formulaText">A string containing the mathematical formula that must be converted 
         /// into an abstract syntax tree.</param>
         /// <param name="compiledConstants">The constants which are to be available in the given formula.</param>
+        /// <param name="optimize">If the abstract syntax tree should be optimized.</param>
         /// <returns>The abstract syntax tree of the formula.</returns>
-        private Operation BuildAbstractSyntaxTree(string formulaText, IConstantRegistry compiledConstants)
+        private Operation BuildAbstractSyntaxTree(string formulaText, IConstantRegistry compiledConstants, bool optimize, bool validate)
         {
-            var tokenReader = new TokenReader(cultureInfo);
             List<Token> tokens = tokenReader.Read(formulaText);
-
+            if (validate)
+            {
+                validator.Validate(tokens);
+            }
+            
             var astBuilder = new AstBuilder(FunctionRegistry, compiledConstants);
             Operation operation = astBuilder.Build(tokens);
 
-            return optimizerEnabled
+            return optimize
                 ? optimizer.Optimize(operation, this.FunctionRegistry, this.ConstantRegistry)
                 : operation;
         }
@@ -223,7 +246,7 @@ namespace Adletec.Sonic
                 // If the operation is a constant, we can just return the constant value
                 if (operation is Constant<double> constant)
                 {
-                    if (guardedMode)
+                    if (guardedModeEnabled)
                     {
                         return values =>
                         {

@@ -99,7 +99,7 @@ namespace Adletec.Sonic.Execution
                 if (variableFound)
                     return value;
 
-                throw new VariableNotDefinedException($"The variable \"{variable.Name}\" used is not defined.");
+                throw new VariableNotDefinedException($"The variable \"{variable.Name}\" used is not defined.", variable.Name);
             }
 
             if (operation.GetType() == typeof(Multiplication))
