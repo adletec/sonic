@@ -235,6 +235,13 @@ Custom constants will also be taken into account during the optimization phase o
 
 ### Validation
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+* A constant name collides with a function name
+* A function name collides with a variable name
+=======
+>>>>>>> Stashed changes
 By default, _sonic_ will validate the given expression upon evaluation (`Evaluate()`-method) or delegate creation
 (`CreateDelegate()`-method). This means that _sonic_ will check if the given expression is syntactically correct and
 contains no unknown functions.
@@ -262,6 +269,10 @@ contained in the exception to provide meaningful error messages or syntax highli
 The following exceptions are thrown by `Validate()`:
 
 | Exception Type | Description                                                                                       |
+<<<<<<< Updated upstream
+=======
+|----------------|---------------------------------------------------------------------------------------------------|
+>>>>>>> Stashed changes
 | InvalidTokenParseException | Thrown if the expression contains an invalid or unexpected token (e.g. `var1*var2 var3`) |
 | InvalidFloatingPointNumberParseException | Thrown if the expression contains an invalid floating point number (e.g. `var1*2.3.4`) |
 | MissingLeftParenthesisParseException | Thrown if the expression contains a closing parenthesis without a matching opening parenthesis (e.g. `var1*2)`) |
@@ -286,6 +297,10 @@ code to avoid validation, unless every millisecond counts.
 
 ### Guarded Mode
 There are some cases in which _sonic_ can get ambiguous inputs. If there is no sane way to continue, _sonic_ will throw an Exception (see [Validation](#validation)).
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 Both cases are easy to find during AST creation, since a text token can't be unambiguously resolved.
 
