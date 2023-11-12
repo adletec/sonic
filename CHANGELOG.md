@@ -1,4 +1,17 @@
 # Changelog
+## 1.3.1 (2023-11-12)
+###
+This release contains some minor improvements for the validation introduced in 1.3.0.
+
+### Changes
+- `ParseException` and all derived types have a new `Expression` property which contains the complete failed expression.
+- The GitHub project now also tracks test coverage. We're starting as is and define < 80% test coverage as "yellow" and < 60% as "red". The aim for the next releases is to consistently improve and then maintain > 80% coverage.
+
+### Bugfix
+- Functions are now identified as such if there are white-spaces between the function name and the opening parenthesis.
+E.g.: `sin (x)` instead of `sin(x)`.
+
+
 ## 1.3.0 (2023-11-06)
 ### Summary
 This release is all about validation. Jace, and thus _sonic_, has always been a bit lenient when it comes to validating expressions. This is due to the fact that Jace didn't actually

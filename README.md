@@ -1,4 +1,5 @@
 # sonic | rapid expression evaluation for .NET
+[![Build status](https://github.com/adletec/jace/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/adletec/jace/actions/workflows/dotnet.yml?query=branch%3Amain) ![Build status](https://github.com/adletec/jace/actions/workflows/release.yml/badge.svg?branch=release) [![codecov](https://codecov.io/gh/adletec/sonic/graph/badge.svg?token=BEYRTHQIGT)](https://codecov.io/gh/adletec/sonic) ![Nuget](https://img.shields.io/nuget/v/Adletec.Sonic)
 
 _sonic_ is a rapid evaluation engine for mathematical expressions. It can parse and evaluate strings containing
 mathematical expressions.
@@ -7,6 +8,7 @@ _sonic_ is also the expression evaluator we use in our commercial products. It i
 simulation tools for virtual vehicle and ADAS prototyping and is continuously stress tested in a demanding environment.
 Its development and maintenance is funded by our product sales.
 
+## Guiding Principles
 The guiding principles for _sonic_ are (in that order):
 
 1. **Performance**: _sonic_ is aiming to be the fastest expression evaluator for .NET. It is optimized for both, multi
@@ -14,31 +16,14 @@ The guiding principles for _sonic_ are (in that order):
 2. **Usability**: _sonic_ is designed to be easy to use. It comes with a sane default configuration, an understandable
    documentation and a simple API. The most common use-cases should be fast out-of-the-box.
 3. **Maintainability**: _sonic_ is designed to be easy to maintain. It is written in a clean and readable code style and
-   comes with a comprehensive test and benchmarking suite. The NuGet package introduces no transient dependencies and is
-   fully self-contained.
-
-_sonic_ originally started as a fork of [_Jace.NET_ by Pieter De Rycke](https://github.com/pieterderycke/Jace), which is
-no longer actively maintained. It is not a drop-in replacement for _Jace.NET_, but you should be able to switch to
-_sonic_ with minimal effort.
-
-_sonic_ is **considerably faster** than _Jace.NET_ (see benchmarks below). It contains numerous **bugfixes** and a lot
-of **maintenance work** over the latest _Jace.NET_ release (1.0.0). Many of them were originally suggested and developed
-by the community for _Jace.NET_, but never merged due to the dormant state of the project. See the [changelog](CHANGELOG.md) for
-details and a complete list.
-
-## Build Status
-
-| branch             | status                                                                                                                                                                                    |
-|--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| main (development) | [![Build status](https://github.com/adletec/jace/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/adletec/jace/actions/workflows/dotnet.yml?query=branch%3Amain) |
-| release            | ![Build status](https://github.com/adletec/jace/actions/workflows/release.yml/badge.svg?branch=release)                                                                                                  |
+   comes with a comprehensive test and benchmarking suite. The NuGet package introduces no transient dependencies.
 
 ## Quick Start
 
 _sonic_ can parse and evaluate strings containing mathematical expressions. These expressions may rely on variables,
 which can be defined at runtime.
 
-Consider this simple example:
+Consider this example:
 
 ```csharp
 var variables = new Dictionary<string, double>();
@@ -77,12 +62,22 @@ times with different variables, and **interpreted mode** if you are evaluating m
 Additionally, for specific use-cases (e.g. Unity with IL2CPP) dynamic code generation can be limited. In those cases,
 you can use the **interpreted mode** as a fallback.
 
+### Migration from Jace.NET
+_sonic_ originally started as a fork of [_Jace.NET_ by Pieter De Rycke](https://github.com/pieterderycke/Jace), which is
+no longer actively maintained. It is not a drop-in replacement for _Jace.NET_, but you should be able to switch to
+_sonic_ with little effort.
+
+_sonic_ is **considerably faster** than _Jace.NET_ (see benchmarks below). It contains numerous **bugfixes** and a lot
+of **maintenance work** over the latest _Jace.NET_ release (1.0.0). Many of them were originally suggested and developed
+by the community for _Jace.NET_, but never merged due to the dormant state of the project. See the [changelog](CHANGELOG.md) for
+details and a complete list.
+
 ## Installation
 
 _sonic_ is available via [nuget](https://www.nuget.org/packages/Adletec.Sonic):
 
 ```bash
-dotnet add package Adletec.Sonic --version 1.2.0
+dotnet add package Adletec.Sonic --version 1.3.1
 ```
 
 ## Usage

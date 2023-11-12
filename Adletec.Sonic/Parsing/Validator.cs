@@ -31,7 +31,7 @@ namespace Adletec.Sonic.Parsing
         /// </summary>
         /// <param name="tokenList">The token list as produced by <see cref="TokenReader"/>.</param>
         /// <exception cref="ArgumentException">If the token list is empty.</exception>
-        public void Validate(IList<Token> tokenList)
+        public void Validate(IList<Token> tokenList, string expression)
         {
             var contextStack = new Stack<ValidationContext>();
 
@@ -50,15 +50,15 @@ namespace Adletec.Sonic.Parsing
             {
                 case TokenType.Operation when IsBinaryOperation(firstToken):
                     // if the first token is a binary operation, there is no left argument
-                    ThrowMissingOperationArgumentParseException(firstToken, "There is no left argument.");
+                    ThrowMissingOperationArgumentParseException(firstToken, expression, "There is no left argument.");
                     break;
                 case TokenType.ArgumentSeparator:
                     // an argument separator must be inside a function, which is not the case for the first token
-                    ThrowInvalidTokenParseException(firstToken);
+                    ThrowInvalidTokenParseException(firstToken, expression);
                     break;
                 case TokenType.RightParenthesis:
                     // if the first token is a right parenthesis, there is no matching left parenthesis
-                    ThrowMissingLeftParenthesisParseException(firstToken);
+                    ThrowMissingLeftParenthesisParseException(firstToken, expression);
                     break;
                 case TokenType.LeftParenthesis:
                     // the first token is a left parenthesis, so we start a parenthesised clause
@@ -94,7 +94,7 @@ namespace Adletec.Sonic.Parsing
                             case TokenType.FloatingPoint:
                             case TokenType.Symbol:
                             case TokenType.RightParenthesis:
-                                ThrowInvalidTokenParseException(token);
+                                ThrowInvalidTokenParseException(token, expression);
                                 break;
                         }
 
@@ -116,7 +116,7 @@ namespace Adletec.Sonic.Parsing
                             case TokenType.FloatingPoint:
                             case TokenType.Symbol:
                             case TokenType.RightParenthesis:
-                                ThrowInvalidTokenParseException(token);
+                                ThrowInvalidTokenParseException(token, expression);
                                 break;
                         }
 
@@ -128,10 +128,11 @@ namespace Adletec.Sonic.Parsing
                         {
                             case TokenType.LeftParenthesis:
                             case TokenType.ArgumentSeparator:
-                                ThrowInvalidTokenParseException(token);
+                                ThrowInvalidTokenParseException(token, expression);
                                 break;
                             case TokenType.Operation:
-                                ThrowMissingOperationArgumentParseException(tokenBefore, "There is no right argument.");
+                                ThrowMissingOperationArgumentParseException(tokenBefore, expression,
+                                    "There is no right argument.");
                                 break;
                         }
 
@@ -143,12 +144,12 @@ namespace Adletec.Sonic.Parsing
                         {
                             case TokenType.ArgumentSeparator:
                             case TokenType.LeftParenthesis:
-                                ThrowInvalidTokenParseException(token);
+                                ThrowInvalidTokenParseException(token, expression);
                                 break;
                             case TokenType.Operation:
                                 if (IsBinaryOperation(tokenBefore))
                                 {
-                                    ThrowMissingOperationArgumentParseException(token,
+                                    ThrowMissingOperationArgumentParseException(token, expression,
                                         "There is no right argument.");
                                 }
 
@@ -159,13 +160,14 @@ namespace Adletec.Sonic.Parsing
                         // number of arguments of the function (checked on context exit)
                         if (contextStack.Count == 0)
                         {
-                            ThrowInvalidTokenParseException(token, "Argument separator is outside of function.");
+                            ThrowInvalidTokenParseException(token, expression,
+                                "Argument separator is outside of function.");
                         }
 
                         var validationContext = contextStack.Peek();
                         if (!validationContext.IsFunction)
                         {
-                            ThrowInvalidTokenParseException(token,
+                            ThrowInvalidTokenParseException(token, expression,
                                 "Argument separator must be a direct child of a function.");
                         }
 
@@ -179,7 +181,7 @@ namespace Adletec.Sonic.Parsing
                             case TokenType.FloatingPoint:
                             case TokenType.Symbol:
                             case TokenType.RightParenthesis:
-                                ThrowInvalidTokenParseException(token);
+                                ThrowInvalidTokenParseException(token, expression);
                                 break;
                         }
 
@@ -190,7 +192,7 @@ namespace Adletec.Sonic.Parsing
                             var functionInfo = functionRegistry.GetFunctionInfo((string)tokenBefore.Value);
                             if (functionInfo == null)
                             {
-                                ThrowUnknownFunctionParseException(tokenBefore);
+                                ThrowUnknownFunctionParseException(tokenBefore, expression);
                             }
 
                             contextStack.Push(
@@ -232,20 +234,22 @@ namespace Adletec.Sonic.Parsing
                         switch (tokenBefore.TokenType)
                         {
                             case TokenType.Operation:
-                                ThrowMissingOperationArgumentParseException(token, "There is no right argument.");
+                                ThrowMissingOperationArgumentParseException(token, expression,
+                                    "There is no right argument.");
                                 break;
                             case TokenType.ArgumentSeparator:
-                                ThrowInvalidTokenParseException(token,
+                                ThrowInvalidTokenParseException(token, expression,
                                     "Argument separator without following argument.");
                                 break;
                             case TokenType.LeftParenthesis when !IsFunctionOnTopOfStack(contextStack):
-                                ThrowInvalidTokenParseException(token, "Empty parentheses are not allowed.");
+                                ThrowInvalidTokenParseException(token, expression,
+                                    "Empty parentheses are not allowed.");
                                 break;
                         }
 
                         if (contextStack.Count == 0)
                         {
-                            ThrowMissingLeftParenthesisParseException(token);
+                            ThrowMissingLeftParenthesisParseException(token, expression);
                         }
 
                         var context = contextStack.Pop();
@@ -253,7 +257,7 @@ namespace Adletec.Sonic.Parsing
                         {
                             if (context.ActualArgumentCount < 1)
                             {
-                                ThrowInvalidDynamicFunctionArgumentCountParseException(context.RootToken);
+                                ThrowInvalidDynamicFunctionArgumentCountParseException(context.RootToken, expression);
                             }
 
                             // dynamic functions can have any number of arguments
@@ -262,7 +266,7 @@ namespace Adletec.Sonic.Parsing
 
                         if (context.ExpectedArgumentCount != context.ActualArgumentCount)
                         {
-                            ThrowInvalidFunctionArgumentCountParseException(context.RootToken,
+                            ThrowInvalidFunctionArgumentCountParseException(context.RootToken, expression,
                                 context.ExpectedArgumentCount, context.ActualArgumentCount);
                         }
 
@@ -274,7 +278,7 @@ namespace Adletec.Sonic.Parsing
 
             if (contextStack.Any())
             {
-                ThrowMissingRightParenthesisParseException(contextStack.Peek().RootToken);
+                ThrowMissingRightParenthesisParseException(contextStack.Peek().RootToken, expression);
             }
 
             // the last token is a special case, since it has no successor
@@ -284,70 +288,75 @@ namespace Adletec.Sonic.Parsing
             // left parenthesis (already checked -> missing right parenthesis)
             if (tokenList[tokenList.Count - 1].TokenType == TokenType.Operation)
             {
-                ThrowMissingOperationArgumentParseException(tokenList.Last(), "There is no right argument.");
+                ThrowMissingOperationArgumentParseException(tokenList.Last(), expression,
+                    "There is no right argument.");
             }
         }
 
-        private void ThrowInvalidTokenParseException(Token token, string message = null)
+        private void ThrowInvalidTokenParseException(Token token, string expression, string message = null)
         {
             var tokenString = token.Value is double d ? d.ToString(cultureInfo) : token.Value.ToString();
             var tokenPosition = token.StartPosition;
             throw new InvalidTokenParseException(
                 $"Unexpected token at position {tokenPosition} in expression: \"{tokenString}\". {message}",
-                tokenPosition, tokenString);
+                expression, tokenPosition, tokenString);
         }
 
-        private static void ThrowMissingOperationArgumentParseException(Token token, string message = null)
+        private static void ThrowMissingOperationArgumentParseException(Token token, string expression,
+            string message = null)
         {
             var tokenString = token.Value.ToString();
             var tokenPosition = token.StartPosition;
             throw new MissingOperandParseException(
                 $"Missing argument for operation \"{tokenString}\" at position {tokenPosition}. {message}",
-                tokenPosition, tokenString);
+                expression, tokenPosition, tokenString);
         }
 
-        private static void ThrowInvalidDynamicFunctionArgumentCountParseException(Token rootToken,
+        private static void ThrowInvalidDynamicFunctionArgumentCountParseException(Token rootToken, string expression,
             string message = null)
         {
             var functionName = rootToken.Value.ToString();
             var functionNamePosition = rootToken.StartPosition;
             throw new InvalidArgumentCountParseException(
                 $"Invalid argument count for dynamic function \"{functionName}\" at position {functionNamePosition}. Expected to find at least one argument, but found none. {message}",
-                functionNamePosition, functionName);
+                expression, functionNamePosition, functionName);
         }
 
-        private static void ThrowInvalidFunctionArgumentCountParseException(Token rootToken, int expectedArguments,
+        private static void ThrowInvalidFunctionArgumentCountParseException(Token rootToken, string expression,
+            int expectedArguments,
             int foundArguments, string message = null)
         {
             var functionName = rootToken.Value.ToString();
             var functionNamePosition = rootToken.StartPosition;
             throw new InvalidArgumentCountParseException(
                 $"Invalid argument count for function \"{functionName}\" at position {functionNamePosition}. Expected {expectedArguments}, but found {foundArguments}. {message}",
-                functionNamePosition, functionName);
+                expression, functionNamePosition, functionName);
         }
 
-        private static void ThrowMissingLeftParenthesisParseException(Token token, string message = null)
+        private static void ThrowMissingLeftParenthesisParseException(Token token, string expression,
+            string message = null)
         {
             var tokenPosition = token.StartPosition;
             throw new MissingLeftParenthesisParseException(
                 $"Missing left parenthesis for right parenthesis at position {tokenPosition}. {message}",
-                tokenPosition);
+                expression, tokenPosition);
         }
 
-        private static void ThrowMissingRightParenthesisParseException(Token token, string message = null)
+        private static void ThrowMissingRightParenthesisParseException(Token token, string expression,
+            string message = null)
         {
             var tokenPosition = token.StartPosition;
             throw new MissingRightParenthesisParseException(
-                $"Missing right parenthesis for left parenthesis at position {tokenPosition}. {message}",
+                $"Missing right parenthesis for left parenthesis at position {tokenPosition}. {message}", expression,
                 tokenPosition);
         }
 
-        private static void ThrowUnknownFunctionParseException(Token token, string message = null)
+        private static void ThrowUnknownFunctionParseException(Token token, string expression, string message = null)
         {
             var tokenString = token.Value.ToString();
             var tokenPosition = token.StartPosition;
             throw new UnknownFunctionParseException(
-                $"Unknown function \"{tokenString}\" at position {tokenPosition}. {message}",
+                $"Unknown function \"{tokenString}\" at position {tokenPosition}. {message}", expression,
                 tokenPosition, token.Value.ToString());
         }
 
