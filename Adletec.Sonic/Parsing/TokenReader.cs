@@ -43,19 +43,19 @@ namespace Adletec.Sonic.Parsing
         }
 
         /// <summary>
-        /// Read in the provided formula and convert it into a list of tokens that can be processed by the
+        /// Read in the provided expression and convert it into a list of tokens that can be processed by the
         /// Abstract Syntax Tree Builder.
         /// </summary>
-        /// <param name="formula">The formula that must be converted into a list of tokens.</param>
-        /// <returns>The list of tokens for the provided formula.</returns>
-        public List<Token> Read(string formula)
+        /// <param name="expression">The expression to be converted into a list of tokens.</param>
+        /// <returns>The list of tokens for the provided expression.</returns>
+        public List<Token> Read(string expression)
         {
-            if (string.IsNullOrEmpty(formula))
-                throw new ArgumentNullException(nameof(formula));
+            if (string.IsNullOrEmpty(expression))
+                throw new ArgumentNullException(nameof(expression));
 
             var tokens = new List<Token>();
 
-            var characters = formula.ToCharArray();
+            var characters = expression.ToCharArray();
 
             var isFormulaSubPart = true;
             var isScientific = false;
@@ -78,7 +78,7 @@ namespace Adletec.Sonic.Parsing
                     while (++i < characters.Length && IsPartOfNumeric(characters[i], false, characters[i-1] == '-', isFormulaSubPart))
                     {
                         if (isScientific && IsScientificNotation(characters[i]))
-                            throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", i, characters[i].ToString());
+                            throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", expression, i, characters[i].ToString());
 
                         if (IsScientificNotation(characters[i]))
                         {
@@ -111,7 +111,7 @@ namespace Adletec.Sonic.Parsing
                         else
                         {
                             throw new InvalidFloatingPointNumberParseException($"Invalid floating point number: {buffer}",
-                                startPosition, buffer.ToString());
+                                expression, startPosition, buffer.ToString());
                         }
                     }
 
@@ -222,7 +222,7 @@ namespace Adletec.Sonic.Parsing
                                 isFormulaSubPart = false;
                             }
                             else
-                                throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", i, characters[i].ToString());
+                                throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", expression, i, characters[i].ToString());
                             break;
                         case '&':
                             if (i + 1 < characters.Length && characters[i + 1] == '&')
@@ -231,7 +231,7 @@ namespace Adletec.Sonic.Parsing
                                 isFormulaSubPart = false;
                             }
                             else
-                                throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", i, characters[i].ToString());
+                                throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", expression, i, characters[i].ToString());
                             break;
                         case '|':
                             if (i + 1 < characters.Length && characters[i + 1] == '|')
@@ -240,7 +240,7 @@ namespace Adletec.Sonic.Parsing
                                 isFormulaSubPart = false;
                             }
                             else
-                                throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", i, characters[i].ToString());
+                                throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", expression, i, characters[i].ToString());
                             break;
                         case '=':
                             if (i + 1 < characters.Length && characters[i + 1] == '=')
@@ -249,10 +249,10 @@ namespace Adletec.Sonic.Parsing
                                 isFormulaSubPart = false;
                             }
                             else
-                                throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", i, characters[i].ToString());
+                                throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", expression, i, characters[i].ToString());
                             break;
                         default:
-                            throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", i, characters[i].ToString());
+                            throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", expression, i, characters[i].ToString());
                     }
                 }
             }

@@ -8,9 +8,12 @@ namespace Adletec.Sonic
     /// </summary>
     public class ParseException : Exception
     {
-        public ParseException(string message)
+        
+        public string Expression { get; }
+        public ParseException(string message, string expression)
             : base(message)
         {
+            Expression = expression;
         }
     }
 
@@ -24,8 +27,8 @@ namespace Adletec.Sonic
 
         public string Token { get; }
 
-        public InvalidTokenParseException(string message, int tokenPosition, string token) :
-            base(message)
+        public InvalidTokenParseException(string message, string expression, int tokenPosition, string token) :
+            base(message, expression)
         {
             TokenPosition = tokenPosition;
             Token = token;
@@ -40,8 +43,8 @@ namespace Adletec.Sonic
         public int TokenPosition { get; }
         public string Token { get; }
 
-        public InvalidFloatingPointNumberParseException(string message, int tokenPosition, string token) :
-            base(message)
+        public InvalidFloatingPointNumberParseException(string message, string expression, int tokenPosition, string token) :
+            base(message, expression)
         {
             TokenPosition = tokenPosition;
             Token = token;
@@ -55,7 +58,7 @@ namespace Adletec.Sonic
     {
         public int RightParenthesisPosition { get; }
 
-        public MissingLeftParenthesisParseException(string message, int rightParenthesisPosition) : base(message)
+        public MissingLeftParenthesisParseException(string message, string expression, int rightParenthesisPosition) : base(message, expression)
         {
             RightParenthesisPosition = rightParenthesisPosition;
         }
@@ -68,7 +71,7 @@ namespace Adletec.Sonic
     {
         public int LeftParenthesisPosition { get; }
 
-        public MissingRightParenthesisParseException(string message, int leftParenthesisPosition) : base(message)
+        public MissingRightParenthesisParseException(string message, string expression, int leftParenthesisPosition) : base(message, expression)
         {
             LeftParenthesisPosition = leftParenthesisPosition;
         }
@@ -82,8 +85,8 @@ namespace Adletec.Sonic
         public int FunctionNamePosition { get; }
         public string FunctionName { get; }
 
-        public UnknownFunctionParseException(string message, int functionNamePosition,
-            string functionName) : base(message)
+        public UnknownFunctionParseException(string message, string expression, int functionNamePosition,
+            string functionName) : base(message, expression)
         {
             FunctionNamePosition = functionNamePosition;
             FunctionName = functionName;
@@ -98,7 +101,7 @@ namespace Adletec.Sonic
         public int FunctionNamePosition { get; }
         public string FunctionName { get; }
 
-        public InvalidArgumentCountParseException(string message, int functionNamePosition, string functionName) : base(message)
+        public InvalidArgumentCountParseException(string message, string expression, int functionNamePosition, string functionName) : base(message, expression)
         {
             FunctionNamePosition = functionNamePosition;
             FunctionName = functionName;
@@ -113,8 +116,8 @@ namespace Adletec.Sonic
         public int OperatorPosition { get; }
         public string Operator { get; }
 
-        public MissingOperandParseException(string message, int operatorPosition, string @operator)
-            : base(message)
+        public MissingOperandParseException(string message, string expression, int operatorPosition, string @operator)
+            : base(message, expression)
         {
             OperatorPosition = operatorPosition;
             Operator = @operator;

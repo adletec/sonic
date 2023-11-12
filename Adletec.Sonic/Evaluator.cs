@@ -215,17 +215,17 @@ namespace Adletec.Sonic
         /// Build the abstract syntax tree for a given formula. The formula string will
         /// be first tokenized.
         /// </summary>
-        /// <param name="formulaText">A string containing the mathematical formula that must be converted 
-        /// into an abstract syntax tree.</param>
+        /// <param name="expression">A string containing the mathematical expression to be parsed.</param>
         /// <param name="compiledConstants">The constants which are to be available in the given formula.</param>
         /// <param name="optimize">If the abstract syntax tree should be optimized.</param>
-        /// <returns>The abstract syntax tree of the formula.</returns>
-        private Operation BuildAbstractSyntaxTree(string formulaText, IConstantRegistry compiledConstants, bool optimize, bool validate)
+        /// <param name="validate">If the expression should be checked for syntax errors.</param>
+        /// <returns>The abstract syntax tree of the expression.</returns>
+        private Operation BuildAbstractSyntaxTree(string expression, IConstantRegistry compiledConstants, bool optimize, bool validate)
         {
-            List<Token> tokens = tokenReader.Read(formulaText);
+            List<Token> tokens = tokenReader.Read(expression);
             if (validate)
             {
-                validator.Validate(tokens);
+                validator.Validate(tokens, expression);
             }
             
             var astBuilder = new AstBuilder(FunctionRegistry, compiledConstants);
