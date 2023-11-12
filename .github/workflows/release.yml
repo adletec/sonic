@@ -8,10 +8,6 @@ on:
     branches:
       - 'release'
 
-  pull_request:
-    branches:
-      - 'release'
-
 jobs:
   build_and_release:
 
