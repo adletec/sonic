@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using Adletec.Sonic.Execution;
 using Adletec.Sonic.Parsing;
 using Adletec.Sonic.Parsing.Tokenizing;
@@ -30,14 +31,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestUnexpectedFloatingPointConstant()
     {
+        const string expression = "1 + 3 34.4";
         try
         {
-            ValidateExpression("1 + 3 34.4");
+            ValidateExpression(expression);
         }
         catch (InvalidTokenParseException e)
         {
             Assert.AreEqual("34.4", e.Token);
             Assert.AreEqual(6, e.TokenPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -47,14 +50,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestDoubleValue()
     {
+        const string expression = "1 a * (sin(cos(3)) + ifless(1,2,3,4))";
         try
         {
-            ValidateExpression("1 a * (sin(cos(3)) + ifless(1,2,3,4))");
+            ValidateExpression(expression);
         }
         catch (InvalidTokenParseException e)
         {
             Assert.AreEqual("a", e.Token);
             Assert.AreEqual(2, e.TokenPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -64,14 +69,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestArgumentSeparatorOutsideFunction()
     {
+        const string expression = "1, a * (sin(cos(3)) + ifless(1,2,3,4))";
         try
         {
-            ValidateExpression("1, a * (sin(cos(3)) + ifless(1,2,3,4))");
+            ValidateExpression(expression);
         }
         catch (InvalidTokenParseException e)
         {
             Assert.AreEqual(",", e.Token);
             Assert.AreEqual(1, e.TokenPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -81,14 +88,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestMissingArgument()
     {
+        const string expression = "1 + a * (sin(cos(3)) + ifless(1,2,3))";
         try
         {
-            ValidateExpression("1 + a * (sin(cos(3)) + ifless(1,2,3))");
+            ValidateExpression(expression);
         }
         catch (InvalidArgumentCountParseException e)
         {
             Assert.AreEqual("ifless", e.FunctionName);
             Assert.AreEqual(23, e.FunctionNamePosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -98,14 +107,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestTooManyArguments()
     {
+        const string expression = "1 + a * (sin(cos(3)) + ifless(1,2,3,4,5))";
         try
         {
-            ValidateExpression("1 + a * (sin(cos(3)) + ifless(1,2,3,4,5))");
+            ValidateExpression(expression);
         }
         catch (InvalidArgumentCountParseException e)
         {
             Assert.AreEqual("ifless", e.FunctionName);
             Assert.AreEqual(23, e.FunctionNamePosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -123,14 +134,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestStartWithOperator()
     {
+        const string expression = "* 1 + a * (sin(cos(3)) + ifless(1,2,3,4))";
         try
         {
-            ValidateExpression("* 1 + a * (sin(cos(3)) + ifless(1,2,3,4))");
+            ValidateExpression(expression);
         }
         catch (MissingOperandParseException e)
         {
             Assert.AreEqual("*", e.Operator);
             Assert.AreEqual(0, e.OperatorPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -140,14 +153,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestMissingOperatorArgument()
     {
+        const string expression = "1 + * (sin(cos(3)) + ifless(1,2,3,4))";
         try
         {
-            ValidateExpression("1 + * (sin(cos(3)) + ifless(1,2,3,4))");
+            ValidateExpression(expression);
         }
         catch (MissingOperandParseException e)
         {
             Assert.AreEqual("+", e.Operator);
             Assert.AreEqual(2, e.OperatorPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -157,14 +172,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestEmptyParentheses()
     {
+        const string expression = "1 + a * ()";
         try
         {
-            ValidateExpression("1 + a * ()");
+            ValidateExpression(expression);
         }
         catch (InvalidTokenParseException e)
         {
             Assert.AreEqual(")", e.Token);
             Assert.AreEqual(9, e.TokenPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -174,13 +191,15 @@ public class ValidatorTest
     [TestMethod]
     public void TestMissingLeftParenthesis()
     {
+        const string expression = "1 + a )";
         try
         {
-            ValidateExpression("1 + a )");
+            ValidateExpression(expression);
         }
         catch (MissingLeftParenthesisParseException e)
         {
             Assert.AreEqual(6, e.RightParenthesisPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -190,13 +209,15 @@ public class ValidatorTest
     [TestMethod]
     public void TestMissingRightParenthesis()
     {
+        const string expression = "1 + (a * 2";
         try
         {
-            ValidateExpression("1 + (a * 2");
+            ValidateExpression(expression);
         }
         catch (MissingRightParenthesisParseException e)
         {
             Assert.AreEqual(4, e.LeftParenthesisPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -214,14 +235,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestParameterlessFunctionWithParameter()
     {
+        const string expression = "1 + random(1)";
         try
         {
-            ValidateExpression("1 + random(1)");
+            ValidateExpression(expression);
         }
         catch (InvalidArgumentCountParseException e)
         {
             Assert.AreEqual("random", e.FunctionName);
             Assert.AreEqual(4, e.FunctionNamePosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -231,13 +254,15 @@ public class ValidatorTest
     [TestMethod]
     public void TestRightParenthesisAsFirstToken()
     {
+        const string expression = ")+1";
         try
         {
-            ValidateExpression(")+1");
+            ValidateExpression(expression);
         }
         catch (MissingLeftParenthesisParseException e)
         {
             Assert.AreEqual(0, e.RightParenthesisPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -247,13 +272,15 @@ public class ValidatorTest
     [TestMethod]
     public void TestRightParenthesisAfterFunctionName()
     {
+        const string expression = "sin)";
         try
         {
-            ValidateExpression("sin)");
+            ValidateExpression(expression);
         }
         catch (MissingLeftParenthesisParseException e)
         {
             Assert.AreEqual(3, e.RightParenthesisPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -263,14 +290,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestWrongPlaceOfArguments()
     {
+        const string expression = "a ifless(,b,c,d)";
         try
         {
-            ValidateExpression("a ifless(,b,c,d)");
+            ValidateExpression(expression);
         }
         catch (InvalidTokenParseException e)
         {
             Assert.AreEqual("ifless", e.Token);
             Assert.AreEqual(2, e.TokenPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -280,14 +309,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestWrongPlaceOfArgumentsEmpty()
     {
+        const string expression = "a sin()";
         try
         {
-            ValidateExpression("a sin()");
+            ValidateExpression(expression);
         }
         catch (InvalidTokenParseException e)
         {
             Assert.AreEqual("sin", e.Token);
             Assert.AreEqual(2, e.TokenPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -305,14 +336,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestInvalidNumberOfOperationArguments()
     {
+        const string expression = "a +";
         try
         {
-            ValidateExpression("a +");
+            ValidateExpression(expression);
         }
         catch (MissingOperandParseException e)
         {
             Assert.AreEqual("+", e.Operator);
             Assert.AreEqual(2, e.OperatorPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -322,14 +355,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestDoubleOperators()
     {
+        const string expression = "1 2 3 + +";
         try
         {
-            ValidateExpression("1 2 3 + +");
+            ValidateExpression(expression);
         }
         catch (InvalidTokenParseException e)
         {
             Assert.AreEqual("2", e.Token);
             Assert.AreEqual(2, e.TokenPosition);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -339,14 +374,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestValidateInvalidToken()
     {
+        const string expression = "a ! b";
         try
         {
-            ValidateExpression("a ! b");
+            ValidateExpression(expression);
         }
         catch (InvalidTokenParseException e)
         {
             Assert.AreEqual(2, e.TokenPosition);
             Assert.AreEqual("!", e.Token);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -381,14 +418,16 @@ public class ValidatorTest
     public void TestDynamicFunctionsWithoutArgument()
     {
         
+        const string expression = "max()";
         try
         {
-            ValidateExpression("max()");
+            ValidateExpression(expression);
         }
         catch (InvalidArgumentCountParseException e)
         {
             Assert.AreEqual(0, e.FunctionNamePosition);
             Assert.AreEqual("max", e.FunctionName);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -405,16 +444,27 @@ public class ValidatorTest
     }
     
     [TestMethod]
+    public void TestFunctionCallWithWhiteSpace()
+    {
+        ValidateExpression("ifless (0.57, (3000-500)/(1500-500), 10, 20)");
+        // does not throw
+        Assert.IsTrue(true);
+    }
+    
+    
+    [TestMethod]
     public void TestUnknownFunction()
     {
+        const string expression = "foo(bar)";
         try
         {
-            ValidateExpression("foo(bar)");
+            ValidateExpression(expression);
         }
         catch (UnknownFunctionParseException e)
         {
             Assert.AreEqual(0, e.FunctionNamePosition);
             Assert.AreEqual("foo", e.FunctionName);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -424,14 +474,16 @@ public class ValidatorTest
     [TestMethod]
     public void TestInvalidFloatingPointNumber()
     {
+        const string expression = "123.456.78";
         try
         {
-            ValidateExpression("123.456.78");
+            ValidateExpression(expression);
         }
         catch (InvalidFloatingPointNumberParseException e)
         {
             Assert.AreEqual(0, e.TokenPosition);
             Assert.AreEqual("123.456.78", e.Token);
+            Assert.AreEqual(expression, e.Expression);
             return;
         }
 
@@ -445,7 +497,7 @@ public class ValidatorTest
         var tokenParser = new TokenReader(CultureInfo.InvariantCulture, ',');
         var tokens = tokenParser.Read(expression);
         var validator = new Validator(functionRegistry, CultureInfo.InvariantCulture);
-        validator.Validate(tokens);
+        validator.Validate(tokens, expression);
     }
 
     private static FunctionRegistry GetPrefilledFunctionRegistry()
