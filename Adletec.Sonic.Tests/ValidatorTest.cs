@@ -405,6 +405,15 @@ public class ValidatorTest
     }
     
     [TestMethod]
+    public void TestFunctionCallWithWhiteSpace()
+    {
+        ValidateExpression("ifless (0.57, (3000-500)/(1500-500), 10, 20)");
+        // does not throw
+        Assert.IsTrue(true);
+    }
+    
+    
+    [TestMethod]
     public void TestUnknownFunction()
     {
         try

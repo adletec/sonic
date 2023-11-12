@@ -122,34 +122,42 @@ namespace Adletec.Sonic.Parsing
                     }
                 }
 
-                if (IsPartOfVariable(characters[i], true))
+                if (IsPartOfTextToken(characters[i], true))
                 {
                     var buffer = "" + characters[i];
                     var startPosition = i;
 
-                    while (++i < characters.Length && IsPartOfVariable(characters[i], false))
+                    var nextCharIndex = i + 1;
+                    while (nextCharIndex < characters.Length && IsPartOfTextToken(characters[nextCharIndex], false))
                     {
-                        buffer += characters[i];
+                        buffer += characters[++i];
+                        nextCharIndex = i + 1;
+                    }
+
+                    // exclusive end (the first char after the token)
+                    var textTokenEnd = nextCharIndex;
+
+                    // Find next non-whitespace character index, so we can check if it is an opening parenthesis
+                    // which would make our text token to a function.
+                    while (characters.Length > nextCharIndex && char.IsWhiteSpace(characters[nextCharIndex]))
+                    {
+                        nextCharIndex++;
                     }
                     
-                    if (characters.Length > i && characters[i] == '(')
+                    if (characters.Length > nextCharIndex && characters[nextCharIndex] == '(')
                     {
-                        tokens.Add(new Token { TokenType = TokenType.Function, Value = buffer, StartPosition = startPosition, Length = i - startPosition });
+                        // We know the next token already, so we can process it and set the index accordingly
+                        i = nextCharIndex;
+                        tokens.Add(new Token { TokenType = TokenType.Function, Value = buffer, StartPosition = startPosition, Length = textTokenEnd - startPosition });
                         tokens.Add(new Token { TokenType = TokenType.LeftParenthesis, Value = '(', StartPosition = i, Length = 1 });
                         isFormulaSubPart = true;
                         continue;
                     }
-                    else
-                    {
-                        tokens.Add(new Token { TokenType = TokenType.Symbol, Value = buffer, StartPosition = startPosition, Length = i - startPosition });
-                        isFormulaSubPart = false;
-                    }
 
-                    if (i == characters.Length)
-                    {
-                        // Last character read
-                        continue;
-                    }
+                    tokens.Add(new Token { TokenType = TokenType.Symbol, Value = buffer, StartPosition = startPosition, Length = textTokenEnd - startPosition });
+                    isFormulaSubPart = false;
+
+                    continue;
                 }
                 if (characters[i] == this.argumentSeparator)
                 {
@@ -257,7 +265,7 @@ namespace Adletec.Sonic.Parsing
             return character == decimalSeparator || (character >= '0' && character <= '9') || (isFormulaSubPart && isFirstCharacter && character == '-') || (!isFirstCharacter && !afterMinus && character == 'e') || (!isFirstCharacter && character == 'E');
         }
 
-        private bool IsPartOfVariable(char character, bool isFirstCharacter)
+        private bool IsPartOfTextToken(char character, bool isFirstCharacter)
         {
             return (character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (!isFirstCharacter && character >= '0' && character <= '9') || (!isFirstCharacter && character == '_');
         }
