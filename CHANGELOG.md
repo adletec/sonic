@@ -1,6 +1,13 @@
 # Changelog
+## 1.3.2 (2023-11-16)
+### Summary
+This is a bugfix release to address an issue with argument count validation.
+
+### Bugfix
+- Fixes #37, in which arguments preceded by a unary minus didn't count towards the argument count in the validation step.
+
 ## 1.3.1 (2023-11-12)
-###
+### Summary
 This release contains some minor improvements for the validation introduced in 1.3.0.
 
 ### Changes
