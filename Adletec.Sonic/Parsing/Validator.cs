@@ -85,6 +85,7 @@ namespace Adletec.Sonic.Parsing
                     case TokenType.Integer:
                     case TokenType.FloatingPoint:
                     case TokenType.Symbol:
+                    case TokenType.Operation when IsUnaryOperation(token):
                         switch (tokenBefore.TokenType)
                         {
                             // legal predecessor: operation, left parenthesis, argument separator
@@ -102,22 +103,6 @@ namespace Adletec.Sonic.Parsing
                         if (IsStartOfArgument(contextStack, tokenBefore))
                         {
                             contextStack.Peek().ActualArgumentCount++;
-                        }
-
-                        break;
-                    case TokenType.Operation when IsUnaryOperation(token):
-                        // basically the same as a value, but doesn't count as argument for a function
-                        switch (tokenBefore.TokenType)
-                        {
-                            // legal predecessor: operation, left parenthesis, argument separator
-                            // illegal predecessor: another value (function, integer, floating point, symbol), right parenthesis
-                            case TokenType.Function:
-                            case TokenType.Integer:
-                            case TokenType.FloatingPoint:
-                            case TokenType.Symbol:
-                            case TokenType.RightParenthesis:
-                                ThrowInvalidTokenParseException(token, expression);
-                                break;
                         }
 
                         break;

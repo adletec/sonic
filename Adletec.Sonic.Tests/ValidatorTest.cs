@@ -490,6 +490,22 @@ public class ValidatorTest
         Assert.Fail("Expected exception not thrown");
     }
 
+    [TestMethod]
+    public void TestArgumentWithUnaryMinus()
+    {
+        const string expression = "ifless(1, -2, 3, 4)";
+        ValidateExpression(expression);
+        Assert.IsTrue(true);
+    }
+
+    [TestMethod]
+    public void TestArgumentWithBooleanExpression()
+    {
+        const string expression = "ifless(1==1,0, 3, 4)";
+        ValidateExpression(expression);
+        Assert.IsTrue(true);
+    }
+
 
     private static void ValidateExpression(string expression)
     {
