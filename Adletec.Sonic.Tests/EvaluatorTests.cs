@@ -1652,6 +1652,13 @@ public class EvaluatorTests
                 .Build();
         });
     }
+
+    [TestMethod]
+    public void TestCalculateFoldedExpressionWithoutFoldedVariable()
+    {
+        var engine = SonicEngines.Interpreted();
+        var result = engine.Evaluate("0 * a + 4 * 5");
+    }
 }
 
 internal static class SonicEngines

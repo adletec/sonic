@@ -17,7 +17,7 @@ namespace Adletec.Sonic
         private readonly TokenReader tokenReader;
         private readonly Optimizer optimizer;
         private readonly IExecutor executor;
-        private readonly Validator validator;
+        private readonly ExpressionValidator expressionValidator;
         
         private readonly MemoryCache<string, Func<IDictionary<string, double>, double>> executionFormulaCache;
         private readonly bool cacheEnabled;
@@ -119,7 +119,7 @@ namespace Adletec.Sonic
                 }
             }
             
-            this.validator = new Validator(FunctionRegistry, cultureInfo);
+            this.expressionValidator = new ExpressionValidator(FunctionRegistry, cultureInfo);
         }
 
         internal IFunctionRegistry FunctionRegistry { get; }
@@ -225,7 +225,7 @@ namespace Adletec.Sonic
             List<Token> tokens = tokenReader.Read(expression);
             if (validate)
             {
-                validator.Validate(tokens, expression);
+                expressionValidator.Validate(tokens, expression);
             }
             
             var astBuilder = new AstBuilder(FunctionRegistry, compiledConstants);
