@@ -3,6 +3,10 @@ using Adletec.Sonic.Operations;
 
 namespace Adletec.Sonic.Parsing
 {
+    /// <summary>
+    /// A validator for an AST as produced by the <see cref="AstBuilder"/>.
+    /// Checks if all variables referenced in the AST are defined.
+    /// </summary>
     public class VariableValidator
     {
         
@@ -14,37 +18,45 @@ namespace Adletec.Sonic.Parsing
         /// <exception cref="VariableNotDefinedException">If a referenced variable is not defined.</exception>
         public void Validate(Operation operation, IList<string> variables)
         {
-            if (operation.GetType() == typeof(Addition))
+            // traverse the AST recursively like we do in the optimizer;
+            // there are two possible termination conditions:
+            // - we reach a variable, which we check against the list of variables
+            // - we reach a constant, which we can safely ignore (no if-branch required)
+            //     => constants must be defined in order to be recognized as constants and like variables
+            //        can't contain further operations
+            
+            var operationType = operation.GetType();
+            if (operationType == typeof(Addition))
             {
                 var addition = (Addition)operation;
                 Validate(addition.Argument1, variables);
                 Validate(addition.Argument2, variables);
             }
-            else if (operation.GetType() == typeof(Subtraction))
+            else if (operationType == typeof(Subtraction))
             {
                 var subtraction = (Subtraction)operation;
                 Validate(subtraction.Argument1, variables);
                 Validate(subtraction.Argument2, variables);
             }
-            else if (operation.GetType() == typeof(Multiplication))
+            else if (operationType == typeof(Multiplication))
             {
                 var multiplication = (Multiplication)operation;
                 Validate(multiplication.Argument1, variables);
                 Validate(multiplication.Argument2, variables);
             }
-            else if (operation.GetType() == typeof(Division))
+            else if (operationType == typeof(Division))
             {
                 var division = (Division)operation;
                 Validate(division.Dividend, variables);
                 Validate(division.Divisor, variables);
             }
-            else if (operation.GetType() == typeof(Exponentiation))
+            else if (operationType == typeof(Exponentiation))
             {
                 var exponentiation = (Exponentiation)operation;
                 Validate(exponentiation.Base, variables);
                 Validate(exponentiation.Exponent, variables);
             }
-            else if (operation.GetType() == typeof(Variable))
+            else if (operationType == typeof(Variable))
             {
                 var variable = (Variable)operation;
                 if (variables.Contains(variable.Name) == false)
@@ -52,7 +64,7 @@ namespace Adletec.Sonic.Parsing
                     throw new VariableNotDefinedException($"Variable '{variable.Name}' is not defined.", variable.Name);
                 }
             }
-            else if (operation.GetType() == typeof(Function))
+            else if (operationType == typeof(Function))
             {
                 var function = (Function)operation;
                 foreach (var argument in function.Arguments)
