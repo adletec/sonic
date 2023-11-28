@@ -10,7 +10,7 @@ namespace Adletec.Sonic.Parsing
     /// <summary>
     /// A validator for the token list produced by the <see cref="TokenReader"/>.
     /// </summary>
-    public class Validator
+    public class ExpressionValidator
     {
         private readonly IFunctionRegistry functionRegistry;
         private readonly CultureInfo cultureInfo;
@@ -20,7 +20,7 @@ namespace Adletec.Sonic.Parsing
         /// </summary>
         /// <param name="functionRegistry">The function registry also used for evaluation.</param>
         /// <param name="cultureInfo">The culture info also used for evaluation.</param>
-        public Validator(IFunctionRegistry functionRegistry, CultureInfo cultureInfo)
+        public ExpressionValidator(IFunctionRegistry functionRegistry, CultureInfo cultureInfo)
         {
             this.functionRegistry = functionRegistry;
             this.cultureInfo = cultureInfo;

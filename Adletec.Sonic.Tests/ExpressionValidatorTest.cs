@@ -1,16 +1,14 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
 using Adletec.Sonic.Execution;
 using Adletec.Sonic.Parsing;
-using Adletec.Sonic.Parsing.Tokenizing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Adletec.Sonic.Tests;
 
 [TestClass]
-public class ValidatorTest
+public class ExpressionValidatorTest
 {
     [TestMethod]
     public void TestValidExpression()
@@ -512,7 +510,7 @@ public class ValidatorTest
         var functionRegistry = GetPrefilledFunctionRegistry();
         var tokenParser = new TokenReader(CultureInfo.InvariantCulture, ',');
         var tokens = tokenParser.Read(expression);
-        var validator = new Validator(functionRegistry, CultureInfo.InvariantCulture);
+        var validator = new ExpressionValidator(functionRegistry, CultureInfo.InvariantCulture);
         validator.Validate(tokens, expression);
     }
 
