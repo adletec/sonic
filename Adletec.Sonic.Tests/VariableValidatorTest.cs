@@ -9,8 +9,6 @@ namespace Adletec.Sonic.Tests;
 [TestClass]
 public class VariableValidatorTest
 {
-    // todo test with constants to make refactorings safer
-    
     [TestMethod]
     public void TestCompleteVariableDefinition()
     {
@@ -76,12 +74,25 @@ public class VariableValidatorTest
         // Assert doesn't throw
         Assert.Fail("Expected exception was not thrown.");
     }
+    
+    [TestMethod]
+    public void TestCompleteVariableDefinitionWithConstant()
+    {
+        var validator = new VariableValidator();
+        var variables = new List<string> { "x", "y" };
+        var expression = "constant + x + y";
+        var ast = GetAst(expression, true);
+        validator.Validate(ast, variables);
+        // Assert doesn't throw
+        Assert.IsTrue(true);
+    }
 
     static Operation GetAst(string expression, bool optimize = false)
     {
         var tokenList = new TokenReader().Read(expression);
         var functionRegistry = new FunctionRegistry(true, false);
         var constantRegistry = new ConstantRegistry(true, false);
+        constantRegistry.RegisterConstant("constant", 1.0);
         var ast = new AstBuilder(functionRegistry, constantRegistry).Build(tokenList);
         if (optimize)
         {
