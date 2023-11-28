@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Adletec.Sonic.Execution;
 using Adletec.Sonic.Operations;
@@ -87,10 +88,23 @@ public class VariableValidatorTest
         Assert.IsTrue(true);
     }
 
+    [TestMethod]
+    public void TestCompleteVariableDefinitionWithDifferentOperators()
+    {
+        var validator = new VariableValidator();
+        var variables = new List<string> { "x", "y", "z" };
+        var expression = "-constant + sin(x) + y / 4 * x - 12^z";
+        var ast = GetAst(expression, true);
+        validator.Validate(ast, variables);
+        // Assert doesn't throw
+        Assert.IsTrue(true);
+    }
+
     static Operation GetAst(string expression, bool optimize = false)
     {
         var tokenList = new TokenReader().Read(expression);
         var functionRegistry = new FunctionRegistry(true, false);
+        functionRegistry.RegisterFunction("sin", (Func<double, double>)Math.Sin);
         var constantRegistry = new ConstantRegistry(true, false);
         constantRegistry.RegisterConstant("constant", 1.0);
         var ast = new AstBuilder(functionRegistry, constantRegistry).Build(tokenList);
