@@ -8,5 +8,6 @@ public enum ExpressionDialect
     Generic,
     Jace,
     Sonic,
-    NCalc
+    NCalc,
+    DynamicExpresso,
 }

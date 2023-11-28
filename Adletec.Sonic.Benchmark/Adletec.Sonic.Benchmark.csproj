@@ -5,6 +5,7 @@
     <ItemGroup>
       <PackageReference Include="BenchmarkDotNet" Version="0.13.8" />
       <PackageReference Include="CodingSeb.ExpressionEvaluator" Version="1.4.40" />
+      <PackageReference Include="DynamicExpresso.Core" Version="2.16.1" />
       <PackageReference Include="Jace" Version="1.0.0" />
       <PackageReference Include="NCalcSync" Version="3.8.0" />
     </ItemGroup>

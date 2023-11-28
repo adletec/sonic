@@ -6,13 +6,8 @@ namespace Adletec.Sonic.Benchmark.Executors.CrossFramework;
 
 public class CodingsebBenchmarkExecutor: IBenchmarkExecutor
 {
-    private readonly ExpressionEvaluator evaluator;
-    
-    public CodingsebBenchmarkExecutor()
-    {
-        evaluator = new ExpressionEvaluator();
-    }
-    
+    private readonly ExpressionEvaluator evaluator = new();
+
     public void RunBenchmark(BenchmarkExpression expression, IValueProvider valueProvider, long iterations)
     {
         var expressionString = expression.GetExpression(Dialect);

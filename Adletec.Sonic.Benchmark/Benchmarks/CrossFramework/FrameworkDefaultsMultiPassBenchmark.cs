@@ -54,6 +54,9 @@ public class FrameworkDefaultsMultiPassBenchmark
     [Benchmark(Description = "codingseb ExpressionEvaluator (Default Settings)")]
     public void CodingsebDefaults() => RunBenchmark(new CodingsebBenchmarkExecutor());
 
+    [Benchmark(Description = "DynamicExpresso (Default Settings)")]
+    public void DynamicExpressoDefaults() => RunBenchmark(new DynamicExpressoBenchmarkExecutor());
+
     private void RunBenchmark(IBenchmarkExecutor executor)
     {
         executor.RunBenchmark(Expression, new IncrementingValueProvider(), Iterations);
