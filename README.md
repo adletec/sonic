@@ -265,7 +265,8 @@ If you also want to check variable completeness without evaluating the expressio
   ```
 This will validate **the completeness of the variables** and **the syntax of the expression** and throw a `VariableNotDefinedException` if the expression contains an unknown variable or a `ParseException` if the expression is invalid.
 
-> **Note:** The decisive factor for variable completeness is not wether all variables referenced in the expression are defined, but wether all variables **necessary to evaluate the expression** are defined.
+> [!NOTE]
+> The decisive factor for variable completeness is not wether all variables referenced in the expression are defined, but wether all variables **necessary to evaluate the expression** are defined.
 > The optimizer, if enabled (default), will pre-evaluate parts of the expression which do not depend on variables, including multiplications with `0` or `0`-exponents.
 >
 > Consider the example `var1 + 0 * var2`.
