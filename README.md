@@ -77,7 +77,7 @@ details and a complete list.
 _sonic_ is available via [nuget](https://www.nuget.org/packages/Adletec.Sonic):
 
 ```bash
-dotnet add package Adletec.Sonic --version 1.3.1
+dotnet add package Adletec.Sonic --version 1.4.0
 ```
 
 ## Usage
