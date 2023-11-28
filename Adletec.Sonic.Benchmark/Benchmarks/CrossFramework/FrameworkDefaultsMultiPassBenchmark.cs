@@ -16,6 +16,7 @@ namespace Adletec.Sonic.Benchmark.Benchmarks.CrossFramework;
 ///
 /// This is the most common use case for Sonic and the the results are the most relevant for most users.
 /// </summary>
+[DryJob]
 [MedianColumn]
 public class FrameworkDefaultsMultiPassBenchmark
 {
@@ -49,6 +50,9 @@ public class FrameworkDefaultsMultiPassBenchmark
 
     [Benchmark(Description = "NCalc [using Expression] (Default Settings)")]
     public void NCalcDefaults() => RunBenchmark(new NCalcBenchmarkExecutor());
+
+    [Benchmark(Description = "codingseb ExpressionEvaluator (Default Settings)")]
+    public void CodingsebDefaults() => RunBenchmark(new CodingsebBenchmarkExecutor());
 
     private void RunBenchmark(IBenchmarkExecutor executor)
     {
