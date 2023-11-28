@@ -65,5 +65,30 @@ namespace Adletec.Sonic
         /// <exception cref="InvalidArgumentCountParseException">If a function call has the wrong number of arguments.</exception>
         /// <exception cref="MissingOperandParseException">If a binary operation is missing an operand.</exception>
         void Validate(string expression);
+
+        /// <summary>
+        /// Validates a given expression and checks if all variables necessary for evaluation are in the given variable list.
+        /// 
+        /// If the expression is invalid, the matching subtype of <see cref="ParseException"/> is thrown.
+        /// 
+        /// This includes:
+        ///  - Malformed numbers.
+        ///  - Unbalanced parentheses.
+        ///  - Unexpected tokens.
+        ///  - Unknown function names.
+        ///  - Wrong number of arguments for functions or operators.
+        /// 
+        /// </summary>
+        /// <param name="expression">The expression to be validated.</param>
+        /// <param name="variables">A list of variable names to check against.</param>
+        /// <exception cref="InvalidTokenParseException">If an invalid token is encountered.</exception>
+        /// <exception cref="InvalidFloatingPointNumberParseException">If a malformed floating point number is encountered.</exception>
+        /// <exception cref="MissingLeftParenthesisParseException">If parentheses are unbalanced (fewer left than right).</exception>
+        /// <exception cref="MissingRightParenthesisParseException">If parentheses are unbalanced (fewer right than left).</exception>
+        /// <exception cref="UnknownFunctionParseException">If an unknown function name is referenced.</exception>
+        /// <exception cref="InvalidArgumentCountParseException">If a function call has the wrong number of arguments.</exception>
+        /// <exception cref="MissingOperandParseException">If a binary operation is missing an operand.</exception>
+        /// <exception cref="VariableNotDefinedException">If a variable necessary for evaluation is missing.</exception>
+        void Validate(string expression, IList<string> variables);
     }
 }

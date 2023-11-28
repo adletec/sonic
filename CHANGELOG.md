@@ -1,4 +1,14 @@
 # Changelog
+## 1.4.0 (2023-11-28)
+### Summary
+This release contains an addition to the validation introduced in 1.3.0.
+
+### Features
+- Add optional validation of variable completeness.
+
+### Maintenance
+- Removal of dead code.
+
 ## 1.3.2 (2023-11-16)
 ### Summary
 This is a bugfix release to address an issue with argument count validation.
