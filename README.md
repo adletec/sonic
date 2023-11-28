@@ -234,6 +234,9 @@ By default, _sonic_ will validate the given expression upon evaluation (`Evaluat
 (`CreateDelegate()`-method). This means that _sonic_ will check if the given expression is syntactically correct and
 contains no unknown functions.
 
+If the expression contains a syntax error, _sonic_ will throw a `ParseException`. If the expression contains an unknown
+variable, _sonic_ will throw a `VariableNotDefinedException`.
+
 #### Validate an Expression
 If you want to validate an expression without evaluating it, you can use the `Validate()`-method of the `Evaluator`:
 
@@ -245,6 +248,33 @@ try {
   // handle exception
 }
 ```
+This will validate the **syntax of the expression** and throw a `ParseException` if the expression is invalid.
+
+#### Validate Variables
+If you also want to check variable completeness without evaluating the expression, you can use the `Validate(string expression, IList<string> variables)`-overload:
+  
+  ```csharp
+  var engine = Evaluator.CreateWithDefaults();
+  try {
+    engine.Validate("var1*var2", new List<string> { "var1", "var2" });
+  } catch (VariableNotDefinedException e) {
+    // handle exception
+  } catch (ParseException e) {
+    // handle exception
+  }
+  ```
+This will validate **the completeness of the variables** and **the syntax of the expression** and throw a `VariableNotDefinedException` if the expression contains an unknown variable or a `ParseException` if the expression is invalid.
+
+> **Note:** The decisive factor for variable completeness is not wether all variables referenced in the expression are defined, but wether all variables **necessary to evaluate the expression** are defined.
+> The optimizer, if enabled (default), will pre-evaluate parts of the expression which do not depend on variables, including multiplications with `0` or `0`-exponents.
+>
+> Consider the example `var1 + 0 * var2`.
+> If the optimizer is enabled, the expression will be pre-evaluated to `var1` and the expression will be valid even if `var2` is not defined. If the optimizer is disabled, the expression will be invalid if `var2` is not defined.
+> 
+> The Validate()-method will always behave like the Evaluate()-method in terms of the optimizer. If the optimizer is enabled, the expression will be pre-evaluated and the variables necessary to evaluate the expression will be checked. If the optimizer is disabled, the expression will be checked without pre-evaluation.
+>
+> However, the Validate()-method will **not** evaluate the expression, so it will be faster than the Evaluate()-method, if you don't need the result.
+
 
 #### Parse Exception Types
 The `Validate()`-method will throw a matching sub-type of [`ParseException`](https://github.com/adletec/sonic/blob/main/Adletec.Sonic/ParseException.cs) if the given expression is invalid.
