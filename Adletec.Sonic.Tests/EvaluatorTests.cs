@@ -1659,6 +1659,29 @@ public class EvaluatorTests
         var engine = SonicEngines.Interpreted();
         var result = engine.Evaluate("0 * a + 4 * 5");
     }
+
+    [TestMethod]
+    public void TestVariableValidationPass()
+    {
+        var engine = SonicEngines.Interpreted();
+        var expression = "a + b + c";
+        var variables = new List<string> { "a", "b", "c" };
+        engine.Validate(expression, variables);
+
+        // assert "does not throw an exception"
+        Assert.IsTrue(true);
+    }
+
+    [TestMethod]
+    public void TestVariableValidationFail()
+    {
+        var engine = SonicEngines.Interpreted();
+        var expression = "a + b + c";
+        var variables = new List<string> { "a", "b" };
+        Assert.ThrowsException<VariableNotDefinedException>(() =>
+            engine.Validate(expression, variables)
+        );
+    }
 }
 
 internal static class SonicEngines

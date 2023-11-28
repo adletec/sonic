@@ -1,13 +1,11 @@
 using System.Collections.Generic;
-using Adletec.Sonic.Execution;
 using Adletec.Sonic.Operations;
 
 namespace Adletec.Sonic.Parsing
 {
     public class VariableValidator
     {
-        private readonly IConstantRegistry constantRegistry;
-
+        
         /// <summary>
         /// Validate that all variables referenced in the given AST are defined.
         /// </summary>

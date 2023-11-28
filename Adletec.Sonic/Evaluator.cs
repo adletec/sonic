@@ -18,6 +18,7 @@ namespace Adletec.Sonic
         private readonly Optimizer optimizer;
         private readonly IExecutor executor;
         private readonly ExpressionValidator expressionValidator;
+        private readonly VariableValidator variableValidator;
         
         private readonly MemoryCache<string, Func<IDictionary<string, double>, double>> executionFormulaCache;
         private readonly bool cacheEnabled;
@@ -120,6 +121,7 @@ namespace Adletec.Sonic
             }
             
             this.expressionValidator = new ExpressionValidator(FunctionRegistry, cultureInfo);
+            this.variableValidator = new VariableValidator();
         }
 
         internal IFunctionRegistry FunctionRegistry { get; }
@@ -156,12 +158,25 @@ namespace Adletec.Sonic
         }
 
         /// <summary>
-        /// Validates the given expression. If the expression is invalid, a matching subtype of ParseException is thrown.
+        /// Validates the given expression. If the expression is invalid, a matching subtype of <see cref="ParseException"/> is thrown.
         /// </summary>
         /// <param name="expression">The expression to check.</param>
         public void Validate(string expression)
         {
             BuildAbstractSyntaxTree(expression, ConstantRegistry, false, true);
+        }
+        
+        /// <summary>
+        /// Validates the given expression and checks if all necessary variables are defined. If the expression is invalid, a matching subtype of ParseException is thrown.
+        /// If the expression is invalid, a matching subtype of <see cref="ParseException"/> is thrown.
+        /// If a variable necessary for evaluation is not defined, a <see cref="VariableNotDefinedException"/> is thrown.
+        /// </summary>
+        /// <param name="expression">The expression to check.</param>
+        /// <param name="variables">The defined variable names.</param>
+        public void Validate(string expression, IList<string> variables)
+        {
+            var ast = BuildAbstractSyntaxTree(expression, ConstantRegistry, optimizerEnabled, true);
+            variableValidator.Validate(ast, variables);
         }
 
         private void RegisterDefaultFunctions()
