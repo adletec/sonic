@@ -283,8 +283,9 @@ namespace Adletec.Sonic.Parsing
             var functionName = (string)functionToken.Value;
             FunctionInfo functionInfo = functionRegistry.GetFunctionInfo(functionName);
 
+            var dynamicFunctionArgumentCount = dynamicFunctionArgumentCountStack.Pop();
             int actualParameterCount = functionInfo.IsDynamicFunc
-                ? dynamicFunctionArgumentCountStack.Pop()
+                ? dynamicFunctionArgumentCount
                 : functionInfo.NumberOfParameters;
 
             var operations = new List<Operation>();

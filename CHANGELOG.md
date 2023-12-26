@@ -1,4 +1,10 @@
 # Changelog
+## 1.4.1 (XXXX-XX-XX)
+### Summary
+
+### Bugfix
+- Fixes #42, in which nested functions could lead to InvalidOperationException if the outer function is a dynamic function and the inner function is a static function.
+
 ## 1.4.0 (2023-11-28)
 ### Summary
 This release contains an addition to the validation introduced in 1.3.0.
