@@ -26,12 +26,14 @@ which can be defined at runtime.
 Consider this example:
 
 ```csharp
+var expression = "var1*var2";
+
 var variables = new Dictionary<string, double>();
 variables.Add("var1", 2.5);
 variables.Add("var2", 3.4);
 
 var engine = Evaluator.CreateWithDefaults();
-double result = engine.Evaluate("var1*var2", variables); // 8.5
+double result = engine.Evaluate(expression, variables); // 8.5
 ```
 
 The Evaluator comes with out-of-the-box support for many arithmetic (`+`, `-`, `*`, `/`, `...`),
