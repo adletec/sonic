@@ -1,5 +1,6 @@
 # sonic | rapid expression evaluation for .NET
 [![Build status](https://github.com/adletec/jace/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/adletec/jace/actions/workflows/dotnet.yml?query=branch%3Amain) ![Build status](https://github.com/adletec/jace/actions/workflows/release.yml/badge.svg?branch=release) [![codecov](https://codecov.io/gh/adletec/sonic/graph/badge.svg?token=BEYRTHQIGT)](https://codecov.io/gh/adletec/sonic) ![Nuget](https://img.shields.io/nuget/v/Adletec.Sonic)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fadletec%2Fsonic.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fadletec%2Fsonic?ref=badge_shield)
 
 _sonic_ is a rapid evaluation engine for mathematical expressions. It can parse and evaluate strings containing
 mathematical expressions.
@@ -500,3 +501,7 @@ or even maintainability benefit from a newer target framework. At the moment, th
 illustrates the AST derived from it. This is a cross-platform version of the same demo, built using Avalonia UI. It's a
 nice little thing if you want to get a better understanding of what _sonic_ does internally. It's not a good example of
 how to use _sonic_, though. If you want to see a lot of usage examples, take a look at the tests.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fadletec%2Fsonic.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fadletec%2Fsonic?ref=badge_large)
