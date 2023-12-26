@@ -26,12 +26,14 @@ which can be defined at runtime.
 Consider this example:
 
 ```csharp
+var expression = "var1*var2";
+
 var variables = new Dictionary<string, double>();
 variables.Add("var1", 2.5);
 variables.Add("var2", 3.4);
 
 var engine = Evaluator.CreateWithDefaults();
-double result = engine.Evaluate("var1*var2", variables); // 8.5
+double result = engine.Evaluate(expression, variables); // 8.5
 ```
 
 The Evaluator comes with out-of-the-box support for many arithmetic (`+`, `-`, `*`, `/`, `...`),
@@ -77,7 +79,7 @@ details and a complete list.
 _sonic_ is available via [nuget](https://www.nuget.org/packages/Adletec.Sonic):
 
 ```bash
-dotnet add package Adletec.Sonic --version 1.4.0
+dotnet add package Adletec.Sonic --version 1.4.1
 ```
 
 ## Usage
@@ -89,12 +91,14 @@ dotnet add package Adletec.Sonic --version 1.4.0
 The easiest way to evaluate an expression is to use the `Evaluate()`-method of the `Evaluator`:
 
 ```csharp
+var expression = "var1*var2";
+
 Dictionary<string, double> variables = new Dictionary<string, double>();
 variables.Add("var1", 2.5);
 variables.Add("var2", 3.4);
 
 var engine = Evaluator.CreateWithDefaults();
-double result = engine.Evaluate("var1*var2", variables);
+double result = engine.Evaluate(expression, variables);
 ```
 
 #### Create a Delegate for an Expression
@@ -103,8 +107,10 @@ _sonic_ can also create a [delegate (Func)](https://learn.microsoft.com/en-us/do
 from your expression which will take the variable dictionary as argument:
 
 ```csharp
+var expression = "var1+2/(3*otherVariable)";
+
 var engine = Evaluator.CreateWithDefaults();
-Func<Dictionary<string, double>, double> evaluate = engine.CreateDelegate("var1+2/(3*otherVariable)");
+Func<Dictionary<string, double>, double> evaluate = engine.CreateDelegate(expression);
 
 Dictionary<string, double> variables = new Dictionary<string, double>();
 variables.Add("var1", 2);
@@ -122,12 +128,14 @@ is no performance benefit in using this method if you are only evaluating the ex
 You can also use mathematical functions in your expressions:
 
 ```csharp
+var expression = "logn(var1,var2)+4";
+
 Dictionary<string, double> variables = new Dictionary<string, double>();
 variables.Add("var1", 2.5);
 variables.Add("var2", 3.4);
 
 var engine = Evaluator.CreateWithDefaults();
-double result = engine.Evaluate("logn(var1,var2)+4", variables);
+double result = engine.Evaluate(expression, variables);
 ```
 
 #### Built-in Functions

@@ -44,7 +44,7 @@ namespace Adletec.Sonic.Execution
             {
                 return variables =>
                 {
-                    variables = EngineUtil.ConvertVariableNamesToLowerCase(variables);
+                    variables = EngineUtil.ConvertToCaseInsensitiveDictionary(variables);
                     VariableVerifier.VerifyVariableNames(variables, constantRegistry, functionRegistry);
                     return Execute(operation, functionRegistry, constantRegistry, variables);
                 };
@@ -52,7 +52,7 @@ namespace Adletec.Sonic.Execution
 
             return variables =>
             {
-                variables = EngineUtil.ConvertVariableNamesToLowerCase(variables);
+                variables = EngineUtil.ConvertToCaseInsensitiveDictionary(variables);
                 return Execute(operation, functionRegistry, constantRegistry, variables);
             };
         }

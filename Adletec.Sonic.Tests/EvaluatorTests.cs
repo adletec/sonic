@@ -1682,6 +1682,19 @@ public class EvaluatorTests
             engine.Validate(expression, variables)
         );
     }
+    
+    // Issue #42
+    [TestMethod]
+    public void TestStaticFuncInDynamicFunc()
+    {
+        var engine = SonicEngines.Interpreted();
+        var expression = "min(if(a==1, 2, 3))";
+        var variables = new List<string> { "a" };
+        engine.Validate(expression, variables);
+        
+        // assert "does not throw an exception"
+        Assert.IsTrue(true);
+    }
 }
 
 internal static class SonicEngines
