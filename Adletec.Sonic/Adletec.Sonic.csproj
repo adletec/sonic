@@ -4,6 +4,7 @@
     <Title>adletec sonic</Title>
     <PackageId>Adletec.Sonic</PackageId>
     <PackageVersion>1.4.1</PackageVersion>
+    <PackageIcon>adletec_sonic_logo_64x64.png</PackageIcon>
     <Authors>Florian Engel, Pieter de Rycke</Authors>
     <Company>adletec Software Engineering</Company>
     <Product>sonic</Product>
@@ -19,5 +20,6 @@
   </PropertyGroup>
   <ItemGroup>
 	  <None Include="..\README.md" Pack="true" PackagePath="\"/>
+	  <None Include="..\.resources\adletec_sonic_logo_64x64.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 </Project>
