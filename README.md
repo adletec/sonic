@@ -1,4 +1,4 @@
-# <img alt="Our beautiful sonic logo" src=".resources/adletec_sonic_logo_64x64.png" width="32"/>sonic | rapid expression evaluation for .NET
+# <img alt="Our beautiful sonic logo" src=".resources/adletec_sonic_logo_64x64.png" width="24"/> sonic | rapid expression evaluation for .NET
 [![Build status](https://github.com/adletec/jace/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/adletec/jace/actions/workflows/dotnet.yml?query=branch%3Amain) ![Build status](https://github.com/adletec/jace/actions/workflows/release.yml/badge.svg?branch=release) [![codecov](https://codecov.io/gh/adletec/sonic/graph/badge.svg?token=BEYRTHQIGT)](https://codecov.io/gh/adletec/sonic) ![Nuget](https://img.shields.io/nuget/v/Adletec.Sonic)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fadletec%2Fsonic.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fadletec%2Fsonic?ref=badge_shield)
 
