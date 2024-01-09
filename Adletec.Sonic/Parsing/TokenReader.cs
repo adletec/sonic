@@ -258,6 +258,7 @@ namespace Adletec.Sonic.Parsing
                             var nextCharIndex = i + 1;
                             while (nextCharIndex < characters.Length && characters[nextCharIndex] != '\'')
                             {
+                                // skip the opening quote
                                 buffer += characters[++i];
                                 nextCharIndex = i + 1;
                             }
