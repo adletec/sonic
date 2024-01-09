@@ -251,6 +251,44 @@ namespace Adletec.Sonic.Parsing
                             else
                                 throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", expression, i, characters[i].ToString());
                             break;
+                        case '\'':
+                            var buffer = "'";
+                            var startPosition = i;
+
+                            var nextCharIndex = i + 1;
+                            while (nextCharIndex < characters.Length)
+                            {
+                                buffer += characters[++i];
+                                nextCharIndex = i + 1;
+                                if (characters[i] == '\'') break;
+                            }
+                            if (nextCharIndex == characters.Length && characters[i] != '\'')
+                                throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", expression, i, characters[i].ToString());
+
+                            // exclusive end (the first char after the token)
+                            var textTokenEnd = nextCharIndex;
+
+                            // Find next non-whitespace character index, so we can check if it is an opening parenthesis
+                            // which would make our text token to a function.
+                            while (characters.Length > nextCharIndex && char.IsWhiteSpace(characters[nextCharIndex]))
+                            {
+                                nextCharIndex++;
+                            }
+                            
+                            if (characters.Length > nextCharIndex && characters[nextCharIndex] == '(')
+                            {
+                                // We know the next token already, so we can process it and set the index accordingly
+                                i = nextCharIndex;
+                                tokens.Add(new Token { TokenType = TokenType.Function, Value = buffer, StartPosition = startPosition, Length = textTokenEnd - startPosition });
+                                tokens.Add(new Token { TokenType = TokenType.LeftParenthesis, Value = '(', StartPosition = i, Length = 1 });
+                                isFormulaSubPart = true;
+                                continue;
+                            }
+
+                            tokens.Add(new Token { TokenType = TokenType.Symbol, Value = buffer, StartPosition = startPosition, Length = textTokenEnd - startPosition });
+                            isFormulaSubPart = false;
+
+                            continue;
                         default:
                             throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", expression, i, characters[i].ToString());
                     }
