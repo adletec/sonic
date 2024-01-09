@@ -1731,6 +1731,22 @@ public class EvaluatorTests
         // assert "does not throw an exception"
         Assert.IsTrue(true);
     }
+    
+    // Issue #45
+    [TestMethod]
+    public void TestQuotedStringExpression()
+    {
+        var engine = SonicBuilders.Interpreted()
+            .AddFunction("'!@#$%^&*()_-+=[] {}|\\;:,.<>/?'", () => 4)
+            .AddConstant("'bar baz'", 5)
+            .Build();
+        
+        var expression = "'foo bar' + '!@#$%^&*()_-+=[] {}|\\;:,.<>/?'() + 'bar baz'";
+        var variables = new Dictionary<string, double> { {"'foo bar'", 3} };
+        
+        var result = engine.Evaluate(expression, variables);
+        Assert.AreEqual(12, result);
+    }
 }
 
 internal static class SonicEngines
