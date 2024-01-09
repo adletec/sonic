@@ -252,21 +252,23 @@ namespace Adletec.Sonic.Parsing
                                 throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", expression, i, characters[i].ToString());
                             break;
                         case '\'':
-                            var buffer = "'";
+                            var buffer = "";
                             var startPosition = i;
 
                             var nextCharIndex = i + 1;
-                            while (nextCharIndex < characters.Length)
+                            while (nextCharIndex < characters.Length && characters[nextCharIndex] != '\'')
                             {
                                 buffer += characters[++i];
                                 nextCharIndex = i + 1;
-                                if (characters[i] == '\'') break;
                             }
-                            if (nextCharIndex == characters.Length && characters[i] != '\'')
+                            if (nextCharIndex == characters.Length)
                                 throw new MissingQuoteParseException($"Missing corresponding quote to quote sign at position {i}.", expression, i);
 
-                            // exclusive end (the first char after the token)
-                            var textTokenEnd = nextCharIndex;
+                            // skip the closing quote
+                            i++;
+                            
+                            // exclusive end (the first char after the token and its closing quote)
+                            var textTokenEnd = ++nextCharIndex;
 
                             // Find next non-whitespace character index, so we can check if it is an opening parenthesis
                             // which would make our text token to a function.
@@ -297,7 +299,7 @@ namespace Adletec.Sonic.Parsing
 
             return tokens;
         }
-
+        
         private bool IsPartOfNumeric(char character, bool isFirstCharacter, bool afterMinus, bool isFormulaSubPart)
         {
             return character == decimalSeparator || (character >= '0' && character <= '9') || (isFormulaSubPart && isFirstCharacter && character == '-') || (!isFirstCharacter && !afterMinus && character == 'e') || (!isFirstCharacter && character == 'E');

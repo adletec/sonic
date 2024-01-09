@@ -771,7 +771,7 @@ public class TokenReaderTests
         Assert.AreEqual(5, tokens.Count);
 
         Assert.AreEqual(TokenType.Symbol, tokens[0].TokenType);
-        Assert.AreEqual("'foo bar baz'", tokens[0].Value);
+        Assert.AreEqual("foo bar baz", tokens[0].Value);
         Assert.AreEqual(0, tokens[0].StartPosition);
         Assert.AreEqual(13, tokens[0].Length);
 
@@ -779,7 +779,7 @@ public class TokenReaderTests
         Assert.AreEqual(14, tokens[1].StartPosition);
         Assert.AreEqual(1, tokens[1].Length);
 
-        Assert.AreEqual("'foobar baz'", tokens[2].Value);
+        Assert.AreEqual("foobar baz", tokens[2].Value);
         Assert.AreEqual(TokenType.Function, tokens[2].TokenType);
         Assert.AreEqual(16, tokens[2].StartPosition);
         Assert.AreEqual(12, tokens[2].Length);
