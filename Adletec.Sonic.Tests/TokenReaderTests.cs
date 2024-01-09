@@ -54,15 +54,15 @@ public class TokenReaderTests
         Assert.AreEqual(42, tokens[1].Value);
         Assert.AreEqual(1, tokens[1].StartPosition);
         Assert.AreEqual(2, tokens[1].Length);
-            
+
         Assert.AreEqual('+', tokens[2].Value);
         Assert.AreEqual(3, tokens[2].StartPosition);
         Assert.AreEqual(1, tokens[2].Length);
-            
+
         Assert.AreEqual(31, tokens[3].Value);
         Assert.AreEqual(4, tokens[3].StartPosition);
         Assert.AreEqual(2, tokens[3].Length);
-            
+
         Assert.AreEqual(')', tokens[4].Value);
         Assert.AreEqual(6, tokens[4].StartPosition);
         Assert.AreEqual(1, tokens[4].Length);
@@ -100,7 +100,7 @@ public class TokenReaderTests
         List<Token> tokens = reader.Read("(42+ 8) *2");
 
         Assert.AreEqual(7, tokens.Count);
-            
+
         Assert.AreEqual('(', tokens[0].Value);
         Assert.AreEqual(0, tokens[0].StartPosition);
         Assert.AreEqual(1, tokens[0].Length);
@@ -141,7 +141,7 @@ public class TokenReaderTests
         Assert.AreEqual('(', tokens[0].Value);
         Assert.AreEqual(0, tokens[0].StartPosition);
         Assert.AreEqual(1, tokens[0].Length);
-            
+
         Assert.AreEqual(42.87, tokens[1].Value);
         Assert.AreEqual(1, tokens[1].StartPosition);
         Assert.AreEqual(5, tokens[1].Length);
@@ -200,7 +200,7 @@ public class TokenReaderTests
         List<Token> tokens = reader.Read("varb(");
 
         Assert.AreEqual(2, tokens.Count);
-            
+
         Assert.AreEqual("varb", tokens[0].Value);
         Assert.AreEqual(0, tokens[0].StartPosition);
         Assert.AreEqual(4, tokens[0].Length);
@@ -284,7 +284,7 @@ public class TokenReaderTests
         Assert.AreEqual('_', tokens[0].Value);
         Assert.AreEqual(0, tokens[0].StartPosition);
         Assert.AreEqual(1, tokens[0].Length);
-        
+
         Assert.AreEqual(2.1, tokens[1].Value);
         Assert.AreEqual(1, tokens[1].StartPosition);
         Assert.AreEqual(3, tokens[1].Length);
@@ -326,7 +326,7 @@ public class TokenReaderTests
         Assert.AreEqual('*', tokens[1].Value);
         Assert.AreEqual(1, tokens[1].StartPosition);
         Assert.AreEqual(1, tokens[1].Length);
-        
+
         Assert.AreEqual('_', tokens[2].Value);
         Assert.AreEqual(2, tokens[2].StartPosition);
         Assert.AreEqual(1, tokens[2].Length);
@@ -359,7 +359,7 @@ public class TokenReaderTests
         Assert.AreEqual('_', tokens[3].Value);
         Assert.AreEqual(3, tokens[3].StartPosition);
         Assert.AreEqual(1, tokens[3].Length);
-        
+
         Assert.AreEqual(2, tokens[4].Value);
         Assert.AreEqual(4, tokens[4].StartPosition);
         Assert.AreEqual(1, tokens[4].Length);
@@ -484,7 +484,7 @@ public class TokenReaderTests
         List<Token> tokens = reader.Read("2.11E-3");
 
         Assert.AreEqual(1, tokens.Count);
-            
+
         Assert.AreEqual(2.11E-3, tokens[0].Value);
         Assert.AreEqual(0, tokens[0].StartPosition);
         Assert.AreEqual(7, tokens[0].Length);
@@ -623,6 +623,7 @@ public class TokenReaderTests
         Assert.AreEqual(5, tokens[5].StartPosition);
         Assert.AreEqual(1, tokens[5].Length);
     }
+
     [TestMethod]
     public void TestTokenReader28()
     {
@@ -721,7 +722,7 @@ public class TokenReaderTests
         Assert.AreEqual(2, tokens[2].StartPosition);
         Assert.AreEqual(1, tokens[2].Length);
     }
-    
+
     [TestMethod]
     public void TestTokenReader35()
     {
@@ -751,7 +752,7 @@ public class TokenReaderTests
             List<Token> tokens = reader.Read("3e");
         });
     }
-    
+
     [TestMethod]
     public void TestArgumentSeparatorCollidesWithDecimalSeparator()
     {
@@ -760,7 +761,7 @@ public class TokenReaderTests
             var _ = new TokenReader(CultureInfo.GetCultureInfo("de-DE"), ',');
         });
     }
-    
+
     [TestMethod]
     public void TestQuotedStringVariableName()
     {
@@ -782,15 +783,22 @@ public class TokenReaderTests
         Assert.AreEqual(TokenType.Function, tokens[2].TokenType);
         Assert.AreEqual(16, tokens[2].StartPosition);
         Assert.AreEqual(12, tokens[2].Length);
-        
+
         Assert.AreEqual(TokenType.LeftParenthesis, tokens[3].TokenType);
         Assert.AreEqual(28, tokens[3].StartPosition);
         Assert.AreEqual(1, tokens[3].Length);
-        
+
         Assert.AreEqual(TokenType.RightParenthesis, tokens[4].TokenType);
         Assert.AreEqual(29, tokens[4].StartPosition);
         Assert.AreEqual(1, tokens[4].Length);
     }
 
-    
+    [TestMethod]
+    public void TestMissingQuoteInQuotedStringVariableName()
+    {
+        TokenReader reader = new TokenReader();
+        Assert.ThrowsException<MissingQuoteParseException>(() =>
+            reader.Read("'foo bar baz' + 'foobar baz()")
+        );
+    }
 }
