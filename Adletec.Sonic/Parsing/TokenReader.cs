@@ -263,7 +263,7 @@ namespace Adletec.Sonic.Parsing
                                 if (characters[i] == '\'') break;
                             }
                             if (nextCharIndex == characters.Length && characters[i] != '\'')
-                                throw new InvalidTokenParseException($"Invalid token \"{characters[i]}\" detected at position {i}.", expression, i, characters[i].ToString());
+                                throw new MissingQuoteParseException($"Missing corresponding quote to quote sign at position {i}.", expression, i);
 
                             // exclusive end (the first char after the token)
                             var textTokenEnd = nextCharIndex;

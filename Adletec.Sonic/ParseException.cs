@@ -123,4 +123,18 @@ namespace Adletec.Sonic
             Operator = @operator;
         }
     }
+    
+    /// <summary>
+    /// This exception is thrown if there is no corresponding "'" for another "'" encountered during parsing.
+    /// </summary>
+    public class MissingQuoteParseException : ParseException
+    {
+        public int QuotePosition { get; }
+
+        public MissingQuoteParseException(string message, string expression, int quotePosition)
+            : base(message, expression)
+        {
+            QuotePosition = quotePosition;
+        }
+    }
 }
