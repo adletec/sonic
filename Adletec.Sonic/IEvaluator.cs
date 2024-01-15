@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Adletec.Sonic.Execution;
+using Adletec.Sonic.Operations;
 
 namespace Adletec.Sonic
 {
@@ -90,5 +91,13 @@ namespace Adletec.Sonic
         /// <exception cref="MissingOperandParseException">If a binary operation is missing an operand.</exception>
         /// <exception cref="VariableNotDefinedException">If a variable necessary for evaluation is missing.</exception>
         void Validate(string expression, IList<string> variables);
+
+        /// <summary>
+        /// Build the abstract syntax tree for a given formula. The formula string will
+        /// be first tokenized.
+        /// </summary>
+        /// <param name="expression">A string containing the mathematical expression to be parsed.</param>
+        /// <returns>The abstract syntax tree of the expression.</returns>
+        Operation BuildAbstractSyntaxTree(string expression);
     }
 }

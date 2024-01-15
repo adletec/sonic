@@ -231,6 +231,23 @@ namespace Adletec.Sonic
         /// be first tokenized.
         /// </summary>
         /// <param name="expression">A string containing the mathematical expression to be parsed.</param>
+        /// <returns>The abstract syntax tree of the expression.</returns>
+        public Operation BuildAbstractSyntaxTree(string expression)
+        {
+            if (string.IsNullOrEmpty(expression))
+                throw new ArgumentNullException(nameof(expression));
+
+            return BuildAbstractSyntaxTree(
+                expression,
+                optimizerEnabled,
+                validationEnabled);
+        }
+
+        /// <summary>
+        /// Build the abstract syntax tree for a given formula. The formula string will
+        /// be first tokenized.
+        /// </summary>
+        /// <param name="expression">A string containing the mathematical expression to be parsed.</param>
         /// <param name="compiledConstants">The constants which are to be available in the given formula.</param>
         /// <param name="optimize">If the abstract syntax tree should be optimized.</param>
         /// <param name="validate">If the expression should be checked for syntax errors.</param>
