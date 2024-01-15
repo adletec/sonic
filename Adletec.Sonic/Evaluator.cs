@@ -153,7 +153,7 @@ namespace Adletec.Sonic
                 return result;
             }
 
-            Operation operation = BuildAbstractSyntaxTree(expression, ConstantRegistry, optimizerEnabled, validationEnabled);
+            Operation operation = BuildAbstractSyntaxTree(expression, optimizerEnabled, validationEnabled);
             return BuildEvaluator(expression, operation);
         }
 
@@ -163,7 +163,7 @@ namespace Adletec.Sonic
         /// <param name="expression">The expression to check.</param>
         public void Validate(string expression)
         {
-            BuildAbstractSyntaxTree(expression, ConstantRegistry, false, true);
+            BuildAbstractSyntaxTree(expression, false, true);
         }
         
         /// <summary>
@@ -175,7 +175,7 @@ namespace Adletec.Sonic
         /// <param name="variables">The defined variable names.</param>
         public void Validate(string expression, IList<string> variables)
         {
-            var ast = BuildAbstractSyntaxTree(expression, ConstantRegistry, optimizerEnabled, true);
+            var ast = BuildAbstractSyntaxTree(expression, optimizerEnabled, true);
             variableValidator.Validate(ast, variables);
         }
 
@@ -235,7 +235,7 @@ namespace Adletec.Sonic
         /// <param name="optimize">If the abstract syntax tree should be optimized.</param>
         /// <param name="validate">If the expression should be checked for syntax errors.</param>
         /// <returns>The abstract syntax tree of the expression.</returns>
-        private Operation BuildAbstractSyntaxTree(string expression, IConstantRegistry compiledConstants, bool optimize, bool validate)
+        private Operation BuildAbstractSyntaxTree(string expression, bool optimize, bool validate)
         {
             List<Token> tokens = tokenReader.Read(expression);
             if (validate)
@@ -243,11 +243,11 @@ namespace Adletec.Sonic
                 expressionValidator.Validate(tokens, expression);
             }
             
-            var astBuilder = new AstBuilder(FunctionRegistry, compiledConstants);
+            var astBuilder = new AstBuilder(FunctionRegistry, ConstantRegistry);
             Operation operation = astBuilder.Build(tokens);
 
             return optimize
-                ? optimizer.Optimize(operation, this.FunctionRegistry, this.ConstantRegistry)
+                ? optimizer.Optimize(operation, FunctionRegistry, ConstantRegistry)
                 : operation;
         }
         
