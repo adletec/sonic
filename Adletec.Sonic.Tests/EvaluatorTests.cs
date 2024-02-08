@@ -510,6 +510,42 @@ public class EvaluatorTests
     }
 
     [TestMethod]
+    public void TestExponentiationWithPositiveExponentCompiled()
+    {
+        var engine = SonicBuilders.Compiled().Build();
+
+        double result = engine.Evaluate("2*10^2");
+        Assert.AreEqual(200.0, result);
+    }
+
+    [TestMethod]
+    public void TestExponentiationWithNegativeExponentCompiled()
+    {
+        var engine = SonicBuilders.Compiled().Build();
+
+        double result = engine.Evaluate("2*10^-2");
+        Assert.AreEqual(0.02, result);
+    }
+
+    [TestMethod]
+    public void TestExponentiationWithPositiveExponentInterpreted()
+    {
+        var engine = SonicBuilders.Interpreted().Build();
+
+        double result = engine.Evaluate("2*10^2");
+        Assert.AreEqual(200.0, result);
+    }
+
+    [TestMethod]
+    public void TestExponentiationWithNegativeExponentInterpreted()
+    {
+        var engine = SonicBuilders.Interpreted().Build();
+
+        double result = engine.Evaluate("2*10^-2");
+        Assert.AreEqual(0.02, result);
+    }
+
+    [TestMethod]
     public void TestFormulaBuilderInvalidParameterNameUnguarded()
     {
         var engine = Sonic.Evaluator.Create()
