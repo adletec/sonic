@@ -36,7 +36,7 @@ namespace Adletec.Sonic.Parsing
             operationPrecedence.Add('/', 4);
             operationPrecedence.Add('%', 4);
             operationPrecedence.Add('_', 5);
-            operationPrecedence.Add('^', 6);
+            operationPrecedence.Add('^', 5);
         }
 
         public Operation Build(IList<Token> tokens)
