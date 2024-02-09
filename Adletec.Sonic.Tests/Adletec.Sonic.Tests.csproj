@@ -1,13 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
 
     <AssemblyName>Adletec.Sonic.Tests</AssemblyName>
 
     <RootNamespace>Adletec.Sonic.Tests</RootNamespace>
+
+    <LangVersion>12</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
