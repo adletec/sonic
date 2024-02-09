@@ -1,4 +1,14 @@
 # Changelog
+## 1.5.0 (2024-02-09)
+### Summary
+This release contains quoted string support and a fix for a bug in the operator precedence.
+
+### Features
+- Add support for quoted strings. Quoted strings can be used as symbol or function names in expressions. They can contain any character apart from the quotation delimiter (`'`), including white-spaces and special characters. To use a quoted string, simply enclose the string in single quotes. E.g.: `var expression = "a + 'b c'"`.
+
+### Bugfix
+- Fixes #49, in which a negative exponent was not correctly handled. This was due to a bug in the operator precedence, which evaluated the exponentiation operator before the unary minus operator of the exponent. The unary minus has now the same precedence as the exponentiation operator, which resolves the issue. Thanks to @FabianNitsche for the fix.
+
 ## 1.4.1 (2023-12-26)
 ### Summary
 This is a bugfix release to address an issue with nested functions.
