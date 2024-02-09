@@ -146,6 +146,7 @@ double result = engine.Evaluate(expression, variables); // 3.4
 
 > [!CAUTION]
 > You might want to use this feature to allow the usage of arbitrary token names from external sources in your application, e.g. from user input. Be aware that _sonic_ won't sanitize the input or token names in any way. This means that defining an expression with user defined token names (e.g. `var expression = $"1234 + '{tokenFromUserInput}'";`) will allow the user to inject arbitrary code into your expression.
+>
 > In other words, **don't use user input as token names, if you don't want them to manipulate your expression**.
 
 
