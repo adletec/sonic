@@ -263,7 +263,7 @@ namespace Adletec.Sonic.Parsing
                                 nextCharIndex = i + 1;
                             }
                             if (nextCharIndex == characters.Length)
-                                throw new MissingQuoteParseException($"Missing corresponding quote to quote sign at position {i}.", expression, i);
+                                throw new MissingQuoteParseException($"Missing corresponding quote to quote sign at position {startPosition}.", expression, startPosition);
 
                             // skip the closing quote
                             i++;

@@ -797,8 +797,16 @@ public class TokenReaderTests
     public void TestMissingQuoteInQuotedStringVariableName()
     {
         TokenReader reader = new TokenReader();
-        Assert.ThrowsException<MissingQuoteParseException>(() =>
-            reader.Read("'foo bar baz' + 'foobar baz()")
-        );
+        try
+        {
+            reader.Read("'foo bar baz' + 'foobar baz()");
+
+        }
+        catch (MissingQuoteParseException e)
+        {
+            Assert.AreEqual(16, e.QuotePosition);
+            return;
+        }
+        Assert.Fail("Expected MissingQuoteParseException");
     }
 }
