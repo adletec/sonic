@@ -1718,7 +1718,7 @@ public class EvaluatorTests
             engine.Validate(expression, variables)
         );
     }
-    
+
     // Issue #42
     [TestMethod]
     public void TestStaticFuncInDynamicFunc()
@@ -1727,9 +1727,41 @@ public class EvaluatorTests
         var expression = "min(if(a==1, 2, 3))";
         var variables = new List<string> { "a" };
         engine.Validate(expression, variables);
-        
+
         // assert "does not throw an exception"
         Assert.IsTrue(true);
+    }
+
+    // Issue #45
+    [TestMethod]
+    public void TestQuotedStringExpression()
+    {
+        var engine = SonicBuilders.Interpreted()
+            .AddFunction("!@#$%^&*()_-+=[] {}|\\;:,.<>/?", () => 4)
+            .AddConstant("bar baz", 5)
+            .Build();
+
+        var expression = "'foo bar' + '!@#$%^&*()_-+=[] {}|\\;:,.<>/?'() + 'bar baz'";
+        var variables = new Dictionary<string, double> { { "foo bar", 3 } };
+
+        var result = engine.Evaluate(expression, variables);
+        Assert.AreEqual(12, result);
+    }
+
+    [TestMethod]
+    public void TestQuotedAndUnquotedStringExpression()
+    {
+        // Validate that 
+        var engine = SonicBuilders.Interpreted()
+            .AddFunction("a", () => 4)
+            .AddConstant("b", 5)
+            .Build();
+
+        var expression = "'a'() + 'b' + 'c'";
+        var variables = new Dictionary<string, double> { { "c", 3 } };
+
+        var result = engine.Evaluate(expression, variables);
+        Assert.AreEqual(12, result);
     }
 }
 
