@@ -157,20 +157,20 @@ _sonic_ supports a wide range of operators, including simple Boolean logic:
 
 | Operator | Operation | Usage                    | Parameters                              |
 |----------|-----------|--------------------------|-----------------------------------------|
-| +        | a + b     | Addition                 | `a`: first summand, `b`: second summand |
-| -        | a - b     | Subtraction              | `a`: minuend, `b`: subtrahend           |
-| *        | a * b     | Multiplication           | `a`: first factor, `b`: second factor   |
-| /        | a / b     | Division                 | `a`: dividend, `b`: divisor             |
-| %        | a % b     | Modulo                   | `a`: dividend, `b`: divisor             |
-| ^        | a ^ b     | Exponentiation           | `a`: base, `b`: exponent                |
-| ==       | a == b    | Equality                 | `a`: first value, `b`: second value     |
-| !=       | a != b    | Inequality               | `a`: first value, `b`: second value     |
-| \<       | a < b     | Less than                | `a`: first value, `b`: second value     |
-| \<=      | a <= b    | Less than or equal to    | `a`: first value, `b`: second value     |
-| \>       | a > b     | Greater than             | `a`: first value, `b`: second value     |
-| \>=      | a >= b    | Greater than or equal to | `a`: first value, `b`: second value     |
-| &&       | a && b    | Logical AND              | `a`: first value, `b`: second value     |
-| \|\|     | a \|\| b  | Logical OR               | `a`: first value, `b`: second value     |
+| `+`        | `a + b`   | Addition                 | `a`: first summand, `b`: second summand |
+| `-`        | `a - b`   | Subtraction              | `a`: minuend, `b`: subtrahend           |
+| `*`        | `a * b`   | Multiplication           | `a`: first factor, `b`: second factor   |
+| `/`        | `a / b`   | Division                 | `a`: dividend, `b`: divisor             |
+| `%`        | `a % b`   | Modulo                   | `a`: dividend, `b`: divisor             |
+| `^`        | `a ^ b`   | Exponentiation           | `a`: base, `b`: exponent                |
+| `==`       | `a == b`  | Equality                 | `a`: first value, `b`: second value     |
+| `!=`       | `a != b`  | Inequality               | `a`: first value, `b`: second value     |
+| `<`       | `a < b`   | Less than                | `a`: first value, `b`: second value     |
+| `<=`      | `a <= b`  | Less than or equal to    | `a`: first value, `b`: second value     |
+| `>`       | `a > b`   | Greater than             | `a`: first value, `b`: second value     |
+| `>=`      | `a >= b`  | Greater than or equal to | `a`: first value, `b`: second value     |
+| `&&`       | `a && b`  | Logical AND              | `a`: first value, `b`: second value     |
+| `\|\|`     | `a \|\| b` | Logical OR               | `a`: first value, `b`: second value     |
 
 Boolean operators will return `1` if the condition is true and `0` if it is false. As input parameters, they accept
 any numeric value, which will be interpreted as `true` if it is not `0` and `false` if it is `0`.
