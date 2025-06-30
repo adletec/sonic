@@ -517,7 +517,7 @@ Your contributions are welcome. To streamline the process, take note of the foll
 ## FAQ
 
 **Q:** Why is the main project still on .NET Standard 2.0?<br/>
-**A:** This is the [offically recommended](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-1-0#when-to-target-netx0-vs-netstandard) target version for reusable libraries aiming to maximimze compatibility. However, the build uses multi-targeting and is also targeting .NET6 and 8 directly, so there is no drawback for users on modern platforms.
+**A:** This is the [offically recommended](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-1-0#when-to-target-netx0-vs-netstandard) target version for reusable libraries aiming to maximimze compatibility. However, the build uses multi-targeting and is also targeting .NET6 directly, so there is no drawback for users on modern platforms.
 
 **Q:** What is the purpose of demo application in the solution?<br/>
 **A:** The original _Jace.NET_ contained a demo application just like this. It shows how an expression is parsed and
