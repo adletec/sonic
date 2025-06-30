@@ -269,6 +269,11 @@ double result = engine.Evaluate("customSum(1,2,3,4,5,6)"); // 21.0
 
 Custom function names are overridable, so you can re-register the same name with a different implementation.
 
+> [!NOTE]
+> You can also use custom functions to override the NaN or Infinity calculation behavior. Example: creating a custom function `isNaN()` which
+> returns `1` if the input is `NaN` and `0` otherwise allows you to use it in your expressions to check for NaN values.
+> `if(isNaN(var1), 0, var1)` will return `0` if `var1` is `NaN`, otherwise it will return the value of `var1`.
+
 ### Using Constants
 
 _sonic_ provides support for pre-compile constants. These constants are taken into account during the optimization phase
@@ -299,6 +304,10 @@ double result = engine.Evaluate("g*2"); // 19.6133
 ```
 
 Custom constants will also be taken into account during the optimization phase of the compilation process.
+
+> [!NOTE]
+> You can also use custom constants to handle NaN or Infinity values. 
+> For example, you can define a constant `NaN` with the value `double.NaN` and use it in your expressions.
 
 ### Validation
 
