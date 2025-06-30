@@ -94,7 +94,7 @@ The easiest way to evaluate an expression is to use the `Evaluate()`-method of t
 ```csharp
 var expression = "var1*var2";
 
-Dictionary<string, double> variables = new Dictionary<string, double>();
+var variables = new Dictionary<string, double>();
 variables.Add("var1", 2.5);
 variables.Add("var2", 3.4);
 
@@ -113,7 +113,7 @@ var expression = "var1+2/(3*otherVariable)";
 var engine = Evaluator.CreateWithDefaults();
 Func<Dictionary<string, double>, double> evaluate = engine.CreateDelegate(expression);
 
-Dictionary<string, double> variables = new Dictionary<string, double>();
+var variables = new Dictionary<string, double>();
 variables.Add("var1", 2);
 variables.Add("otherVariable", 4.2);
 	
@@ -138,9 +138,12 @@ Be aware that the quotation is not part of the token name, so `sin('x')` and `si
 
 ```csharp
 var expression = "sin('x') + 'my variable'";
-Dictionary<string, double> variables = new Dictionary<string, double>();
+
+var variables = new Dictionary<string, double>();
 variables.Add("x", 0);
 variables.Add("my variable", 3.4);
+
+var engine = Evaluator.CreateWithDefaults();
 double result = engine.Evaluate(expression, variables); // 3.4
 ```
 
@@ -175,7 +178,7 @@ any numeric value, which will be interpreted as `true` if it is not `0` and `fal
 ```csharp
 var expression = "var1 > var2 && var3 < 5";
 
-Dictionary<string, double> variables = new Dictionary<string, double>();
+var variables = new Dictionary<string, double>();
 variables.Add("var1", 1);
 variables.Add("var2", 2);
 variables.Add("var3", 3);
@@ -191,7 +194,7 @@ You can also use mathematical functions in your expressions:
 ```csharp
 var expression = "logn(var1,var2)+4";
 
-Dictionary<string, double> variables = new Dictionary<string, double>();
+var variables = new Dictionary<string, double>();
 variables.Add("var1", 2.5);
 variables.Add("var2", 3.4);
 
