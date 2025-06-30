@@ -187,6 +187,10 @@ var engine = Evaluator.CreateWithDefaults();
 double result = engine.Evaluate(expression, variables); // 1.0 (true)
 ```
 
+#### Scientific Notation
+You can use the scientific notation for numbers, e.g. `1.5e3` for `1500` or `2.5e-2` for `0.025`. Lower- and
+upper-case are treated equally, so `1.5E3` is equivalent to `1.5e3`.
+
 ### Using Mathematical Functions
 
 You can also use mathematical functions in your expressions:
@@ -270,7 +274,7 @@ double result = engine.Evaluate("customSum(1,2,3,4,5,6)"); // 21.0
 Custom function names are overridable, so you can re-register the same name with a different implementation.
 
 > [!NOTE]
-> You can also use custom functions to override the NaN or Infinity calculation behavior. Example: creating a custom function `isNaN()` which
+> You can also use custom functions to override the `NaN` or `Infinity` calculation behavior. Example: creating a custom function `isNaN()` which
 > returns `1` if the input is `NaN` and `0` otherwise allows you to use it in your expressions to check for NaN values.
 > `if(isNaN(var1), 0, var1)` will return `0` if `var1` is `NaN`, otherwise it will return the value of `var1`.
 
