@@ -516,11 +516,8 @@ Your contributions are welcome. To streamline the process, take note of the foll
 
 ## FAQ
 
-**Q:** Why is the main project still on .NET Standard 1.6?<br/>
-**A:** While upgrading the project to .NET 7.0 would give us access to a couple of nice language features, there is no
-real benefit for the user of the library. But if we'd upgrade, we'd also force everyone who's currently on .NET < 7.0 to
-upgrade, too - which might break their use-case. This might change in the future, if there is a significant performance
-or even maintainability benefit from a newer target framework. At the moment, this is not the case.
+**Q:** Why is the main project still on .NET Standard 2.0?<br/>
+**A:** This is the [offically recommended](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-1-0#when-to-target-netx0-vs-netstandard) target version for reusable libraries aiming to maximimze compatibility. However, the build uses multi-targeting and is also targeting .NET6 and 8 directly, so there is no drawback for users on modern platforms.
 
 **Q:** What is the purpose of demo application in the solution?<br/>
 **A:** The original _Jace.NET_ contained a demo application just like this. It shows how an expression is parsed and
