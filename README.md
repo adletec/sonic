@@ -94,7 +94,7 @@ The easiest way to evaluate an expression is to use the `Evaluate()`-method of t
 ```csharp
 var expression = "var1*var2";
 
-Dictionary<string, double> variables = new Dictionary<string, double>();
+var variables = new Dictionary<string, double>();
 variables.Add("var1", 2.5);
 variables.Add("var2", 3.4);
 
@@ -113,7 +113,7 @@ var expression = "var1+2/(3*otherVariable)";
 var engine = Evaluator.CreateWithDefaults();
 Func<Dictionary<string, double>, double> evaluate = engine.CreateDelegate(expression);
 
-Dictionary<string, double> variables = new Dictionary<string, double>();
+var variables = new Dictionary<string, double>();
 variables.Add("var1", 2);
 variables.Add("otherVariable", 4.2);
 	
@@ -138,9 +138,12 @@ Be aware that the quotation is not part of the token name, so `sin('x')` and `si
 
 ```csharp
 var expression = "sin('x') + 'my variable'";
-Dictionary<string, double> variables = new Dictionary<string, double>();
+
+var variables = new Dictionary<string, double>();
 variables.Add("x", 0);
 variables.Add("my variable", 3.4);
+
+var engine = Evaluator.CreateWithDefaults();
 double result = engine.Evaluate(expression, variables); // 3.4
 ```
 
@@ -149,6 +152,44 @@ double result = engine.Evaluate(expression, variables); // 3.4
 >
 > In other words, **don't use user input as token names, if you don't want them to manipulate your expression**.
 
+### Operators
+_sonic_ supports a wide range of operators, including simple Boolean logic:
+
+| Operator | Operation  | Usage                    | Parameters                              |
+|----------|------------|--------------------------|-----------------------------------------|
+| `+`      | `a + b`    | Addition                 | `a`: first summand, `b`: second summand |
+| `-`      | `a - b`    | Subtraction              | `a`: minuend, `b`: subtrahend           |
+| `*`      | `a * b`    | Multiplication           | `a`: first factor, `b`: second factor   |
+| `/`      | `a / b`    | Division                 | `a`: dividend, `b`: divisor             |
+| `%`      | `a % b`    | Modulo                   | `a`: dividend, `b`: divisor             |
+| `^`      | `a ^ b`    | Exponentiation           | `a`: base, `b`: exponent                |
+| `==`     | `a == b`   | Equality                 | `a`: first value, `b`: second value     |
+| `!=`     | `a != b`   | Inequality               | `a`: first value, `b`: second value     |
+| `<`      | `a < b`    | Less than                | `a`: first value, `b`: second value     |
+| `<=`     | `a <= b`   | Less than or equal to    | `a`: first value, `b`: second value     |
+| `>`      | `a > b`    | Greater than             | `a`: first value, `b`: second value     |
+| `>=`     | `a >= b`   | Greater than or equal to | `a`: first value, `b`: second value     |
+| `&&`     | `a && b`   | Logical AND              | `a`: first value, `b`: second value     |
+| `\|\|`   | `a \|\| b` | Logical OR               | `a`: first value, `b`: second value     |
+
+Boolean operators will return `1` if the condition is true and `0` if it is false. As input parameters, they accept
+any numeric value, which will be interpreted as `true` if it is not `0` and `false` if it is `0`.
+
+```csharp
+var expression = "var1 > var2 && var3 < 5";
+
+var variables = new Dictionary<string, double>();
+variables.Add("var1", 1);
+variables.Add("var2", 2);
+variables.Add("var3", 3);
+
+var engine = Evaluator.CreateWithDefaults();
+double result = engine.Evaluate(expression, variables); // 1.0 (true)
+```
+
+#### Scientific Notation
+You can use the scientific notation for numbers, e.g. `1.5e3` for `1500` or `2.5e-2` for `0.025`. Lower- and
+upper-case are treated equally, so `1.5E3` is equivalent to `1.5e3`.
 
 ### Using Mathematical Functions
 
@@ -157,7 +198,7 @@ You can also use mathematical functions in your expressions:
 ```csharp
 var expression = "logn(var1,var2)+4";
 
-Dictionary<string, double> variables = new Dictionary<string, double>();
+var variables = new Dictionary<string, double>();
 variables.Add("var1", 2.5);
 variables.Add("var2", 3.4);
 
@@ -232,6 +273,11 @@ double result = engine.Evaluate("customSum(1,2,3,4,5,6)"); // 21.0
 
 Custom function names are overridable, so you can re-register the same name with a different implementation.
 
+> [!NOTE]
+> You can also use custom functions to override the `NaN` or `Infinity` calculation behavior. Example: creating a custom function `isNaN()` which
+> returns `1` if the input is `NaN` and `0` otherwise allows you to use it in your expressions to check for NaN values.
+> `if(isNaN(var1), 0, var1)` will return `0` if `var1` is `NaN`, otherwise it will return the value of `var1`.
+
 ### Using Constants
 
 _sonic_ provides support for pre-compile constants. These constants are taken into account during the optimization phase
@@ -262,6 +308,10 @@ double result = engine.Evaluate("g*2"); // 19.6133
 ```
 
 Custom constants will also be taken into account during the optimization phase of the compilation process.
+
+> [!NOTE]
+> You can also use custom constants to handle `NaN` or `Infinity` values. 
+> For example, you can define a constant `NaN` with the value `double.NaN` and use it in your expressions.
 
 ### Validation
 
