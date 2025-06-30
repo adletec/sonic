@@ -310,7 +310,7 @@ double result = engine.Evaluate("g*2"); // 19.6133
 Custom constants will also be taken into account during the optimization phase of the compilation process.
 
 > [!NOTE]
-> You can also use custom constants to handle NaN or Infinity values. 
+> You can also use custom constants to handle `NaN` or `Infinity` values. 
 > For example, you can define a constant `NaN` with the value `double.NaN` and use it in your expressions.
 
 ### Validation
