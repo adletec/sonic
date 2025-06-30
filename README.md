@@ -149,6 +149,40 @@ double result = engine.Evaluate(expression, variables); // 3.4
 >
 > In other words, **don't use user input as token names, if you don't want them to manipulate your expression**.
 
+### Operators
+_sonic_ supports a wide range of operators, including simple Boolean logic:
+
+| Operator | Operation | Usage                                               | Parameters |
+|----------|-----------|-----------------------------------------------------|------------|
+| +        | a + b | Addition   | `a`: first summand, `b`: second summand |
+| -        | a - b | Subtraction | `a`: minuend, `b`: subtrahend |
+| *        | a * b | Multiplication | `a`: first factor, `b`: second factor |
+| /        | a / b | Division | `a`: dividend, `b`: divisor |
+| %        | a % b | Modulo | `a`: dividend, `b`: divisor |
+| ^        | a ^ b | Exponentiation | `a`: base, `b`: exponent |
+| ==       | a == b | Equality | `a`: first value, `b`: second value |
+| !=       | a != b | Inequality | `a`: first value, `b`: second value |
+| \<       | a < b | Less than | `a`: first value, `b`: second value |
+| \<=      | a <= b | Less than or equal to | `a`: first value, `b`: second value |
+| \>       | a > b | Greater than | `a`: first value, `b`: second value |
+| \>=      | a >= b | Greater than or equal to | `a`: first value, `b`: second value |
+| &&       | a && b | Logical AND | `a`: first value, `b`: second value |
+| \|\|     | a \|\| b | Logical OR | `a`: first value, `b`: second value |
+
+Boolean operators will return `1` if the condition is true and `0` if it is false. As input parameters, they accept
+any numeric value, which will be interpreted as `true` if it is not `0` and `false` if it is `0`.
+
+```csharp
+var expression = "var1 > var2 && var3 < 5";
+
+Dictionary<string, double> variables = new Dictionary<string, double>();
+variables.Add("var1", 1);
+variables.Add("var2", 2);
+variables.Add("var3", 3);
+
+var engine = Evaluator.CreateWithDefaults();
+double result = engine.Evaluate(expression, variables); // 1.0 (true)
+```
 
 ### Using Mathematical Functions
 
